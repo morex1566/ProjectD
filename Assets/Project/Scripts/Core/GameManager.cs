@@ -16,8 +16,9 @@ namespace TRPG.Runtime
         private static void OnBeforeSceneLoaded()
         {
             Init();
+
             DOTween.Init();
-            InputManager.Init();
+            InputManager.Init();     
             // NetManager.Init();
             ResourceManager.Init();
         }
@@ -26,6 +27,8 @@ namespace TRPG.Runtime
         private static void OnAfterSceneLoaded()
         {
             UIManager.Init();
+            Player.Init();
+            CreatureSelector.Init();
         }
 
         private static void Init()
