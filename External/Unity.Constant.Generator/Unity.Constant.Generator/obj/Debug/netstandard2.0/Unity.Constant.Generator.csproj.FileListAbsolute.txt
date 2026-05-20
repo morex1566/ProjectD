@@ -1,0 +1,11 @@
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\bin\Debug\netstandard2.0\Unity.Constant.Generator.deps.json
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\bin\Debug\netstandard2.0\Unity.Constant.Generator.dll
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\bin\Debug\netstandard2.0\Unity.Constant.Generator.pdb
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\obj\Debug\netstandard2.0\Unity.Constant.Generator.csproj.AssemblyReference.cache
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\obj\Debug\netstandard2.0\Unity.Constant.Generator.GeneratedMSBuildEditorConfig.editorconfig
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\obj\Debug\netstandard2.0\Unity.Constant.Generator.AssemblyInfoInputs.cache
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\obj\Debug\netstandard2.0\Unity.Constant.Generator.AssemblyInfo.cs
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\obj\Debug\netstandard2.0\Unity.Constant.Generator.csproj.CoreCompileInputs.cache
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\obj\Debug\netstandard2.0\Unity.Constant.Generator.sourcelink.json
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\obj\Debug\netstandard2.0\Unity.Constant.Generator.dll
+D:\Devs\us2d_client\External\Unity.Constant.Generator\Unity.Constant.Generator\obj\Debug\netstandard2.0\Unity.Constant.Generator.pdb

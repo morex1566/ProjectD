@@ -13,11 +13,17 @@ namespace TRPG.Runtime
         private Rect lastSafeArea;
         private Vector2Int lastScreenSize;
 
+        /// <summary>
+        /// 오브젝트가 활성화될 때 현재 Safe Area 기준으로 베젤을 배치합니다.
+        /// </summary>
         private void OnEnable()
         {
             Apply();
         }
 
+        /// <summary>
+        /// 런타임 RectTransform 크기 변경 시 Safe Area 배치를 다시 계산합니다.
+        /// </summary>
         private void OnRectTransformDimensionsChange()
         {
             if (!Application.isPlaying) return;
@@ -25,6 +31,9 @@ namespace TRPG.Runtime
             Apply();
         }
 
+        /// <summary>
+        /// Safe Area 또는 화면 크기가 변경되었는지 감시합니다.
+        /// </summary>
         private void Update()
         {
             Vector2Int screenSize = new Vector2Int(Screen.width, Screen.height);
@@ -35,6 +44,9 @@ namespace TRPG.Runtime
             }
         }
 
+        /// <summary>
+        /// 현재 Safe Area를 정규화해 상하좌우 베젤 RectTransform에 적용합니다.
+        /// </summary>
         private void Apply()
         {
             Rect safe = Screen.safeArea;
@@ -59,6 +71,9 @@ namespace TRPG.Runtime
             SetRight(safeXMax, safeYMin, safeYMax);
         }
 
+        /// <summary>
+        /// 루트 RectTransform을 부모 전체 영역에 맞춥니다.
+        /// </summary>
         private void FitRoot()
         {
             RectTransform root = (RectTransform)transform;
@@ -70,6 +85,9 @@ namespace TRPG.Runtime
             root.sizeDelta = Vector2.zero;
         }
 
+        /// <summary>
+        /// Safe Area 위쪽 바깥 영역을 top 베젤로 채웁니다.
+        /// </summary>
         private void SetTop(float safeYMax)
         {
             topBezel.anchorMin = new Vector2(0f, safeYMax);
@@ -80,6 +98,9 @@ namespace TRPG.Runtime
             topBezel.gameObject.SetActive(safeYMax < 1f);
         }
 
+        /// <summary>
+        /// Safe Area 아래쪽 바깥 영역을 bottom 베젤로 채웁니다.
+        /// </summary>
         private void SetBottom(float safeYMin)
         {
             bottomBezel.anchorMin = new Vector2(0f, 0f);
@@ -90,6 +111,9 @@ namespace TRPG.Runtime
             bottomBezel.gameObject.SetActive(safeYMin > 0f);
         }
 
+        /// <summary>
+        /// Safe Area 왼쪽 바깥 영역을 left 베젤로 채웁니다.
+        /// </summary>
         private void SetLeft(float safeXMin, float safeYMin, float safeYMax)
         {
             leftBezel.anchorMin = new Vector2(0f, safeYMin);
@@ -100,6 +124,9 @@ namespace TRPG.Runtime
             leftBezel.gameObject.SetActive(safeXMin > 0f);
         }
 
+        /// <summary>
+        /// Safe Area 오른쪽 바깥 영역을 right 베젤로 채웁니다.
+        /// </summary>
         private void SetRight(float safeXMax, float safeYMin, float safeYMax)
         {
             rightBezel.anchorMin = new Vector2(safeXMax, safeYMin);

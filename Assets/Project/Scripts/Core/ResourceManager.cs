@@ -6,6 +6,9 @@ namespace TRPG.Runtime
     {
         private static ResourceManagerSettingsData data;
 
+        /// <summary>
+        /// 리소스 매니저 인스턴스와 설정 데이터를 준비합니다.
+        /// </summary>
         public static void Init()
         {
             GetInstance();

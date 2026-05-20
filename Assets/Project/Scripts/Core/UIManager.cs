@@ -9,6 +9,9 @@ namespace TRPG.Runtime
     {
         public UnityEvent<float, float> OnResolutionChanged = new();
 
+        /// <summary>
+        /// UI 매니저 초기화 진입점입니다.
+        /// </summary>
         public static void Init()
         {
         }

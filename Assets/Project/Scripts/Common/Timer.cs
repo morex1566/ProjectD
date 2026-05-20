@@ -13,11 +13,17 @@ namespace TRPG.Runtime
     /// </summary>
     public static class Timer
     {
+        /// <summary>
+        /// 타이머 시스템 시작 이후 경과 시간을 밀리초 단위로 반환합니다.
+        /// </summary>
         public static double GetCurrentMs()
         {
             return _stopwatch.Elapsed.TotalMilliseconds;
         }
 
+        /// <summary>
+        /// 직전 캡처 시점부터 현재까지의 경과 시간을 반환하고 기준 시점을 갱신합니다.
+        /// </summary>
         public static double Capture()
         {
             double currMs = GetCurrentMs();
@@ -39,6 +45,9 @@ namespace TRPG.Runtime
             ScheduleInternal(delayMs, callback, state);
         }
 
+        /// <summary>
+        /// 예약 요청을 정렬된 태스크 큐에 추가하고 필요하면 시스템 타이머를 재설정합니다.
+        /// </summary>
         private static void ScheduleInternal(int delayMs, Action<object> callback, object state)
         {
             double targetTime = GetCurrentMs() + delayMs;
@@ -70,6 +79,9 @@ namespace TRPG.Runtime
             }
         }
 
+        /// <summary>
+        /// 만료된 태스크를 수집해 실행하고 다음 태스크 기준으로 시스템 타이머를 예약합니다.
+        /// </summary>
         private static void OnTick(object state)
         {
             double now = GetCurrentMs();
@@ -125,6 +137,9 @@ namespace TRPG.Runtime
 
             public object state;
 
+            /// <summary>
+            /// 실행 시간이 빠른 태스크가 앞에 오도록 비교합니다.
+            /// </summary>
             public int CompareTo(TimerTask other)
             {
                 return executionTime.CompareTo(other.executionTime);

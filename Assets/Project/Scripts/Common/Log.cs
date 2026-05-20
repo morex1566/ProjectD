@@ -7,6 +7,9 @@ namespace TRPG.Runtime
     {
         private readonly ILogHandler m_DefaultHandler = Debug.unityLogger.logHandler;
 
+        /// <summary>
+        /// Unity 로그 메시지에 시간과 로그 레벨을 붙여 기본 핸들러로 전달합니다.
+        /// </summary>
         public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
         {
             // 1. 시간 및 로그 레벨 설정
@@ -23,6 +26,9 @@ namespace TRPG.Runtime
             m_DefaultHandler.LogFormat(logType, context, "{0}", finalMessage);
         }
 
+        /// <summary>
+        /// 예외 로그는 Unity 기본 핸들러에 위임합니다.
+        /// </summary>
         public void LogException(Exception exception, UnityEngine.Object context)
         {
             m_DefaultHandler.LogException(exception, context);
@@ -32,6 +38,9 @@ namespace TRPG.Runtime
     // 초기화 스크립트
     public static class LogInitializer
     {
+        /// <summary>
+        /// 씬 로드 전에 커스텀 로그 핸들러를 Unity 로거에 연결합니다.
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Init()
         {

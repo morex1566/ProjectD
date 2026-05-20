@@ -1,44 +1,81 @@
+using System.Collections;
 using UnityEngine;
 
 namespace TRPG.Runtime
 {
-    public class CreatureController : MonoBehaviour, ISelectable
+    [DisallowMultipleComponent]
+    public abstract class CreatureController : MonoBehaviour
     {
-        [SerializeField] private bool canSelect = true;
-        [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private Color selectedColor = new Color(0.35f, 0.8f, 1f, 1f);
-        [SerializeField] private float selectedScale = 1.1f;
+        [SerializeField, ReadOnly] private CreatureModel creatureModel = null;
 
-        private Color defaultColor;
-        private Vector3 defaultScale;
+        public CreatureModel Model => creatureModel;
 
-        public bool CanSelect => canSelect;
-        public bool IsSelected { get; private set; }
+        protected Coroutine movement;
+
+        protected Coroutine attack;
+
+        private void OnValidate()
+        {
+            Init();
+        }
 
         protected virtual void Awake()
         {
-            if (!spriteRenderer)
+            Init();
+        }
+
+        private void Init()
+        {
+            creatureModel = GetComponent<CreatureModel>();
+        }
+
+        private void OnEnable()
+        {
+
+        }
+
+        private void OnDisable()
+        {
+
+        }
+
+        /// <summary>
+        /// 화면 좌표가 Tilemap 레이어의 유효한 셀이면 해당 셀로 이동합니다.
+        /// </summary>
+        public void Move(Vector3 targetWorldPos, Vector3Int targetCellPos)
+        {
+            // 이동
+            movement = StartCoroutine(Movement(targetWorldPos, targetCellPos));
+        }
+
+        public void Attack(CreatureController creatureController)
+        {
+            creatureController.Hit(Model.Damage);
+        }
+
+        public void Hit(float damage)
+        {
+            Model.SetHp(Model.Hp - damage);
+        }
+
+        private IEnumerator Movement(Vector3 targetWorldPos, Vector3Int targetCellPos)
+        {
+            Vector3 startWorldPos = transform.position;
+            targetWorldPos.z = transform.position.z;
+
+            float elapsedTime = 0f;
+            while (elapsedTime < 0.25f)
             {
-                spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+                elapsedTime += Time.deltaTime;
+                float progress = Mathf.Clamp01(elapsedTime / 0.25f);
+                transform.position = Vector3.Lerp(startWorldPos, targetWorldPos, progress);
+
+                yield return null;
             }
 
-            defaultColor = spriteRenderer.color;
-            defaultScale = transform.localScale;
-        }
-
-        public bool ContainsScreenPosition(Vector2 screenPosition, Camera targetCamera)
-        {
-            Vector3 worldPosition = targetCamera.ScreenToWorldPoint(screenPosition);
-            worldPosition.z = spriteRenderer.bounds.center.z;
-
-            return spriteRenderer.bounds.Contains(worldPosition);
-        }
-
-        public virtual void SetSelected(bool isSelected)
-        {
-            IsSelected = isSelected;
-            spriteRenderer.color = isSelected ? selectedColor : defaultColor;
-            transform.localScale = isSelected ? defaultScale * selectedScale : defaultScale;
+            transform.position = targetWorldPos;
+            creatureModel.SetCellPos(targetCellPos);
+            movement = null;
         }
     }
 }

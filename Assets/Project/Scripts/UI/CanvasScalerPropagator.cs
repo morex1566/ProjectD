@@ -12,6 +12,9 @@ namespace TRPG.Runtime
         [Header("Reference Canvas")]
         [SerializeField] private Canvas referenceCanvas;
 
+        /// <summary>
+        /// 에디터에서 값이 변경될 때 자식 CanvasScaler 설정을 동기화합니다.
+        /// </summary>
         private void OnValidate()
         {
 #if UNITY_EDITOR
@@ -23,6 +26,9 @@ namespace TRPG.Runtime
         }
 
         [ContextMenu("Sync Canvas Scaler Settings")]
+        /// <summary>
+        /// 기준 CanvasScaler 설정을 모든 하위 Canvas에 복사합니다.
+        /// </summary>
         public void Sync()
         {
             if (referenceCanvas == null)
@@ -51,6 +57,9 @@ namespace TRPG.Runtime
             Debug.Log("[CanvasScalerPropagator] CanvasScaler 설정 동기화 완료");
         }
 
+        /// <summary>
+        /// 단일 대상 Canvas의 CanvasScaler를 기준 설정과 일치시킵니다.
+        /// </summary>
         private void SyncCanvasScaler(CanvasScaler sourceScaler, Canvas targetCanvas)
         {
             CanvasScaler targetScaler = targetCanvas.GetComponent<CanvasScaler>();
