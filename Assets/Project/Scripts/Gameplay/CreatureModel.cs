@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
-    public class CreatureModel : MonoBehaviour, ISelectable
+    public class CreatureModel : MonoBehaviour
     {
         [Header("Runtime")]
 
@@ -19,19 +19,9 @@ namespace TRPG.Runtime
 
         [Header("Setup")]
 
-        [SerializeField] private SpriteRenderer spriteRenderer = null;
-
         [SerializeField] protected CreatureData data;
 
-        [SerializeField] private SkillData skillData;
 
-
-
-        public bool CanSelect { get; set; } = false;
-
-        public bool IsSelected { get; set; } = false;
-
-        public SkillData SkillData => skillData;
 
         public Vector3Int CellPos => cellPos;
 
@@ -40,21 +30,13 @@ namespace TRPG.Runtime
         public float Hp => hp;
 
 
-
-        private void OnValidate()
+        /// <summary>
+        /// 크리처 데이터를 주입하고 런타임 값을 초기화합니다.
+        /// </summary>
+        public virtual void Init(CreatureData data, Vector3Int cellPos)
         {
-            Init();
-        }
-
-        protected virtual void Awake()
-        {
-            Init();
-        }
-
-        private void Init()
-        {
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            SetSkillData(skillData);
+            this.data = data;
+            this.cellPos = cellPos;
         }
 
         private void OnEnable()
@@ -68,41 +50,11 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 좌표가 이 크리처의 렌더러 영역 안에 있는지 검사합니다.
-        /// </summary>
-        public bool Contains(Vector3 position)
-        {
-            position.z = spriteRenderer.bounds.center.z;
-
-            return spriteRenderer.bounds.Contains(position);
-        }
-
-        /// <summary>
-        /// 현재 선택 상태를 저장합니다.
-        /// </summary>
-        public void SetSelected(bool isSelected)
-        {
-            IsSelected = isSelected;
-        }
-
-        /// <summary>
         /// 현재 Transform 위치를 지정된 Tilemap의 셀 좌표로 변환합니다.
         /// </summary>
         public Vector3Int GetCurrentTilePos(Tilemap tilemap)
         {
             return tilemap.WorldToCell(transform.position);
-        }
-
-        /// <summary>
-        /// 스킬 데이터를 설정하고, 해당 데이터와 관련된 런타임 스텟 초기화합니다.
-        /// </summary>
-        /// <param name="skillData"></param>
-        public void SetSkillData(SkillData skillData)
-        {
-            this.skillData = skillData;
-
-            moveRange = SkillData.moveRange;
-            damage = SkillData.damage;
         }
 
         public void SetHp(float hp)

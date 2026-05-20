@@ -26,8 +26,8 @@ namespace TRPG.Runtime
 //#endif
 //        public static bool Init()
 //        {
-//            data = Resources.Load<NetManagerSettingsData>("SO_NetManagerSettings");
-//            if (data == null)
+//            settings = Resources.Load<NetManagerSettingsData>("SO_NetManagerSettings");
+//            if (settings == null)
 //            {
 //                Debug.LogError("SO_NetManagerSettings resource was not found.");
 //                return false;
@@ -37,7 +37,7 @@ namespace TRPG.Runtime
 //            {
 //                tcp = TCP.GetInstance();
 //                {
-//                    bool succeeded = tcp.Init(data.TcpHost, data.TcpPort);
+//                    bool succeeded = tcp.Init(settings.TcpHost, settings.TcpPort);
 //                    if (!succeeded)
 //                    {
 //                        Debug.LogWarning("TCP init failed.");

@@ -20,8 +20,7 @@ namespace TRPG.Runtime
         [Header("Setup")]
 
         [SerializeField] private GameObject monsterPb = null;
-
-        [SerializeField] private GameObject playerCharacterPb = null;
+        [SerializeField] private GameObject playerPb = null;
 
         private void OnValidate()
         {
@@ -31,6 +30,10 @@ namespace TRPG.Runtime
         private void Awake()
         {
             Init();
+
+            // 인스턴싱
+            InstantiateMonster(ResourceManager.GetMonsterData("Monster_00"), new Vector3Int(0, 2, 0));
+            InstantiatePlayer(new Vector3Int(0, 0, 0));
         }
 
         private void Init()
@@ -45,6 +48,7 @@ namespace TRPG.Runtime
                 tilemaps.AddRange(grid.GetComponentsInChildren<Tilemap>());
             }
 
+            // 모든 Ground(이동가능 타일맵)을 매핑
             foreach (Tilemap tilemap in tilemaps)
             {
                 if (tilemap.gameObject.layer != UnityConstant.Layers.GroundIndex) continue;
@@ -100,9 +104,29 @@ namespace TRPG.Runtime
             return false;
         }
 
-        public void Instantiate(GameObject creaturePb, Vector3Int cellPos)
+        public void InstantiateMonster(MonsterData monsterData, Vector3Int cellPos)
         {
+            // 인스턴싱할 수 없는 위치
+            if (!TryGetGroundWorldPosition(cellPos, out Vector3 worldPos)) return;
 
+            GameObject monsterInst = Instantiate(monsterPb, worldPos, Quaternion.identity);
+            {
+                MonsterController monsterController = monsterInst.GetComponent<MonsterController>();
+                monsterController.Model.Init(monsterData, cellPos);
+                creatures.Add(monsterController);
+            }
+        }
+
+        public void InstantiatePlayer(Vector3Int cellPos)
+        {
+            // 인스턴싱할 수 없는 위치
+            if (!TryGetGroundWorldPosition(cellPos, out Vector3 worldPos)) return;
+
+            GameObject playerInst = Instantiate(playerPb, worldPos, Quaternion.identity);
+            {
+                PlayerController playerController = playerInst.GetComponent<PlayerController>();
+                creatures.Add(playerController);
+            }
         }
 
         /// <summary>

@@ -10,6 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24a8f07d6f0db204fab187c3c7835a9c, type: 3}
-  m_Name: SO_Player
+  m_Name: SO_Player_00
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.PlayerData
-  Damage: 0
+  MoveDelay: 0.3
+  AttackDelay: 0.2
+  Damage: 1

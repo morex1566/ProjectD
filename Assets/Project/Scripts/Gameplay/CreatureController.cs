@@ -4,15 +4,19 @@ using UnityEngine;
 namespace TRPG.Runtime
 {
     [DisallowMultipleComponent]
-    public abstract class CreatureController : MonoBehaviour
+    public abstract class CreatureController : MonoBehaviour, ISelectable
     {
-        [SerializeField, ReadOnly] private CreatureModel creatureModel = null;
+        [SerializeField, ReadOnly] private SpriteRenderer spriteRenderer = null;
 
-        public CreatureModel Model => creatureModel;
+        [SerializeField, ReadOnly] private CreatureModel model = null;
 
-        protected Coroutine movement;
 
-        protected Coroutine attack;
+        public bool CanSelect { get; set; } = false;
+
+        public bool IsSelected { get; set; } = false;
+
+        public CreatureModel Model => model;
+
 
         private void OnValidate()
         {
@@ -26,7 +30,8 @@ namespace TRPG.Runtime
 
         private void Init()
         {
-            creatureModel = GetComponent<CreatureModel>();
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+            model = GetComponent<CreatureModel>();
         }
 
         private void OnEnable()
@@ -40,42 +45,29 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 화면 좌표가 Tilemap 레이어의 유효한 셀이면 해당 셀로 이동합니다.
+        /// 좌표가 이 크리처의 렌더러 영역 안에 있는지 검사합니다.
         /// </summary>
-        public void Move(Vector3 targetWorldPos, Vector3Int targetCellPos)
+        public bool Contains(Vector3 position)
         {
-            // 이동
-            movement = StartCoroutine(Movement(targetWorldPos, targetCellPos));
+            position.z = spriteRenderer.bounds.center.z;
+
+            return spriteRenderer.bounds.Contains(position);
         }
 
-        public void Attack(CreatureController creatureController)
+        /// <summary>
+        /// 현재 선택 상태를 저장합니다.
+        /// </summary>
+        public void SetSelected(bool isSelected)
         {
-            creatureController.Hit(Model.Damage);
+            IsSelected = isSelected;
         }
 
+        /// <summary>
+        /// 피해량만큼 HP를 감소시킵니다.
+        /// </summary>
         public void Hit(float damage)
         {
-            Model.SetHp(Model.Hp - damage);
-        }
-
-        private IEnumerator Movement(Vector3 targetWorldPos, Vector3Int targetCellPos)
-        {
-            Vector3 startWorldPos = transform.position;
-            targetWorldPos.z = transform.position.z;
-
-            float elapsedTime = 0f;
-            while (elapsedTime < 0.25f)
-            {
-                elapsedTime += Time.deltaTime;
-                float progress = Mathf.Clamp01(elapsedTime / 0.25f);
-                transform.position = Vector3.Lerp(startWorldPos, targetWorldPos, progress);
-
-                yield return null;
-            }
-
-            transform.position = targetWorldPos;
-            creatureModel.SetCellPos(targetCellPos);
-            movement = null;
+            model.SetHp(model.Hp - damage);
         }
     }
 }

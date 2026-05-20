@@ -14,7 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Remote_Core
   m_GUID: 244b5853c3b72284a8b05beca09e97a4
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: ac908ac551fa0d941930811ce672e40c
+    m_Address: SO_Player
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: a4554c02061d64e4c9a9dca40a903723, type: 2}
   m_SchemaSet:

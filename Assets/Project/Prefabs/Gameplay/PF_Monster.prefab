@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3184946928956853724}
   - component: {fileID: 5623844873239391356}
   m_Layer: 10
-  m_Name: PF_Monster_00
+  m_Name: PF_Monster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -446,35 +446,11 @@ namespace TRPG.Editor
         private static string GetAssetName(TableData table, Dictionary<string, string> record, int rowIndex)
         {
             string id = record.TryGetValue("Id", out string idValue) ? idValue : string.Empty;
-            string suffix = string.IsNullOrWhiteSpace(id)
+            string assetId = string.IsNullOrWhiteSpace(id)
                 ? (rowIndex + 1).ToString(CultureInfo.InvariantCulture)
-                : GetAssetSuffix(table.SchemaName, id);
+                : id;
 
-            return SanitizeFileName($"SO_{table.SchemaName}_{suffix}");
-        }
-
-        private static string GetAssetSuffix(string schemaName, string id)
-        {
-            string schemaPrefix = $"{schemaName}_";
-            if (id.StartsWith(schemaPrefix, StringComparison.OrdinalIgnoreCase))
-            {
-                return id.Substring(schemaPrefix.Length);
-            }
-
-            string abbreviation = GetUpperAbbreviation(schemaName);
-            string abbreviationPrefix = $"{abbreviation}_";
-            if (id.StartsWith(abbreviationPrefix, StringComparison.OrdinalIgnoreCase))
-            {
-                return id.Substring(abbreviationPrefix.Length);
-            }
-
-            return id;
-        }
-
-        private static string GetUpperAbbreviation(string schemaName)
-        {
-            string letters = new string(schemaName.Where(char.IsLetterOrDigit).Take(3).ToArray());
-            return letters.ToUpperInvariant();
+            return SanitizeFileName($"SO_{assetId}");
         }
 
         private static int GetColumnIndex(string cellReference)
