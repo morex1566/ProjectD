@@ -15,7 +15,7 @@ namespace TRPG.Runtime
         /// </summary>
         [SerializeField, ReadOnly] private List<Tilemap> ground = null;
 
-        [SerializeField, ReadOnly] private List<CreatureController> creatures = null;
+        [SerializeField, ReadOnly] private Dictionary<int, CreatureController> creatures = null;
 
         [Header("Setup")]
 
@@ -31,15 +31,18 @@ namespace TRPG.Runtime
         {
             Init();
 
+            ResourceManager.Database.Load();
+
             // 인스턴싱
-            InstantiateMonster(ResourceManager.GetMonsterData("Monster_00"), new Vector3Int(0, 2, 0));
-            InstantiatePlayer(new Vector3Int(0, 0, 0));
+            SpawnMonster(ResourceManager.Database.GetMonsterData("Monster_00"), new Vector3Int(0, 2, 0));
+            SpawnPlayer(new Vector3Int(0, 0, 0));
         }
 
         private void Init()
         {
             tilemaps = new List<Tilemap>();
             ground = new List<Tilemap>();
+            creatures = new Dictionary<int, CreatureController>();
 
             // 모든 타일맵을 매핑
             Grid[] grids = FindObjectsByType<Grid>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID);
@@ -104,50 +107,70 @@ namespace TRPG.Runtime
             return false;
         }
 
-        public void InstantiateMonster(MonsterData monsterData, Vector3Int cellPos)
+        public void SpawnMonster(CreatureData monsterData, Vector3Int cellPos)
         {
             // 인스턴싱할 수 없는 위치
             if (!TryGetGroundWorldPosition(cellPos, out Vector3 worldPos)) return;
 
+            // 몬스터 생성
             GameObject monsterInst = Instantiate(monsterPb, worldPos, Quaternion.identity);
+            MonsterController monsterController = monsterInst.GetComponent<MonsterController>();
+            if (monsterController == null)
             {
-                MonsterController monsterController = monsterInst.GetComponent<MonsterController>();
-                monsterController.Model.Init(monsterData, cellPos);
-                creatures.Add(monsterController);
+                Debug.LogWarning($"SpawnMonster failed. MonsterController not found. Prefab: {monsterPb.name}");
+                Destroy(monsterInst);
+                return;
             }
+            monsterController.Model.Init(cellPos, monsterData);
+
+            // 몬스터 등록
+            creatures.Add(monsterController.GetInstanceID(), monsterController);
         }
 
-        public void InstantiatePlayer(Vector3Int cellPos)
+        public void SpawnPlayer(Vector3Int cellPos)
         {
             // 인스턴싱할 수 없는 위치
             if (!TryGetGroundWorldPosition(cellPos, out Vector3 worldPos)) return;
 
+            // 플레이어 생성
             GameObject playerInst = Instantiate(playerPb, worldPos, Quaternion.identity);
+            PlayerController playerController = playerInst.GetComponent<PlayerController>();
+            if (playerController == null)
             {
-                PlayerController playerController = playerInst.GetComponent<PlayerController>();
-                creatures.Add(playerController);
+                Debug.LogWarning($"SpawnPlayer failed. PlayerController not found. Prefab: {playerPb.name}");
+                Destroy(playerInst);
+                return;
             }
+            playerController.Model.Init(cellPos);
+
+            // 플레이어 등록
+            creatures.Add(playerController.GetInstanceID(), playerController);
+        }
+
+        public void Despawn(int instanceId)
+        {
+            Destroy(creatures[instanceId].gameObject);
+            creatures.Remove(instanceId);
         }
 
         /// <summary>
         /// 이 위치에 몬스터가 있는지 확인합니다. 
         /// </summary>
-        public bool HasMonster(Vector3Int cellPos, out MonsterController monster)
+        public bool HasMonster(Vector3Int cellPos, out MonsterController monsterController)
         {
-            monster = null;
-
-            foreach (CreatureController creature in creatures)
+            foreach (KeyValuePair<int, CreatureController> pair in creatures)
             {
                 // 위치에 creature가 없음
-                if (cellPos != creature.Model.CellPos) continue;
+                if (cellPos != pair.Value.Model.CellPos) continue;
 
                 // creature가 monster가 아님
-                if (creature is not MonsterController foundMonster) continue;
+                if (pair.Value is not MonsterController castedController) continue;
 
-                monster = foundMonster;
+                monsterController = castedController;
                 return true;
             }
 
+            monsterController = null;
             return false;
         }
     }

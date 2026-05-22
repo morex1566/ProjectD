@@ -324,11 +324,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2554801384736110470, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2554801384736110470, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2554801384736110470, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
       propertyPath: m_LocalPosition.z
@@ -362,6 +362,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6564672677110749043, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
+      propertyPath: orthographic size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6564672677110749043, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.12452829
+      objectReference: {fileID: 0}
+    - target: {fileID: 6564672677110749043, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.12452829
+      objectReference: {fileID: 0}
+    - target: {fileID: 6564672677110749043, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.12452829
+      objectReference: {fileID: 0}
     - target: {fileID: 8696006802350935441, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
       propertyPath: m_Name
       value: PF_MainCamera
@@ -379,6 +395,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 860247393580215606, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1903749674788783344, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -418,6 +438,14 @@ PrefabInstance:
     - target: {fileID: 1903749674788783344, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3863466949627509375, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 3863466949627509375, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -100
       objectReference: {fileID: 0}
     - target: {fileID: 8965933311715102202, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
       propertyPath: m_Name
@@ -476,7 +504,6 @@ MonoBehaviour:
   - {fileID: 4686382918471487427}
   ground:
   - {fileID: 4686382918471487427}
-  creatures: []
   monsterPb: {fileID: 3046058275729229627, guid: 669db6c883a1c0d48a770e4b3b66cae3, type: 3}
   playerPb: {fileID: 9046667874142349478, guid: fe859d1a378664047919604f767dbe0f, type: 3}
 --- !u!1001 &4686382918471487426
@@ -488,12 +515,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2983971158143547013, guid: b37f4b1e3b4079e489b3a67fb0e45939, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2983971158143547013, guid: b37f4b1e3b4079e489b3a67fb0e45939, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2983971158143547013, guid: b37f4b1e3b4079e489b3a67fb0e45939, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 2983971158143547013, guid: b37f4b1e3b4079e489b3a67fb0e45939, type: 3}
       propertyPath: m_LocalPosition.z

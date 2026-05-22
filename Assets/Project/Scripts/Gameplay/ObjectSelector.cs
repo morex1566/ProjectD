@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
-    public class ObjectSelector : MonoBehaviour
+    public partial class ObjectSelector : MonoBehaviour
     {
         [SerializeField] private GameObject selectorCursor;
 
@@ -11,37 +12,29 @@ namespace TRPG.Runtime
 
         public UnityEvent<ISelectable> OnSelectableDeselected = new UnityEvent<ISelectable>();
 
+        public UnityEvent<Vector3Int, Vector3> OnCursorMoved = new UnityEvent<Vector3Int, Vector3>();
+
         public ISelectable SelectedSelectable { get; private set; }
 
         public CreatureController SelectedCreature => SelectedSelectable as CreatureController;
 
-        private Vector3Int cursorCellPos;
+        private Vector3Int cursorCellPos = new Vector3Int(0, 0);
 
 
 
-        private void OnValidate()
+        protected void Awake()
         {
-            Init();
-        }
-
-        protected virtual void Awake()
-        {
-            Init();
-        }
-
-        private void Init()
-        {
-            
+            selectorCursor.transform.SetParent(null, true);
         }
 
         private void OnEnable()
         {
-
+            InputManager.InputMappingContext.Player.LeftClick.performed += OnClick;
         }
 
         private void OnDisable()
         {
-
+            InputManager.InputMappingContext.Player.LeftClick.performed -= OnClick;
         }
 
         /// <summary>
@@ -116,6 +109,7 @@ namespace TRPG.Runtime
             selectorCursor.SetActive(true);
             cursorCellPos = cellPos;
             selectorCursor.transform.position = worldPos;
+            OnCursorMoved.Invoke(cursorCellPos, worldPos);
             return true;
         }
 
@@ -129,7 +123,7 @@ namespace TRPG.Runtime
             }
 
             // 현재 커서의 위치를 다시 지정?
-            if (cursorCellPos == cellPos)
+            if (cursorCellPos == cellPos && selectorCursor.activeSelf)
             {
                 selectorCursor.SetActive(false);
                 return false;
@@ -145,7 +139,19 @@ namespace TRPG.Runtime
             selectorCursor.SetActive(true);
             cursorCellPos = cellPos;
             selectorCursor.transform.position = worldPosByCell;
+            OnCursorMoved.Invoke(cursorCellPos, worldPosByCell);
             return true;
         }
     }
+
+    public partial class ObjectSelector : MonoBehaviour
+    {
+        private void OnClick(InputAction.CallbackContext context)
+        {
+            Vector3 worldPos = MouseEx.GetMouseWorldPosition(Camera.main);
+
+            TryMoveCursor(worldPos);
+        }
+    }
+
 }

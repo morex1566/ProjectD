@@ -9,7 +9,7 @@ namespace TRPG.Runtime
     {
         private const string CreatureDataLabel = "CreatureData";
 
-        private readonly Dictionary<string, MonsterData> monsterDatas = new();
+        private Dictionary<string, CreatureData> creatureDatas = new();
 
         private AsyncOperationHandle<IList<CreatureData>> creatureDataHandle;
 
@@ -22,9 +22,9 @@ namespace TRPG.Runtime
         {
             if (IsLoaded) return;
 
-            monsterDatas.Clear();
+            creatureDatas.Clear();
             creatureDataHandle = Addressables.LoadAssetsAsync<CreatureData>(CreatureDataLabel, null);
-            IList<CreatureData> creatureDatas = creatureDataHandle.WaitForCompletion();
+            IList<CreatureData> creatureDataList = creatureDataHandle.WaitForCompletion();
 
             if (creatureDataHandle.Status != AsyncOperationStatus.Succeeded)
             {
@@ -32,7 +32,7 @@ namespace TRPG.Runtime
                 return;
             }
 
-            foreach (CreatureData creatureData in creatureDatas)
+            foreach (CreatureData creatureData in creatureDataList)
             {
                 OnCreatureDataLoaded(creatureData);
             }
@@ -40,35 +40,40 @@ namespace TRPG.Runtime
             IsLoaded = true;
         }
 
-        public bool TryGetMonsterData(string id, out MonsterData monsterData)
+        public bool TryGetCreatureData(string id, out CreatureData creatureData)
         {
-            return monsterDatas.TryGetValue(id, out monsterData);
+            return creatureDatas.TryGetValue(id, out creatureData);
         }
 
-        public MonsterData GetMonsterData(string id)
+        public CreatureData GetCreatureData(string id)
         {
-            if (monsterDatas.TryGetValue(id, out MonsterData monsterData)) return monsterData;
+            if (creatureDatas.TryGetValue(id, out CreatureData creatureData)) return creatureData;
 
-            Debug.LogWarning($"MonsterData not found. Id: {id}");
+            Debug.LogWarning($"CreatureData not found. Id: {id}");
             return null;
+        }
+
+        public CreatureData GetMonsterData(string id)
+        {
+            return GetCreatureData(id);
         }
 
         private void OnCreatureDataLoaded(CreatureData creatureData)
         {
-            if (creatureData is not MonsterData monsterData) return;
-            if (string.IsNullOrWhiteSpace(monsterData.Id))
+            if (creatureData == null) return;
+            if (string.IsNullOrWhiteSpace(creatureData.Id))
             {
-                Debug.LogWarning($"MonsterData has empty id. Asset: {monsterData.name}");
+                Debug.LogWarning($"CreatureData has empty id. Asset: {creatureData.name}");
                 return;
             }
 
-            if (monsterDatas.ContainsKey(monsterData.Id))
+            if (creatureDatas.ContainsKey(creatureData.Id))
             {
-                Debug.LogWarning($"Duplicate MonsterData id ignored. Id: {monsterData.Id}, Asset: {monsterData.name}");
+                Debug.LogWarning($"Duplicate CreatureData id ignored. Id: {creatureData.Id}, Asset: {creatureData.name}");
                 return;
             }
 
-            monsterDatas.Add(monsterData.Id, monsterData);
+            creatureDatas.Add(creatureData.Id, creatureData);
         }
     }
 }

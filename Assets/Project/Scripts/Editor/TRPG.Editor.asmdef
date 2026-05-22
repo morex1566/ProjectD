@@ -2,7 +2,8 @@
     "name": "TRPG.Editor",
     "rootNamespace": "TRPG.Editor",
     "references": [
-        "TRPG.Runtime"
+        "TRPG.Runtime",
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"

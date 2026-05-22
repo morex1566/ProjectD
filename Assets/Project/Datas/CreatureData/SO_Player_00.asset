@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24a8f07d6f0db204fab187c3c7835a9c, type: 3}
   m_Name: SO_Player_00
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.PlayerData
+  Id: Player
+  DisplayName: "\uD50C\uB808\uC774\uC5B4"
+  DefaultSkillId: Attack_00
+  Hp: 10
+  Damage: 2
+  Armor: 1
+  Description: "\uB354\uBBF8 \uD50C\uB808\uC774\uC5B4"
   MoveDelay: 0.3
   AttackDelay: 0.2
-  Damage: 1

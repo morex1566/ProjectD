@@ -22,25 +22,25 @@ namespace TRPG.Runtime
 
         private ActionFlag actionFlags;
 
-        private new PlayerModel Model => base.Model as PlayerModel;
+        public new PlayerModel Model => base.Model as PlayerModel;
 
 
 
 
         private void OnEnable()
         {
-            InputManager.InputMappingContext.Player.LeftClick.performed += OnClick;
             InputManager.InputMappingContext.Player.Move.performed += OnMove;
             InputManager.InputMappingContext.Player.Move.canceled += OnMoveCanceled;
+
             moveInput = Vector2.zero;
             actionFlags = ActionFlag.None;
         }
 
         private void OnDisable()
         {
-            InputManager.InputMappingContext.Player.LeftClick.performed -= OnClick;
             InputManager.InputMappingContext.Player.Move.performed -= OnMove;
             InputManager.InputMappingContext.Player.Move.canceled -= OnMoveCanceled;
+
             moveInput = Vector2.zero;
             actionFlags = ActionFlag.None;
         }
@@ -93,12 +93,12 @@ namespace TRPG.Runtime
         /// <summary>
         /// 적 공격, 적 방향으로 전진했다가 다시 원위치로 이동합니다. 
         /// </summary>
-        public void Attack(Vector3 targetWorldPos, CreatureController creatureController)
+        public void Attack(Vector3 targetWorldPos, CreatureController targetController)
         {
             if (HasActionFlag(ActionFlag.Moving | ActionFlag.Attacking)) return;
 
             actionFlags |= ActionFlag.Attacking;
-            StartCoroutine(AttackCo(targetWorldPos, creatureController));
+            StartCoroutine(AttackCo(targetWorldPos, targetController));
         }
 
         private IEnumerator MovementCo(Vector3 targetWorldPos, Vector3Int targetCellPos)
@@ -144,7 +144,8 @@ namespace TRPG.Runtime
             }
 
             // 공격
-            creatureController.Hit(Model.Damage);
+            creatureController.Hit(this, Model.Damage);
+            Hit(creatureController, creatureController.Model.Damage);
 
             // 플레이어 후진
             elapsedTime = 0f;
@@ -181,32 +182,11 @@ namespace TRPG.Runtime
         }
     }
 
+    /// <summary>
+    /// 입력
+    /// </summary>
     public partial class PlayerController
     {
-        /// <summary>
-        /// 클릭 입력으로 화면 좌표 아래의 타일을 검사합니다.
-        /// </summary>
-        private void OnClick(InputAction.CallbackContext context)
-        {
-            if (!MouseEx.TryGetMouseWorldPosition(Camera.main, out Vector3 screenWorldPos)) return;
-
-            // TODO : 전투씬에서만 사용하도록 return;
-
-            // TODO : ObjectSelector 대상으로만 한정?
-
-            // 클릭한 위치가 이동할 수 있는 곳임?
-            if (WorldManager.GetInstance().TryGetGroundCellPosition(screenWorldPos, out Vector3Int cellPos))
-            {
-
-            }
-
-            // 공격할 수 있는곳임?
-            if (WorldManager.GetInstance().HasMonster(cellPos, out MonsterController monster))
-            {
-
-            }
-        }
-
         private void OnMove(InputAction.CallbackContext context)
         {
             moveInput = context.ReadValue<Vector2>();
@@ -216,5 +196,17 @@ namespace TRPG.Runtime
         {
             moveInput = Vector2.zero;
         }
+    }
+
+    /// <summary>
+    /// 뷰
+    /// </summary>
+    public partial class PlayerController
+    {
+        [Header("View")]
+
+        [SerializeField] private Sprite attackPointImg;
+
+        [SerializeField] private Sprite armorPointImg;
     }
 }

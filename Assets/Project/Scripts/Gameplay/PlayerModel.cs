@@ -7,11 +7,10 @@ namespace TRPG.Runtime
     {
         public PlayerData Data => data as PlayerData;
 
-        public override void Init(CreatureData data, Vector3Int cellPos)
+        public override void Init(Vector3Int cellPos, CreatureData data = null)
         {
-            base.Init(data, cellPos);
-
-            base.data = data as PlayerData;
+            // 플레이어의 경우 이미 데이터가 프리팹에 들어있음
+            base.Init(cellPos, this.data);
         }
     }
 }

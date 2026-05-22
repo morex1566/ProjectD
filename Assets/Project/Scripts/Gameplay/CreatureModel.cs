@@ -17,6 +17,8 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private float hp;
 
+        [SerializeField, ReadOnly] private float armor;
+
         [Header("Setup")]
 
         [SerializeField] protected CreatureData data;
@@ -29,14 +31,23 @@ namespace TRPG.Runtime
 
         public float Hp => hp;
 
+        public float Armor => armor;
+
+
 
         /// <summary>
         /// 크리처 데이터를 주입하고 런타임 값을 초기화합니다.
         /// </summary>
-        public virtual void Init(CreatureData data, Vector3Int cellPos)
+        public virtual void Init(Vector3Int cellPos, CreatureData data = null)
         {
             this.data = data;
             this.cellPos = cellPos;
+
+            if (data == null) return;
+
+            hp = data.Hp;
+            damage = data.Damage;
+            armor = data.Armor;
         }
 
         private void OnEnable()

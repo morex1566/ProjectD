@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - PlayerCharacter
+  - GameplayCanvas
+  - GameplayTopLayout
+  - GameplayCenterLayout
   layers:
   - Default
   - TransparentFX

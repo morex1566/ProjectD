@@ -8,7 +8,7 @@ namespace TRPG.Runtime
     {
         private static ResourceManagerSettingsData settings;
 
-        private static GameDatabase database;
+        public static GameDatabase Database = new GameDatabase();
 
         private static readonly Queue<LoadQueueItem> loadQueue = new();
 
@@ -27,8 +27,7 @@ namespace TRPG.Runtime
             GetInstance();
             {
                 settings = Resources.Load<ResourceManagerSettingsData>("SO_ResourceManagerSettings");
-                database = new GameDatabase();
-                EnqueueLoad("GameDatabase", database.Load);
+                EnqueueLoad("GameDatabase", Database.Load);
             }
         }
 
@@ -47,34 +46,8 @@ namespace TRPG.Runtime
 
             if (isProcessingLoadQueue) return;
 
+            // 작업 시작
             ProcessLoadQueue();
-        }
-
-        public static bool TryGetMonsterData(string id, out MonsterData monsterData)
-        {
-            monsterData = null;
-
-            if (database == null) return false;
-            if (!database.IsLoaded) return false;
-
-            return database.TryGetMonsterData(id, out monsterData);
-        }
-
-        public static MonsterData GetMonsterData(string id)
-        {
-            if (database == null)
-            {
-                Debug.LogWarning("ResourceManager database is not initialized.");
-                return null;
-            }
-
-            if (!database.IsLoaded)
-            {
-                Debug.LogWarning($"ResourceManager database is not loaded yet. Id: {id}");
-                return null;
-            }
-
-            return database.GetMonsterData(id);
         }
 
         private static void ProcessLoadQueue()

@@ -16,6 +16,6 @@ MonoBehaviour:
   DisplayName: "\uC950"
   DefaultSkillId: Attack_00
   Hp: 10
-  Damage: 5
+  Damage: 1
   Armor: 1
   Description: "\uB354\uBBF8 \uBAAC\uC2A4\uD130"

@@ -8,8 +8,11 @@ using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Callbacks;
 using UnityEngine;
+using TRPG.Runtime;
 
 namespace TRPG.Editor
 {
@@ -18,6 +21,8 @@ namespace TRPG.Editor
         private const string ExcelDirectory = "Excels";
         private const string SchemaDirectory = "Assets/Project/Scripts/Data";
         private const string AssetRootDirectory = "Assets/Project/Datas";
+        private const string AddressableGroupName = "Remote_Core";
+        private const string CreatureDataLabel = "CreatureData";
         private const string PendingAssetImportKey = "TRPG.ExcelDataImporter.PendingAssetImport";
 
         [MenuItem("TRPG/Data/Import Excel Tables")]
@@ -253,6 +258,7 @@ namespace TRPG.Editor
                     }
 
                     ApplyRecordToAsset(asset, table.Fields, record);
+                    RegisterCreatureDataAddressable(asset, assetPath, assetName);
                     EditorUtility.SetDirty(asset);
                     createdOrUpdatedCount++;
                 }
@@ -261,6 +267,34 @@ namespace TRPG.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log($"Excel ScriptableObject import completed. Assets created or updated: {createdOrUpdatedCount}");
+        }
+
+        private static void RegisterCreatureDataAddressable(ScriptableObject asset, string assetPath, string assetName)
+        {
+            if (asset is not CreatureData) return;
+
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+            if (settings == null)
+            {
+                Debug.LogWarning("Addressable settings not found. CreatureData asset was created but not registered.");
+                return;
+            }
+
+            AddressableAssetGroup group = settings.FindGroup(AddressableGroupName) ?? settings.DefaultGroup;
+            if (group == null)
+            {
+                Debug.LogWarning("Addressable group not found. CreatureData asset was created but not registered.");
+                return;
+            }
+
+            settings.AddLabel(CreatureDataLabel);
+
+            string guid = AssetDatabase.AssetPathToGUID(assetPath);
+            AddressableAssetEntry entry = settings.CreateOrMoveEntry(guid, group);
+            entry.address = assetName;
+            entry.SetLabel(CreatureDataLabel, true, true);
+
+            settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, entry, true);
         }
 
         private static void ApplyRecordToAsset(ScriptableObject asset, List<FieldData> fields, Dictionary<string, string> record)
