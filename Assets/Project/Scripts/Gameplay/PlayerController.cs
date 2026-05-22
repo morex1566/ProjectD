@@ -10,73 +10,43 @@ namespace TRPG.Runtime
         private enum ActionFlag
         {
             None = 0,
-            Moving = 1 << 0,
-            Attacking = 1 << 1
+            Moving = 1 << 0
         }
 
-        private const float MoveInputThreshold = 0.5f;
+        [Header("PlayerController")]
+        [SerializeField, ReadOnly] private DragPendulum2D dragPendulum;
 
-        private const float AttackMoveRatio = 0.2f;
-
-        private Vector2 moveInput;
+        private const int DefaultMoveRange = 1;
 
         private ActionFlag actionFlags;
 
         public new PlayerModel Model => base.Model as PlayerModel;
 
+        protected override void Awake()
+        {
+            base.Awake();
 
-
+            dragPendulum = GetComponent<DragPendulum2D>();
+        }
 
         private void OnEnable()
         {
-            InputManager.InputMappingContext.Player.Move.performed += OnMove;
-            InputManager.InputMappingContext.Player.Move.canceled += OnMoveCanceled;
+            InputManager.InputMappingContext.Player.LeftClick.performed += OnClickPerformed;
+            InputManager.InputMappingContext.Player.LeftClick.canceled += OnClickCanceled;
 
-            moveInput = Vector2.zero;
             actionFlags = ActionFlag.None;
         }
 
         private void OnDisable()
         {
-            InputManager.InputMappingContext.Player.Move.performed -= OnMove;
-            InputManager.InputMappingContext.Player.Move.canceled -= OnMoveCanceled;
+            InputManager.InputMappingContext.Player.LeftClick.performed -= OnClickPerformed;
+            InputManager.InputMappingContext.Player.LeftClick.canceled -= OnClickCanceled;
 
-            moveInput = Vector2.zero;
+            dragPendulum.EndDrag();
+
+            WorldManager.GetInstance().ClearMoveRange();
+
             actionFlags = ActionFlag.None;
-        }
-
-        private void Update()
-        {
-            UpdateMovement();
-        }
-
-        private void UpdateMovement()
-        {
-            Vector3Int cellStep = GetInputDirection(moveInput);
-
-            Vector3Int targetCellPos = Model.CellPos + cellStep;
-
-            // 이동 안한거임?
-            if (cellStep == Vector3Int.zero) return;
-
-            // 이동 또는 공격 액션 중에는 새 입력을 실행하지 않습니다.
-            if (HasActionFlag(ActionFlag.Moving | ActionFlag.Attacking)) return;
-
-            // 이동 가능한 타일?
-            if (WorldManager.GetInstance().TryGetGroundWorldPosition(targetCellPos, out Vector3 targetWorldPos))
-            {
-                // 적이 있어서 공격 가능한 타일?
-                if (WorldManager.GetInstance().HasMonster(targetCellPos, out MonsterController monsterController))
-                {
-                    Attack(targetWorldPos, monsterController);
-                }
-                else
-                {
-                    Move(targetWorldPos, targetCellPos);
-                }
-
-                return;
-            }
         }
 
         /// <summary>
@@ -84,21 +54,10 @@ namespace TRPG.Runtime
         /// </summary>
         public void Move(Vector3 targetWorldPos, Vector3Int targetCellPos)
         {
-            if (HasActionFlag(ActionFlag.Moving | ActionFlag.Attacking)) return;
+            if (HasActionFlag(ActionFlag.Moving)) return;
 
             actionFlags |= ActionFlag.Moving;
             StartCoroutine(MovementCo(targetWorldPos, targetCellPos));
-        }
-
-        /// <summary>
-        /// 적 공격, 적 방향으로 전진했다가 다시 원위치로 이동합니다. 
-        /// </summary>
-        public void Attack(Vector3 targetWorldPos, CreatureController targetController)
-        {
-            if (HasActionFlag(ActionFlag.Moving | ActionFlag.Attacking)) return;
-
-            actionFlags |= ActionFlag.Attacking;
-            StartCoroutine(AttackCo(targetWorldPos, targetController));
         }
 
         private IEnumerator MovementCo(Vector3 targetWorldPos, Vector3Int targetCellPos)
@@ -123,62 +82,41 @@ namespace TRPG.Runtime
             actionFlags &= ~ActionFlag.Moving;
         }
 
-        private IEnumerator AttackCo(Vector3 targetWorldPos, CreatureController creatureController)
-        {
-            Vector3 startWorldPos = transform.position;
-            targetWorldPos.z = transform.position.z;
-
-            // 공격 이동은 실제 셀을 바꾸지 않고, 대상 방향으로 한 칸 거리의 일부만 왕복합니다.
-            Vector3 attackWorldPos = Vector3.Lerp(startWorldPos, targetWorldPos, AttackMoveRatio);
-            float halfAttackDelay = Model.Data.AttackDelay * 0.5f;
-
-            // 플레이어 전진
-            float elapsedTime = 0f;
-            while (elapsedTime < halfAttackDelay)
-            {
-                elapsedTime += Time.deltaTime;
-                float progress = Mathf.Clamp01(elapsedTime / halfAttackDelay);
-                transform.position = Vector3.Lerp(startWorldPos, attackWorldPos, progress);
-
-                yield return null;
-            }
-
-            // 공격
-            creatureController.Hit(this, Model.Damage);
-            Hit(creatureController, creatureController.Model.Damage);
-
-            // 플레이어 후진
-            elapsedTime = 0f;
-            while (elapsedTime < halfAttackDelay)
-            {
-                elapsedTime += Time.deltaTime;
-                float progress = Mathf.Clamp01(elapsedTime / halfAttackDelay);
-                transform.position = Vector3.Lerp(attackWorldPos, startWorldPos, progress);
-
-                yield return null;
-            }
-
-            // 플레이어 공격 끝, 나머지 설정 후처리
-            transform.position = startWorldPos;
-            actionFlags &= ~ActionFlag.Attacking;
-        }
-
         private bool HasActionFlag(ActionFlag flag)
         {
             return (actionFlags & flag) != ActionFlag.None;
         }
 
-        private Vector3Int GetInputDirection(Vector2 input)
+        private int GetMoveRange()
         {
-            if (input.sqrMagnitude < MoveInputThreshold * MoveInputThreshold) return Vector3Int.zero;
+            return GetMoveRange(this);
+        }
 
-            // 대각 입력은 허용하지 않고 더 강한 축을 한 칸 이동 방향으로 사용합니다.
-            if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
-            {
-                return input.x > 0f ? Vector3Int.right : Vector3Int.left;
-            }
+        private int GetMoveRange(CreatureController creatureController)
+        {
+            if (creatureController.Model.MoveRange > 0) return creatureController.Model.MoveRange;
 
-            return input.y > 0f ? Vector3Int.up : Vector3Int.down;
+            // 스킬 데이터 에셋이 아직 연결되지 않은 상태에서도 이동 범위를 확인할 수 있게 합니다.
+            return DefaultMoveRange;
+        }
+
+        private bool TryMoveToHighlightedCell(Vector3 worldPos)
+        {
+            if (!WorldManager.GetInstance().TryGetGroundCellPosition(worldPos, out Vector3Int cellPos)) return false;
+
+            if (!WorldManager.GetInstance().IsMoveRangeOwner(this)) return false;
+
+            if (!WorldManager.GetInstance().IsMovableHighlighted(cellPos)) return false;
+
+            if (!WorldManager.GetInstance().TryGetGroundWorldPosition(cellPos, out Vector3 targetWorldPos)) return false;
+
+            if (WorldManager.GetInstance().HasMonster(cellPos, out _)) return false;
+
+            WorldManager.GetInstance().ClearMoveRange();
+
+            Move(targetWorldPos, cellPos);
+
+            return true;
         }
     }
 
@@ -187,26 +125,35 @@ namespace TRPG.Runtime
     /// </summary>
     public partial class PlayerController
     {
-        private void OnMove(InputAction.CallbackContext context)
+        private void OnClickPerformed(InputAction.CallbackContext context)
         {
-            moveInput = context.ReadValue<Vector2>();
+            // 플레이어 이동중?
+            if (HasActionFlag(ActionFlag.Moving)) return;
+
+            // 화면좌표 구할 수 없음?
+            if (!MouseEx.TryGetMouseWorldPosition(Camera.main, out Vector3 worldPos)) return;
+
+            // 플레이어를 클릭하면 아군 이동 가능 타일을 표시합니다.
+            if (Contains(worldPos))
+            {
+                WorldManager.GetInstance().ShowMoveRange(this, GetMoveRange(), WorldManager.GetInstance().AllyMovableTilePb);
+                dragPendulum.BeginDrag(worldPos);
+                return;
+            }
+
+            // 적을 클릭하면 적의 이동 가능 범위만 표시합니다.
+            if (WorldManager.GetInstance().HasMonsterAtWorld(worldPos, out MonsterController monsterController))
+            {
+                WorldManager.GetInstance().ShowMoveRange(monsterController, GetMoveRange(monsterController), WorldManager.GetInstance().EnemyMovableTilePb);
+                return;
+            }
+
+            if (TryMoveToHighlightedCell(worldPos)) return;
         }
 
-        private void OnMoveCanceled(InputAction.CallbackContext context)
+        private void OnClickCanceled(InputAction.CallbackContext context)
         {
-            moveInput = Vector2.zero;
+            dragPendulum.EndDrag();
         }
-    }
-
-    /// <summary>
-    /// 뷰
-    /// </summary>
-    public partial class PlayerController
-    {
-        [Header("View")]
-
-        [SerializeField] private Sprite attackPointImg;
-
-        [SerializeField] private Sprite armorPointImg;
     }
 }

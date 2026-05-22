@@ -39,6 +39,8 @@ Material:
     m_Floats:
     - _CurveFalloff: 4
     - _CurveStrength: 0.1
+    - _ScanlineCount: 120
+    - _ScanlineStrength: 0.35
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

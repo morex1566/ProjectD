@@ -21,6 +21,14 @@ namespace TRPG.Runtime
 
         [SerializeField] private GameObject monsterPb = null;
         [SerializeField] private GameObject playerPb = null;
+        [SerializeField] private GameObject allyMovableTilePb = null;
+        [SerializeField] private GameObject enemyMovableTilePb = null;
+
+        private const float IndicatorCloseDestroyDelay = 0.35f;
+
+        private readonly Dictionary<Vector3Int, GameObject> movableIndicators = new();
+
+        private CreatureController shownMoveRangeOwner = null;
 
         private void OnValidate()
         {
@@ -153,6 +161,56 @@ namespace TRPG.Runtime
             creatures.Remove(instanceId);
         }
 
+        public GameObject AllyMovableTilePb => allyMovableTilePb;
+
+        public GameObject EnemyMovableTilePb => enemyMovableTilePb;
+
+        /// <summary>
+        /// 크리처의 이동 범위 안에 있는 모든 Ground 타일을 지정된 프리팹으로 표시합니다.
+        /// </summary>
+        public void ShowMoveRange(CreatureController owner, int moveRange, GameObject indicatorPrefab)
+        {
+            ClearMoveRange();
+
+            if (owner == null) return;
+            if (moveRange <= 0) return;
+
+            shownMoveRangeOwner = owner;
+            Vector3Int originCellPos = owner.Model.CellPos;
+            for (int x = -moveRange; x <= moveRange; x++)
+            {
+                for (int y = -moveRange; y <= moveRange; y++)
+                {
+                    int distance = Mathf.Abs(x) + Mathf.Abs(y);
+                    if (distance == 0 || distance > moveRange) continue;
+
+                    Vector3Int cellPos = originCellPos + new Vector3Int(x, y, 0);
+                    if (!TryGetGroundWorldPosition(cellPos, out Vector3 worldPos)) continue;
+
+                    AddIndicator(movableIndicators, indicatorPrefab, cellPos, worldPos);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 현재 표시 중인 이동 가능 타일 표시를 모두 제거합니다.
+        /// </summary>
+        public void ClearMoveRange()
+        {
+            ClearIndicators(movableIndicators);
+            shownMoveRangeOwner = null;
+        }
+
+        public bool IsMovableHighlighted(Vector3Int cellPos)
+        {
+            return movableIndicators.ContainsKey(cellPos);
+        }
+
+        public bool IsMoveRangeOwner(CreatureController owner)
+        {
+            return shownMoveRangeOwner == owner;
+        }
+
         /// <summary>
         /// 이 위치에 몬스터가 있는지 확인합니다. 
         /// </summary>
@@ -172,6 +230,57 @@ namespace TRPG.Runtime
 
             monsterController = null;
             return false;
+        }
+
+        public bool HasMonsterAtWorld(Vector3 worldPos, out MonsterController monsterController)
+        {
+            if (!TryGetGroundCellPosition(worldPos, out Vector3Int cellPos))
+            {
+                monsterController = null;
+                return false;
+            }
+
+            // 타일 기반 클릭 판정은 스프라이트 bounds가 아니라 점유 셀을 기준으로 합니다.
+            return HasMonster(cellPos, out monsterController);
+        }
+
+        private void AddIndicator(Dictionary<Vector3Int, GameObject> indicators, GameObject prefab, Vector3Int cellPos, Vector3 worldPos)
+        {
+            if (prefab == null)
+            {
+                Debug.LogWarning("Move range indicator prefab is not assigned.");
+                return;
+            }
+
+            GameObject indicator = Instantiate(prefab, worldPos, Quaternion.identity, transform);
+            indicators.Add(cellPos, indicator);
+            PlayIndicatorTrigger(indicator, UnityConstant.Animator.Parameters.AC_TIleIndicator.Trigger.OnOpen);
+        }
+
+        private void ClearIndicators(Dictionary<Vector3Int, GameObject> indicators)
+        {
+            foreach (KeyValuePair<Vector3Int, GameObject> pair in indicators)
+            {
+                if (pair.Value == null) continue;
+
+                CloseIndicator(pair.Value);
+            }
+
+            indicators.Clear();
+        }
+
+        private void CloseIndicator(GameObject indicator)
+        {
+            PlayIndicatorTrigger(indicator, UnityConstant.Animator.Parameters.AC_TIleIndicator.Trigger.OnClose);
+            Destroy(indicator, IndicatorCloseDestroyDelay);
+        }
+
+        private void PlayIndicatorTrigger(GameObject indicator, string triggerName)
+        {
+            Animator animator = indicator.GetComponentInChildren<Animator>();
+            if (animator == null) return;
+
+            animator.SetTrigger(triggerName);
         }
     }
 }

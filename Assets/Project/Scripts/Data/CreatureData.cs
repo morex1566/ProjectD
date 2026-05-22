@@ -20,5 +20,6 @@ namespace TRPG.Runtime
 
         public string Description;
 
+        public SkillData SkillData;
     }
 }

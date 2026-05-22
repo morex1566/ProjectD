@@ -27,6 +27,8 @@ namespace TRPG.Runtime
 
         public Vector3Int CellPos => cellPos;
 
+        public int MoveRange => moveRange;
+
         public float Damage => damage;
 
         public float Hp => hp;
@@ -42,12 +44,16 @@ namespace TRPG.Runtime
         {
             this.data = data;
             this.cellPos = cellPos;
+            moveRange = 0;
 
             if (data == null) return;
 
             hp = data.Hp;
             damage = data.Damage;
             armor = data.Armor;
+
+            // 현재 선택된 기본 스킬의 범위를 실제 이동 가능 범위로 사용합니다.
+            if (data.SkillData != null) moveRange = Mathf.Max(0, data.SkillData.moveRange);
         }
 
         private void OnEnable()

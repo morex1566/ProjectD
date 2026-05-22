@@ -4,6 +4,8 @@ Shader "Project/Fullscreen/CRT"
     {
         _CurveStrength ("Curve Strength", Range(0, 0.3)) = 0.08
         _CurveFalloff ("Curve Falloff", Range(0.3, 4)) = 1.0
+        _ScanlineStrength ("Scanline Strength", Range(0, 0.6)) = 0.18
+        _ScanlineCount ("Scanline Count", Float) = 720
     }
 
     SubShader
@@ -35,6 +37,8 @@ Shader "Project/Fullscreen/CRT"
 
             float _CurveStrength;
             float _CurveFalloff;
+            float _ScanlineStrength;
+            float _ScanlineCount;
 
             float2 ApplyCurve(float2 uv)
             {
@@ -51,13 +55,24 @@ Shader "Project/Fullscreen/CRT"
                 return centeredUv * 0.5 + 0.5;
             }
 
+            float GetScanline(float2 uv)
+            {
+                // Darkens repeating horizontal bands without changing hue.
+                float wave = sin(uv.y * _ScanlineCount * 6.28318530718);
+                float scanlineValue = wave * 0.5 + 0.5;
+                return lerp(1.0, scanlineValue, saturate(_ScanlineStrength));
+            }
+
             half4 Fragment(Varyings input) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
                 float2 screenUv = input.texcoord.xy;
                 float2 sampleUv = ApplyCurve(screenUv);
-                return SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, sampleUv);
+                half4 color = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, sampleUv);
+
+                color.rgb *= GetScanline(screenUv);
+                return color;
             }
             ENDHLSL
         }
