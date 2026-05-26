@@ -20,21 +20,18 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private Dictionary<int, CreatureController> creatures = null;
 
-        private Dictionary<Vector3Int, GameObject> tileIndicators = new();
+        private Dictionary<Vector3Int, TileIndicator> tileIndicators = new();
 
         [Header("Setup")]
 
-        [SerializeField] private GameObject monsterPb = null;
+        [SerializeField] private CreatureController monsterPb = null;
 
-        [SerializeField] private GameObject playerPb = null;
+        [SerializeField] private CreatureController playerPb = null;
 
-        [SerializeField] private GameObject allyMovableTilePb = null;
+        [SerializeField] private TileIndicator allyTileIndicatorPb = null;
 
-        [SerializeField] private GameObject enemyMovableTilePb = null;
+        [SerializeField] private TileIndicator enemyTileIndicatorPb = null;
 
-        public GameObject AllyMovableTilePb => allyMovableTilePb;
-
-        public GameObject EnemyMovableTilePb => enemyMovableTilePb;
 
         private void OnValidate()
         {
@@ -121,18 +118,38 @@ namespace TRPG.Runtime
             return false;
         }
 
+        /// <summary>
+        /// Ground 셀이 속한 Tilemap의 셀 경계를 반환합니다.
+        /// </summary>
+        public bool TryGetGroundCellBounds(Vector3Int cellPos, out BoundsInt cellBounds)
+        {
+            if (ground == null) Init();
+
+            foreach (Tilemap tilemap in ground)
+            {
+                if (!tilemap.HasTile(cellPos)) continue;
+
+                cellBounds = tilemap.cellBounds;
+
+                return true;
+            }
+
+            cellBounds = default;
+
+            return false;
+        }
+
         public void SpawnMonster(CreatureData monsterData, Vector3Int cellPos)
         {
             // Ground 타일이 없는 셀에는 몬스터를 생성하지 않습니다.
             if (!TryGetGroundWorldPos(cellPos, out Vector3 worldPos)) return;
 
             // 몬스터 프리팹을 생성하고 모델 데이터를 초기화합니다.
-            GameObject monsterInst = Instantiate(monsterPb, worldPos, Quaternion.identity);
-            MonsterController monsterController = monsterInst.GetComponent<MonsterController>();
+            MonsterController monsterController = Instantiate(monsterPb, worldPos, Quaternion.identity) as MonsterController;
             if (monsterController == null)
             {
                 Debug.LogWarning($"SpawnMonster failed. MonsterController not found. Prefab: {monsterPb.name}");
-                Destroy(monsterInst);
+                Destroy(monsterController.gameObject);
                 return;
             }
             monsterController.Model.Init(cellPos, monsterData);
@@ -147,12 +164,11 @@ namespace TRPG.Runtime
             if (!TryGetGroundWorldPos(cellPos, out Vector3 worldPos)) return;
 
             // 플레이어 프리팹을 생성하고 모델 데이터를 초기화합니다.
-            GameObject playerInst = Instantiate(playerPb, worldPos, Quaternion.identity);
-            PlayerController playerController = playerInst.GetComponent<PlayerController>();
+            PlayerController playerController = Instantiate(playerPb, worldPos, Quaternion.identity) as PlayerController;
             if (playerController == null)
             {
                 Debug.LogWarning($"SpawnPlayer failed. PlayerController not found. Prefab: {playerPb.name}");
-                Destroy(playerInst);
+                Destroy(playerController.gameObject);
                 return;
             }
             playerController.Model.Init(cellPos);
@@ -171,23 +187,15 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 현재 표시 중인 이동 가능 타일 표시를 모두 제거합니다.
-        /// </summary>
-        public void ClearMoveRange()
-        {
-            RemoveTileIndicators(tileIndicators);
-        }
-
-        /// <summary>
         /// 내가 소유한 타일 인디케이터인지?
         /// </summary>
-        public bool IsMovableHighlighted(Vector3Int cellPos)
+        public bool HasIndicatorInCellPos(Vector3Int cellPos, CreatureController owner)
         {
-            return tileIndicators.ContainsKey(cellPos);
+            return tileIndicators.ContainsKey(cellPos) && tileIndicators[cellPos].Owner == owner;
         }
 
         /// <summary>
-        /// 이 위치에 몬스터가 있는지 확인합니다. 
+        /// 이 위치에 몬스터가 있는지 확인합니다.
         /// </summary>
         public bool HasMonsterInCellPos(Vector3Int cellPos, out MonsterController monsterController)
         {
@@ -207,8 +215,20 @@ namespace TRPG.Runtime
             return false;
         }
 
+        private bool HasCreatureInCellPos(Vector3Int cellPos)
+        {
+            foreach (KeyValuePair<int, CreatureController> pair in creatures)
+            {
+                if (cellPos != pair.Value.Model.CellPos) continue;
+
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
-        /// 이 위치에 몬스터가 있는지 확인합니다. 
+        /// 이 위치에 몬스터가 있는지 확인합니다.
         /// </summary>
         public bool HasMonsterInWorldPos(Vector3 worldPos, out MonsterController monsterController)
         {
@@ -225,35 +245,104 @@ namespace TRPG.Runtime
         /// <summary>
         /// 타일에 표식 넣기
         /// </summary>
-        public void AddTileIndicator(GameObject prefab, Vector3Int cellPos, Vector3 worldPos)
+        public void AddAllyTileIndicator(List<Vector3Int> cellPosList, CreatureController owner)
         {
-            if (prefab == null)
-            {
-                Debug.LogWarning("Move range tileIndicator prefab is not assigned.");
-                return;
-            }
+            RemoveTileIndicators(owner);
 
-            GameObject tileIndicator = Instantiate(prefab, worldPos, Quaternion.identity, transform);
-            tileIndicators.Add(cellPos, tileIndicator);
-            PlayTileIndicatorTrigger(tileIndicator, UnityConstant.Animator.Parameters.AC_TIleIndicator.Trigger.OnOpen);
+            foreach (Vector3Int cellPos in cellPosList)
+            {
+                if (!TryGetGroundWorldPos(cellPos, out Vector3 indicatorWorldPos)) continue;
+
+                RemoveTileIndicator(cellPos);
+
+                TileIndicator tileIndicator = Instantiate(allyTileIndicatorPb, indicatorWorldPos, Quaternion.identity, transform);
+                tileIndicator.Init(owner, cellPos);
+                tileIndicators.Add(cellPos, tileIndicator);
+            }
+        }
+
+        public void AddEnemyTileIndicator(List<Vector3Int> cellPosList, CreatureController owner)
+        {
+            RemoveTileIndicators(owner);
+
+            foreach (Vector3Int cellPos in cellPosList)
+            {
+                if (!TryGetGroundWorldPos(cellPos, out Vector3 indicatorWorldPos)) continue;
+
+                RemoveTileIndicator(cellPos);
+
+                TileIndicator tileIndicator = Instantiate(enemyTileIndicatorPb, indicatorWorldPos, Quaternion.identity, transform);
+                tileIndicator.Init(owner, cellPos);
+                tileIndicators.Add(cellPos, tileIndicator);
+            }
         }
 
         /// <summary>
         /// 인디케이터 삭제
         /// </summary>
-        private void RemoveTileIndicators(Dictionary<Vector3Int, GameObject> indicators)
+        public void RemoveTileIndicators(CreatureController owner)
         {
-            foreach (KeyValuePair<Vector3Int, GameObject> pair in indicators)
+            List<Vector3Int> removeCellPosList = new();
+            foreach (KeyValuePair<Vector3Int, TileIndicator> pair in tileIndicators)
             {
-                if (pair.Value == null) continue;
+                if (pair.Value == null)
+                {
+                    removeCellPosList.Add(pair.Key);
+                    continue;
+                }
 
-                // 인디케이터 삭제
-                // TODO : 애니메이션 끝에 맞춰서 삭제해야할듯
-                PlayTileIndicatorTrigger(pair.Value, UnityConstant.Animator.Parameters.AC_TIleIndicator.Trigger.OnClose);
-                Destroy(pair.Value, IndicatorCloseDestroyDelay);
+                if (!(pair.Value.Owner == owner)) continue;
+
+                removeCellPosList.Add(pair.Key);
             }
 
-            indicators.Clear();
+            foreach (Vector3Int cellPos in removeCellPosList)
+            {
+                RemoveTileIndicator(cellPos);
+            }
+        }
+
+        private void RemoveTileIndicator(Vector3Int cellPos)
+        {
+            if (!tileIndicators.TryGetValue(cellPos, out TileIndicator tileIndicator)) return;
+
+            // dictionary entry와 Scene object를 함께 제거해야 다음 indicator 생성 시 key가 충돌하지 않습니다.
+            if (tileIndicator != null) Destroy(tileIndicator.gameObject);
+
+            tileIndicators.Remove(cellPos);
+        }
+
+        /// <summary>
+        /// originCellPos 기준 현재 tilemap에서 이동가능한 셀 위치를 가져옵니다.
+        /// </summary>
+        public List<Vector3Int> GetMovableCellPos(Vector3Int originCellPos, List<Vector3Int> directions, bool isRepeatable)
+        {
+            List<Vector3Int> movableCellPosList = new();
+
+            if (directions == null) return movableCellPosList;
+
+            foreach (Vector3Int direction in directions)
+            {
+                if (direction == Vector3Int.zero) continue;
+
+                Vector3Int candidateCellPos = originCellPos + direction;
+                while (TryGetGroundWorldPos(candidateCellPos, out _))
+                {
+                    // 다른 크리처가 점유한 셀은 이동 가능 셀에서 제외하고, 반복 이동도 그 지점에서 멈춥니다.
+                    if (HasCreatureInCellPos(candidateCellPos)) break;
+
+                    if (!movableCellPosList.Contains(candidateCellPos))
+                    {
+                        movableCellPosList.Add(candidateCellPos);
+                    }
+
+                    if (!isRepeatable) break;
+
+                    candidateCellPos += direction;
+                }
+            }
+
+            return movableCellPosList;
         }
     }
 
@@ -262,20 +351,6 @@ namespace TRPG.Runtime
     /// </summary>
     public partial class WorldManager : MonoBehaviourSingleton<WorldManager>
     {
-        private void PlayTileIndicatorTrigger(GameObject indicator, string triggerName)
-        {
-            Animator animator = indicator.GetComponentInChildren<Animator>();
-            if (animator == null) return;
 
-            animator.SetTrigger(triggerName);
-        }
-    }
-
-    /// <summary>
-    /// const
-    /// </summary>
-    public partial class WorldManager : MonoBehaviourSingleton<WorldManager>
-    {
-        private const float IndicatorCloseDestroyDelay = 0.35f;
     }
 }

@@ -139,12 +139,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba1da61f64a24c409c0de2280ce99198, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MonsterModel
-  cellPos: {x: 0, y: 0, z: 0}
-  moveRange: 0
-  damage: 0
-  hp: 0
-  armor: 0
   data: {fileID: 0}
+  cellPos: {x: 0, y: 0, z: 0}
+  hp: 0
+  damage: 0
+  armor: 0
+  cost: 0
+  isMoveRepeatable: 0
+  directions: []
 --- !u!114 &5623844873239391356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,10 +159,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c46a3cbe17f6614fa0cd4dd21217717, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MonsterController
-  spriteRenderer: {fileID: 6735465845777279200}
   model: {fileID: 3184946928956853724}
-  hitFlashColor: {r: 1, g: 0.19433957, b: 0.19433957, a: 1}
-  hitFlashDuration: 0.08
+  spriteRenderer: {fileID: 6735465845777279200}
+  animator: {fileID: 8124359199729283323}
+  actionFlags: 0
+  movableCellPosList: []
+  preLandingOffset: {x: 0, y: 0.5, z: 0}
+  moveDelay: 0.01
+  stompDelay: 0.05
 --- !u!114 &2942208444780335875
 MonoBehaviour:
   m_ObjectHideFlags: 0

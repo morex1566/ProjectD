@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -18,21 +19,39 @@ namespace TRPG.Runtime
     {
         [Header("CreatureController.Comp")]
 
-        [SerializeField, ReadOnly] private SpriteRenderer spriteRenderer = null;
-
-        [SerializeField, ReadOnly] private Animator animator = null;
-
         [SerializeField, ReadOnly] private CreatureModel model = null;
+
+        [SerializeField, ReadOnly] protected Animator animator = null;
+
+        [SerializeField] protected SpriteRenderer spriter = null;
+
+        [SerializeField] protected SpriteRenderer outliner = null;
 
         [Header("CreatureController.View")]
 
-        [SerializeField] private Color hitFlashColor = Color.red;
+        [SerializeField] private Color outlineColor = Color.green;
 
-        [SerializeField] private float hitFlashDuration = 0.08f;
+        [SerializeField, Min(1)] private int outlinePixelWidth = 1;
+
+        private static readonly Vector3[] OutlineDirections =
+        {
+            Vector3.up,
+            Vector3.down,
+            Vector3.left,
+            Vector3.right,
+            new Vector3(-1f, 1f, 0f),
+            new Vector3(1f, 1f, 0f),
+            new Vector3(-1f, -1f, 0f),
+            new Vector3(1f, -1f, 0f)
+        };
+
+        private readonly List<SpriteRenderer> outlineRenderers = new();
 
         [Header("CreatureController.Runtime")]
 
-        [SerializeField, ReadOnly] private ActionFlag actionFlags;
+        [SerializeField, ReadOnly] protected ActionFlag actionFlags;
+
+        [SerializeField, ReadOnly] protected List<Vector3Int> movableCellPosList = new();
 
         /// <summary>
         /// 목표 타일 위에 살짝 띄운 도착 위치 오프셋
@@ -78,9 +97,8 @@ namespace TRPG.Runtime
 
         private void Init()
         {
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            animator = GetComponentInChildren<Animator>();
             model = GetComponent<CreatureModel>();
+            animator = GetComponentInChildren<Animator>();
         }
 
         private void OnEnable()
@@ -98,9 +116,9 @@ namespace TRPG.Runtime
         /// </summary>
         public bool Contains(Vector3 position)
         {
-            position.z = spriteRenderer.bounds.center.z;
+            position.z = spriter.bounds.center.z;
 
-            return spriteRenderer.bounds.Contains(position);
+            return spriter.bounds.Contains(position);
         }
 
         /// <summary>
@@ -112,43 +130,14 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 피해량만큼 HP를 감소시킵니다.
-        /// </summary>
-        public void Hit(CreatureController attacker, float damage)
-        {
-            // 로직
-            float calculatedDamage = Mathf.Clamp(damage - model.Armor, 0f, 99999);
-            model.SetHp(model.Hp - calculatedDamage);
-
-            // 뷰
-            // 맞는 효과
-            // 플레이어와 대상의 사이에서 Damage UI콜
-            PlayHitFlash();
-            Vector3 center = (attacker.transform.position + transform.position) * 0.5f;
-            UIManager.GetInstance().ShowDamage(center, calculatedDamage);
-
-            if (CheckIsDead()) WorldManager.GetInstance().Despawn(GetInstanceID());
-        }
-
-        public bool CheckIsDead()
-        {
-            return model.Hp <= 0;
-        }
-
-        /// <summary>
         /// 화면 좌표가 Tilemap 레이어의 유효한 셀이면 해당 셀로 이동합니다.
         /// </summary>
-        protected void Move
-        (
-            Vector3 targetWorldPos,
-            Vector3Int targetCellPos,
-            Quaternion targetRot,
-            bool usePreLanding = true
-        )
+        protected void Move(Vector3 targetWorldPos, Vector3Int targetCellPos, Quaternion targetRot, bool usePreLanding = true)
         {
             // 이동 시작했으니 이동 플래그, 이동 가능한 지역 해제
             actionFlags |= ActionFlag.Moving;
-            WorldManager.GetInstance().ClearMoveRange();
+
+            WorldManager.GetInstance().RemoveTileIndicators(this);
 
             StartCoroutine(MoveCo(targetWorldPos, targetCellPos, usePreLanding));
             StartCoroutine(RotCo(targetRot));
@@ -259,13 +248,6 @@ namespace TRPG.Runtime
     /// </summary>
     public abstract partial class CreatureController : MonoBehaviour, ISelectable
     {
-        private void PlayHitFlash()
-        {
-            if (hitFlashCoroutine != null) StopCoroutine(hitFlashCoroutine);
-
-            hitFlashCoroutine = StartCoroutine(HitFlashCo());
-        }
-
         protected void PlayPick()
         {
             animator.SetTrigger(UnityConstant.Animator.Parameters.AC_Gameplay_Creature.Trigger.OnPick);
@@ -276,15 +258,59 @@ namespace TRPG.Runtime
             animator.SetTrigger(UnityConstant.Animator.Parameters.AC_Gameplay_Creature.Trigger.OnDrop);
         }
 
-        private IEnumerator HitFlashCo()
+        protected void SetOutline(bool active)
         {
-            Color originColor = spriteRenderer.color;
+            EnsureOutlineRenderers();
 
-            spriteRenderer.color = Color.red;
-            yield return new WaitForSeconds(hitFlashDuration);
+            foreach (SpriteRenderer outlineRenderer in outlineRenderers)
+            {
+                outlineRenderer.gameObject.SetActive(active);
+            }
 
-            spriteRenderer.color = originColor;
-            hitFlashCoroutine = null;
+            if (!active || spriter.sprite == null)
+            {
+                return;
+            }
+
+            float pixelSize = Mathf.Max(1, outlinePixelWidth) / spriter.sprite.pixelsPerUnit;
+            for (int i = 0; i < outlineRenderers.Count; i++)
+            {
+                ApplyOutlineRenderer(outlineRenderers[i], OutlineDirections[i] * pixelSize);
+            }
+        }
+
+        private void EnsureOutlineRenderers()
+        {
+            outlineRenderers.RemoveAll(outlineRenderer => outlineRenderer == null);
+
+            if (outlineRenderers.Count == 0)
+            {
+                outlineRenderers.Add(outliner);
+            }
+
+            for (int i = outlineRenderers.Count; i < OutlineDirections.Length; i++)
+            {
+                SpriteRenderer outlineRenderer = Instantiate(outliner, outliner.transform.parent);
+
+                outlineRenderer.name = $"{outliner.name}_{i}";
+                outlineRenderers.Add(outlineRenderer);
+            }
+        }
+
+        private void ApplyOutlineRenderer(SpriteRenderer outlineRenderer, Vector3 localOffset)
+        {
+            outlineRenderer.sprite = spriter.sprite;
+            outlineRenderer.color = Color.white;
+
+            // Scale 확대 대신 PPU 기준 픽셀 단위 offset으로 외곽선을 맞춥니다.
+            outlineRenderer.transform.localPosition = localOffset;
+            outlineRenderer.transform.localScale = Vector3.one;
+
+            outlineRenderer.sortingLayerID = spriter.sortingLayerID;
+            outlineRenderer.sortingOrder = spriter.sortingOrder - 1;
+            outlineRenderer.flipX = spriter.flipX;
+            outlineRenderer.flipY = spriter.flipY;
+            outlineRenderer.material.SetColor("_Color", outlineColor);
         }
     }
 }

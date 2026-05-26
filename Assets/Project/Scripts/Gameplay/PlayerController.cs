@@ -1,6 +1,6 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements.Experimental;
 
 namespace TRPG.Runtime
 {
@@ -10,6 +10,7 @@ namespace TRPG.Runtime
     public partial class PlayerController : CreatureController
     {
         [Header("PlayerController")]
+
         [SerializeField] private DragPendulum2D dragger;
 
         public new PlayerModel Model => base.Model as PlayerModel;
@@ -23,12 +24,14 @@ namespace TRPG.Runtime
         {
             InputManager.InputMappingContext.Player.LeftClick.performed += OnClickPerformed;
             InputManager.InputMappingContext.Player.LeftClick.canceled += OnClickCanceled;
+            InputManager.InputMappingContext.Player.Point.performed += OnPointPerformed;
         }
 
         private void OnDisable()
         {
             InputManager.InputMappingContext.Player.LeftClick.performed -= OnClickPerformed;
             InputManager.InputMappingContext.Player.LeftClick.canceled -= OnClickCanceled;
+            InputManager.InputMappingContext.Player.Point.performed -= OnPointPerformed;
         }
     }
 
@@ -37,8 +40,30 @@ namespace TRPG.Runtime
     /// </summary>
     public partial class PlayerController
     {
+        private void OnPointPerformed(InputAction.CallbackContext context)
+        {
+            Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
+
+            // 플레이어 이동중?
+            if (HasActionFlag(ActionFlag.Moving)) return;
+
+            // 드래깅 중임?
+            if (!dragger.gameObject.activeSelf) return;
+
+            // 플레이어를 호버링하면 외곽선 쉐이더 실행
+            if (Contains(mouseWorldPos))
+            {
+                SetOutline(true);
+            }
+            else
+            {
+                SetOutline(false);
+            }
+        }
+
         private void OnClickPerformed(InputAction.CallbackContext context)
         {
+            WorldManager worldManager = WorldManager.GetInstance();
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
 
             // 플레이어 이동중?
@@ -48,9 +73,14 @@ namespace TRPG.Runtime
             if (!Contains(mouseWorldPos)) return;
 
             // 이동할 수 없는 타일 선택?
-            if (!WorldManager.GetInstance().TryGetGroundCellPos(mouseWorldPos, out Vector3Int mouseCellPos)) return;
+            if (!worldManager.TryGetGroundCellPos(mouseWorldPos, out Vector3Int mouseCellPos)) return;
 
-
+            // 드래깅 시작
+            // 이동 범위 요청
+            // 적에 대한 외곽선 효과 요청
+            // 
+            movableCellPosList = worldManager.GetMovableCellPos(Model.CellPos, Model.Directions, Model.IsMoveRepeatable);
+            worldManager.AddAllyTileIndicator(movableCellPosList, this);
             dragger.gameObject.SetActive(true);
             PlayPick();
         }
@@ -61,15 +91,16 @@ namespace TRPG.Runtime
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
             worldManager.TryGetGroundWorldPos(Model.CellPos, out Vector3 modelWorldPos);
 
-            // 드래깅 중임?
-            if (!dragger.gameObject.activeSelf) return;
-
             // 플레이어 이동중?
             if (HasActionFlag(ActionFlag.Moving)) return;
 
+            // 드래깅 중임?
+            if (!dragger.gameObject.activeSelf) return;
+
             // 마우스 커서가 있는 Ground 타일로 이동
             if (worldManager.TryGetGroundCellPos(mouseWorldPos, out Vector3Int mouseCellPos) &&
-                worldManager.TryGetGroundWorldPos(mouseCellPos, out mouseWorldPos))
+                worldManager.TryGetGroundWorldPos(mouseCellPos, out mouseWorldPos) &&
+                movableCellPosList.Contains(mouseCellPos))
             {
                 Move(mouseWorldPos, mouseCellPos, Quaternion.identity);
             }
@@ -79,6 +110,10 @@ namespace TRPG.Runtime
                 Move(modelWorldPos, Model.CellPos, Quaternion.identity);
             }
 
+            // 드래깅 끝
+            // 이동 범위 초기화
+            movableCellPosList = new();
+            worldManager.RemoveTileIndicators(this);
             dragger.gameObject.SetActive(false);
             PlayDrop();
         }

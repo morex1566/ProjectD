@@ -224,6 +224,24 @@ namespace TRPG.Editor
                 builder.AppendLine();
             }
 
+            if (table.ClassName == "CreatureData" && table.Fields.All(field => field.FieldName != "Cost"))
+            {
+                builder.AppendLine("        public int Cost;");
+                builder.AppendLine();
+            }
+
+            if (table.ClassName == "CreatureData" && table.Fields.All(field => field.FieldName != "MoveRangeData"))
+            {
+                builder.AppendLine($"        public {nameof(MoveRangeData)} MoveRangeData;");
+                builder.AppendLine();
+            }
+
+            if (table.ClassName == "CreatureData" && table.Fields.All(field => field.FieldName != "SkillData"))
+            {
+                builder.AppendLine($"        public {nameof(SkillData)} SkillData;");
+                builder.AppendLine();
+            }
+
             builder.AppendLine("    }");
             builder.AppendLine("}");
 
@@ -312,6 +330,19 @@ namespace TRPG.Editor
                 object value = ConvertValue(rawValue, fieldInfo.FieldType);
                 fieldInfo.SetValue(asset, value);
             }
+
+            ApplyDerivedReferences(asset, record);
+        }
+
+        private static void ApplyDerivedReferences(ScriptableObject asset, Dictionary<string, string> record)
+        {
+            if (asset is not CreatureData creatureData) return;
+
+            // DefaultSkillId는 데이터 식별자로 유지하고, 런타임 참조 필드는 import 시 자동 연결합니다.
+            if (record.TryGetValue("DefaultSkillId", out string defaultSkillId))
+            {
+                creatureData.SkillData = LoadAssetByRecordValue(defaultSkillId, typeof(SkillData)) as SkillData;
+            }
         }
 
         private static object ConvertValue(string rawValue, Type targetType)
@@ -342,6 +373,49 @@ namespace TRPG.Editor
             if (targetType.IsEnum)
             {
                 return Enum.TryParse(targetType, rawValue, true, out object value) ? value : Activator.CreateInstance(targetType);
+            }
+
+            if (typeof(ScriptableObject).IsAssignableFrom(targetType))
+            {
+                return LoadAssetByRecordValue(rawValue, targetType);
+            }
+
+            return null;
+        }
+
+        private static ScriptableObject LoadAssetByRecordValue(string rawValue, Type targetType)
+        {
+            rawValue = rawValue?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(rawValue)) return null;
+
+            if (targetType == typeof(MoveRangeData))
+            {
+                return LoadAssetByName($"SO_MoveRange_{rawValue}", targetType);
+            }
+
+            if (targetType == typeof(SkillData))
+            {
+                string compactId = rawValue.Replace("_", string.Empty);
+                return LoadAssetByName($"SO_Skill_{compactId}", targetType, false)
+                    ?? LoadAssetByName($"SO_Skill_{rawValue}", targetType, false)
+                    ?? LoadAssetByName(rawValue, targetType);
+            }
+
+            return LoadAssetByName(rawValue, targetType);
+        }
+
+        private static ScriptableObject LoadAssetByName(string assetName, Type targetType, bool logWarning = true)
+        {
+            foreach (string guid in AssetDatabase.FindAssets(assetName))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                ScriptableObject asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
+                if (asset != null && targetType.IsInstanceOfType(asset)) return asset;
+            }
+
+            if (logWarning)
+            {
+                Debug.LogWarning($"ScriptableObject asset not found. Type: {targetType.Name}, Name: {assetName}");
             }
 
             return null;
@@ -386,8 +460,8 @@ namespace TRPG.Editor
         {
             string lowerName = fieldName.ToLowerInvariant();
             if (lowerName is "id" or "displayname" or "prefabaddress" or "defaultskillid" or "description") return "string";
-            if (lowerName is "hp" or "damage" or "armor") return "float";
-            if (lowerName is "moverange" or "level" or "count") return "int";
+            if (lowerName == "moverangedata") return nameof(MoveRangeData);
+            if (lowerName is "hp" or "damage" or "armor" or "cost" or "level" or "count") return "int";
 
             List<string> values = rawValues.Where(value => !string.IsNullOrWhiteSpace(value)).ToList();
             if (values.Count == 0) return "string";
@@ -567,6 +641,7 @@ namespace TRPG.Editor
             {
                 "PrefabName" => "PrefabAddress",
                 "DefaultSkillID" => "DefaultSkillId",
+                "MoveRange" => "MoveRangeData",
                 _ => fieldName,
             };
         }

@@ -104,6 +104,15 @@ namespace TRPG.Runtime
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""Point"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""52805266-3466-4dbc-956c-ab62c87a7a58"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""ScrollWheel"",
                     ""type"": ""PassThrough"",
                     ""id"": ""544507be-9aa4-4c97-bb9f-0fb3a4814e84"",
@@ -333,6 +342,39 @@ namespace TRPG.Runtime
                     ""processors"": """",
                     ""groups"": ""Joystick"",
                     ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bf94ba5c-ac29-470e-8b36-f74abdf72e45"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Point"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8734f9a3-0702-4a76-a980-8bbff0e4f01e"",
+                    ""path"": ""<Pen>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Point"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""65b43889-b1ae-4bcf-9a7a-8fa85250803e"",
+                    ""path"": ""<Touchscreen>/touch*/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Touch"",
+                    ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -683,7 +725,7 @@ namespace TRPG.Runtime
                     ""name"": ""Cancel"",
                     ""type"": ""Button"",
                     ""id"": ""15cef263-9014-4fd5-94d9-4e4a6234a6ef"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -1240,6 +1282,7 @@ namespace TRPG.Runtime
             // Player
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
             m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
+            m_Player_Point = m_Player.FindAction("Point", throwIfNotFound: true);
             m_Player_ScrollWheel = m_Player.FindAction("ScrollWheel", throwIfNotFound: true);
             m_Player_RightClick = m_Player.FindAction("RightClick", throwIfNotFound: true);
             m_Player_LeftClick = m_Player.FindAction("LeftClick", throwIfNotFound: true);
@@ -1345,6 +1388,7 @@ namespace TRPG.Runtime
         private readonly InputActionMap m_Player;
         private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
         private readonly InputAction m_Player_Move;
+        private readonly InputAction m_Player_Point;
         private readonly InputAction m_Player_ScrollWheel;
         private readonly InputAction m_Player_RightClick;
         private readonly InputAction m_Player_LeftClick;
@@ -1371,6 +1415,10 @@ namespace TRPG.Runtime
             /// Provides access to the underlying input action "Player/Move".
             /// </summary>
             public InputAction @Move => m_Wrapper.m_Player_Move;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/Point".
+            /// </summary>
+            public InputAction @Point => m_Wrapper.m_Player_Point;
             /// <summary>
             /// Provides access to the underlying input action "Player/ScrollWheel".
             /// </summary>
@@ -1444,6 +1492,9 @@ namespace TRPG.Runtime
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
+                @Point.started += instance.OnPoint;
+                @Point.performed += instance.OnPoint;
+                @Point.canceled += instance.OnPoint;
                 @ScrollWheel.started += instance.OnScrollWheel;
                 @ScrollWheel.performed += instance.OnScrollWheel;
                 @ScrollWheel.canceled += instance.OnScrollWheel;
@@ -1491,6 +1542,9 @@ namespace TRPG.Runtime
                 @Move.started -= instance.OnMove;
                 @Move.performed -= instance.OnMove;
                 @Move.canceled -= instance.OnMove;
+                @Point.started -= instance.OnPoint;
+                @Point.performed -= instance.OnPoint;
+                @Point.canceled -= instance.OnPoint;
                 @ScrollWheel.started -= instance.OnScrollWheel;
                 @ScrollWheel.performed -= instance.OnScrollWheel;
                 @ScrollWheel.canceled -= instance.OnScrollWheel;
@@ -1831,6 +1885,13 @@ namespace TRPG.Runtime
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMove(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnPoint(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "ScrollWheel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

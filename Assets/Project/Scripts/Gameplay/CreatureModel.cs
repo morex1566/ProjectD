@@ -10,74 +10,60 @@ namespace TRPG.Runtime
     /// </summary>
     public class CreatureModel : MonoBehaviour
     {
-        [Header("Runtime")]
-
-        [SerializeField, ReadOnly] private Vector3Int cellPos;
-
-        [SerializeField, ReadOnly] private int moveRange;
-
-        [SerializeField, ReadOnly] private float damage;
-
-        [SerializeField, ReadOnly] private float hp;
-
-        [SerializeField, ReadOnly] private float armor;
-
-        [Header("Setup")]
+        [Header(nameof(CreatureModel) + ".Setup")]
 
         [SerializeField] protected CreatureData data;
 
+        [Header(nameof(CreatureModel) + ".Runtime")]
+
+        [SerializeField, ReadOnly] private Vector3Int cellPos;
+
+        [SerializeField, ReadOnly] private int hp;
+
+        [SerializeField, ReadOnly] private int damage;
+
+        [SerializeField, ReadOnly] private int armor;
+
+        [SerializeField, ReadOnly] private int cost;
+
+        [SerializeField, ReadOnly] private bool isMoveRepeatable;
+
+        [SerializeField, ReadOnly] private List<Vector3Int> directions;
 
 
         public Vector3Int CellPos => cellPos;
 
-        public int MoveRange => moveRange;
+        public int Damage => damage;
 
-        public float Damage => damage;
+        public int Hp => hp;
 
-        public float Hp => hp;
+        public int Armor => armor;
 
-        public float Armor => armor;
+        public int Cost => cost;    
+
+        public bool IsMoveRepeatable => isMoveRepeatable;
+
+        public List<Vector3Int> Directions => directions;
 
 
 
         /// <summary>
         /// 크리처 데이터를 주입하고 런타임 값을 초기화합니다.
         /// </summary>
-        public virtual void Init(Vector3Int cellPos, CreatureData data = null)
+        public virtual void Init(Vector3Int initCellPos, CreatureData initData = null)
         {
-            this.data = data;
-            this.cellPos = cellPos;
-            moveRange = 0;
+            data = initData;
+            cellPos = initCellPos;
 
-            if (data == null) return;
-
-            hp = data.Hp;
-            damage = data.Damage;
-            armor = data.Armor;
-
-            // 현재 선택된 기본 스킬의 범위를 실제 이동 가능 범위로 사용합니다.
-            if (data.SkillData != null) moveRange = Mathf.Max(0, data.SkillData.moveRange);
+            hp = initData.Hp;
+            damage = initData.Damage;
+            armor = initData.Armor;
+            cost = initData.Cost;
+            isMoveRepeatable = initData.MoveRangeData.IsRepeatable;
+            directions = initData.MoveRangeData.Directions;
         }
 
-        private void OnEnable()
-        {
-
-        }
-
-        private void OnDisable()
-        {
-
-        }
-
-        /// <summary>
-        /// 현재 Transform 위치를 지정된 Tilemap의 셀 좌표로 변환합니다.
-        /// </summary>
-        public Vector3Int GetCurrentTilePos(Tilemap tilemap)
-        {
-            return tilemap.WorldToCell(transform.position);
-        }
-
-        public void SetHp(float hp)
+        public void SetHp(int hp)
         {
             this.hp = hp;
         }

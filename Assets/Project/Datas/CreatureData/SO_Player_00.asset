@@ -18,7 +18,7 @@ MonoBehaviour:
   Hp: 10
   Damage: 2
   Armor: 1
+  Cost: 0
   Description: "\uB354\uBBF8 \uD50C\uB808\uC774\uC5B4"
+  MoveRangeData: {fileID: 11400000, guid: 98833fa063d44e409fca7d833bb9d74b, type: 2}
   SkillData: {fileID: 11400000, guid: fe9e2a5e53c9bb441b1533e756212734, type: 2}
-  MoveDelay: 0.3
-  AttackDelay: 0.2

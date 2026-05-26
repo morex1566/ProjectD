@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureData
   Id: Monster_00
   DisplayName: "\uC950"
+  MoveRangeData: {fileID: 11400000, guid: 98833fa063d44e409fca7d833bb9d74b, type: 2}
   DefaultSkillId: Attack_00
   Hp: 10
   Damage: 1
   Armor: 1
   Description: "\uB354\uBBF8 \uBAAC\uC2A4\uD130"
+  Cost: 0
   SkillData: {fileID: 11400000, guid: fe9e2a5e53c9bb441b1533e756212734, type: 2}

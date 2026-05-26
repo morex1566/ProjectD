@@ -7,5 +7,8 @@ namespace TRPG.Runtime
     /// </summary>
     public class ReadOnlyAttribute : PropertyAttribute
     {
+        public ReadOnlyAttribute() : base(true)
+        {
+        }
     }
 }
