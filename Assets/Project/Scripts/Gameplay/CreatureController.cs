@@ -45,7 +45,7 @@ namespace TRPG.Runtime
             new Vector3(1f, -1f, 0f)
         };
 
-        private readonly List<SpriteRenderer> outlineRenderers = new();
+        private readonly List<SpriteRenderer> outliners = new();
 
         [Header("CreatureController.Runtime")]
 
@@ -258,11 +258,11 @@ namespace TRPG.Runtime
             animator.SetTrigger(UnityConstant.Animator.Parameters.AC_Gameplay_Creature.Trigger.OnDrop);
         }
 
-        protected void SetOutline(bool active)
+        public void SetOutline(bool active)
         {
             EnsureOutlineRenderers();
 
-            foreach (SpriteRenderer outlineRenderer in outlineRenderers)
+            foreach (SpriteRenderer outlineRenderer in outliners)
             {
                 outlineRenderer.gameObject.SetActive(active);
             }
@@ -273,27 +273,27 @@ namespace TRPG.Runtime
             }
 
             float pixelSize = Mathf.Max(1, outlinePixelWidth) / spriter.sprite.pixelsPerUnit;
-            for (int i = 0; i < outlineRenderers.Count; i++)
+            for (int i = 0; i < outliners.Count; i++)
             {
-                ApplyOutlineRenderer(outlineRenderers[i], OutlineDirections[i] * pixelSize);
+                ApplyOutlineRenderer(outliners[i], OutlineDirections[i] * pixelSize);
             }
         }
 
         private void EnsureOutlineRenderers()
         {
-            outlineRenderers.RemoveAll(outlineRenderer => outlineRenderer == null);
+            outliners.RemoveAll(outlineRenderer => outlineRenderer == null);
 
-            if (outlineRenderers.Count == 0)
+            if (outliners.Count == 0)
             {
-                outlineRenderers.Add(outliner);
+                outliners.Add(outliner);
             }
 
-            for (int i = outlineRenderers.Count; i < OutlineDirections.Length; i++)
+            for (int i = outliners.Count; i < OutlineDirections.Length; i++)
             {
                 SpriteRenderer outlineRenderer = Instantiate(outliner, outliner.transform.parent);
 
                 outlineRenderer.name = $"{outliner.name}_{i}";
-                outlineRenderers.Add(outlineRenderer);
+                outliners.Add(outlineRenderer);
             }
         }
 

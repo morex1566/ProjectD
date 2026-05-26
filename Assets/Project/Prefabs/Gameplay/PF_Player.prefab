@@ -1062,7 +1062,7 @@ MonoBehaviour:
   animator: {fileID: 6506947027681853864}
   spriter: {fileID: 4698189444536495477}
   outliner: {fileID: 6553556130000401305}
-  outlineColor: {r: 0, g: 1, b: 0, a: 1}
+  outlineColor: {r: 0, g: 0.74509805, b: 0.22352941, a: 1}
   outlinePixelWidth: 1
   actionFlags: 0
   movableCellPosList: []

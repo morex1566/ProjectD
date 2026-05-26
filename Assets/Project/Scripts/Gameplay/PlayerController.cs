@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements.Experimental;
@@ -33,6 +34,18 @@ namespace TRPG.Runtime
             InputManager.InputMappingContext.Player.LeftClick.canceled -= OnClickCanceled;
             InputManager.InputMappingContext.Player.Point.performed -= OnPointPerformed;
         }
+
+        /// <summary>
+        /// 이동 범위에 있는 크리쳐에게 외곽선 효과 요청
+        /// </summary>
+        private void RequestShowOutline(bool active)
+        {
+            List<CreatureController> creatureControllers = WorldManager.GetInstance().GetCreaturesInCellPosList(movableCellPosList);
+            foreach (CreatureController creatureController in creatureControllers)
+            {
+                creatureController.SetOutline(active);
+            }
+        }
     }
 
     /// <summary>
@@ -47,18 +60,11 @@ namespace TRPG.Runtime
             // 플레이어 이동중?
             if (HasActionFlag(ActionFlag.Moving)) return;
 
-            // 드래깅 중임?
-            if (!dragger.gameObject.activeSelf) return;
+            // 드래깅 중이지 않고
+            // 플레이어 호버링하면 외곽선 쉐이딩
+            bool isOutlineEnable = !dragger.gameObject.activeSelf && Contains(mouseWorldPos);
 
-            // 플레이어를 호버링하면 외곽선 쉐이더 실행
-            if (Contains(mouseWorldPos))
-            {
-                SetOutline(true);
-            }
-            else
-            {
-                SetOutline(false);
-            }
+            SetOutline(isOutlineEnable);
         }
 
         private void OnClickPerformed(InputAction.CallbackContext context)
@@ -77,11 +83,12 @@ namespace TRPG.Runtime
 
             // 드래깅 시작
             // 이동 범위 요청
-            // 적에 대한 외곽선 효과 요청
-            // 
-            movableCellPosList = worldManager.GetMovableCellPos(Model.CellPos, Model.Directions, Model.IsMoveRepeatable);
-            worldManager.AddAllyTileIndicator(movableCellPosList, this);
+            // 이동 범위에 있는 크리쳐에게 외곽선 효과 요청
+            movableCellPosList = worldManager.GetMovableCellPos(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+            var indicatorCellPosList = worldManager.GetMovableCellPos(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, false);
+            worldManager.AddAllyTileIndicator(indicatorCellPosList, this);
             dragger.gameObject.SetActive(true);
+            RequestShowOutline(true);
             PlayPick();
         }
 
@@ -112,10 +119,11 @@ namespace TRPG.Runtime
 
             // 드래깅 끝
             // 이동 범위 초기화
-            movableCellPosList = new();
-            worldManager.RemoveTileIndicators(this);
-            dragger.gameObject.SetActive(false);
             PlayDrop();
+            RequestShowOutline(false);
+            dragger.gameObject.SetActive(false);
+            worldManager.RemoveTileIndicators(this);
+            movableCellPosList = new();
         }
     }
 }

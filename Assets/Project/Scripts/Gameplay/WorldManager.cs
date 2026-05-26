@@ -228,6 +228,26 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// 위치에 있는 Creature들을 리턴
+        /// </summary>
+        public List<CreatureController> GetCreaturesInCellPosList(List<Vector3Int> cellPosList)
+        {
+            List<CreatureController> results = new();
+
+            foreach (Vector3Int cellPos in cellPosList)
+            {
+                foreach (KeyValuePair<int, CreatureController> pair in creatures)
+                {
+                    if (!(cellPos == pair.Value.Model.CellPos)) continue;
+
+                    results.Add(pair.Value);
+                }
+            }
+
+            return results;
+        }
+
+        /// <summary>
         /// 이 위치에 몬스터가 있는지 확인합니다.
         /// </summary>
         public bool HasMonsterInWorldPos(Vector3 worldPos, out MonsterController monsterController)
@@ -315,7 +335,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// originCellPos 기준 현재 tilemap에서 이동가능한 셀 위치를 가져옵니다.
         /// </summary>
-        public List<Vector3Int> GetMovableCellPos(Vector3Int originCellPos, List<Vector3Int> directions, bool isRepeatable)
+        public List<Vector3Int> GetMovableCellPos(Vector3Int originCellPos, List<Vector3Int> directions, bool isRepeatable, bool isIncludeCreature)
         {
             List<Vector3Int> movableCellPosList = new();
 
@@ -329,12 +349,11 @@ namespace TRPG.Runtime
                 while (TryGetGroundWorldPos(candidateCellPos, out _))
                 {
                     // 다른 크리처가 점유한 셀은 이동 가능 셀에서 제외하고, 반복 이동도 그 지점에서 멈춥니다.
-                    if (HasCreatureInCellPos(candidateCellPos)) break;
+                    if (!isIncludeCreature && HasCreatureInCellPos(candidateCellPos)) break;
 
-                    if (!movableCellPosList.Contains(candidateCellPos))
-                    {
-                        movableCellPosList.Add(candidateCellPos);
-                    }
+                    if (movableCellPosList.Contains(candidateCellPos)) break;
+
+                    movableCellPosList.Add(candidateCellPos);
 
                     if (!isRepeatable) break;
 
