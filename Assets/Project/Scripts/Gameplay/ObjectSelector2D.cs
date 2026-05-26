@@ -1,10 +1,16 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
-    public partial class ObjectSelector : MonoBehaviour
+    /// <summary>
+    /// 월드 좌표 기준으로 선택 가능한 오브젝트를 찾고 선택 상태를 관리합니다.
+    /// </summary>
+    public class ObjectSelector2D : MonoBehaviour
     {
+        [SerializeField] public GameObject cursor;
+
         public UnityEvent<ISelectable> OnSelectableSelected = new UnityEvent<ISelectable>();
 
         public UnityEvent<ISelectable> OnSelectableDeselected = new UnityEvent<ISelectable>();
@@ -12,6 +18,28 @@ namespace TRPG.Runtime
         public ISelectable SelectedSelectable { get; private set; }
 
         public CreatureController SelectedCreature => SelectedSelectable as CreatureController;
+
+
+
+        /// <summary>
+        /// 현재 마우스의 위치에 Ground 타일 있음? 있으면 커서 cellPos 이동
+        /// </summary>
+        private void Update()
+        {
+            Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
+
+            if (WorldManager.GetInstance().TryGetGroundCellPos(mouseWorldPos, out Vector3Int cellPos))
+            {
+                WorldManager.GetInstance().TryGetGroundWorldPos(cellPos, out Vector3 worldPos);
+
+                cursor.SetActive(true);
+                cursor.transform.position = worldPos;
+            }
+            else
+            {
+                cursor.SetActive(false);
+            }
+        }
 
         /// <summary>
         /// 전달된 선택 가능 개체를 현재 선택 대상으로 설정합니다.
@@ -66,5 +94,4 @@ namespace TRPG.Runtime
             return null;
         }
     }
-
 }

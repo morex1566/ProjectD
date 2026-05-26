@@ -4,6 +4,9 @@ using TRPG.Runtime;
 
 namespace TRPG.Editor
 {
+    /// <summary>
+    /// ReadOnlyAttribute가 붙은 필드를 Inspector에서 수정할 수 없게 그립니다.
+    /// </summary>
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
     public class ReadOnlyDrawer : PropertyDrawer
     {

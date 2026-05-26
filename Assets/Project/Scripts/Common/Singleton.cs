@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// MonoBehaviour가 아닌 타입을 지연 생성하는 기본 싱글톤입니다.
+    /// </summary>
     public class Singleton<T> where T : class, new()
     {
         /// <summary>
@@ -20,6 +23,9 @@ namespace TRPG.Runtime
         protected static T instance = null;
     }
 
+    /// <summary>
+    /// 씬 전환 후에도 유지되는 MonoBehaviour 싱글톤 기반 클래스입니다.
+    /// </summary>
     public class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         protected static bool isQuitting = false;
@@ -37,12 +43,9 @@ namespace TRPG.Runtime
         /// </summary>
         public static T GetInstance()
         {
-            if (isQuitting)
-            {
-                return null;
-            }
+            if (isQuitting) return null;
+            if (instance != null) return instance;
 
-            // 존재하지 않을 때만 새로 생성
             instance = FindAnyObjectByType<T>();
             if (instance == null)
             {
@@ -55,10 +58,10 @@ namespace TRPG.Runtime
                 instanceObj.name = $"[{typeof(T).Name}]";
             }
 
-            GameObject managerRoot = GetManagerRoot();
-            if (instanceObj != managerRoot)
+            GameObject root = GetManagerRoot();
+            if (instanceObj != root)
             {
-                instanceObj.transform.SetParent(managerRoot.transform);
+                instanceObj.transform.SetParent(root.transform);
             }
 
             return instance;

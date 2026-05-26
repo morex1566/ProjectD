@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 런타임 리소스와 게임 데이터 로딩 작업을 순차 처리합니다.
+    /// </summary>
     public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
     {
         private static ResourceManagerSettingsData settings;

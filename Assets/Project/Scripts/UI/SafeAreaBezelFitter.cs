@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 기기 Safe Area 바깥 영역을 베젤 RectTransform으로 채웁니다.
+    /// </summary>
     [RequireComponent(typeof(RectTransform))]
     public class SafeAreaBezelFitter : MonoBehaviour
     {

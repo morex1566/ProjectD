@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 한 프레임 동안 수집된 플레이어 입력 값을 전달하는 스냅샷입니다.
+    /// </summary>
     public struct InputSnapshot
     {
         // Delta
@@ -29,6 +32,9 @@ namespace TRPG.Runtime
         }
     }
 
+    /// <summary>
+    /// Input System 액션 맵을 생성하고 활성화하는 전역 입력 관리자입니다.
+    /// </summary>
     public class InputManager : MonoBehaviourSingleton<InputManager>
     {
         public static InputMappingContext InputMappingContext;

@@ -429,6 +429,55 @@ Transform:
   - {fileID: 8342068765609511102}
   m_Father: {fileID: 4990200996504493943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3184355694397734566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3269049231463703233}
+  - component: {fileID: 7493720225627253240}
+  m_Layer: 11
+  m_Name: Dragger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &3269049231463703233
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3184355694397734566}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1592659731093254881}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7493720225627253240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3184355694397734566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9e4348982fc0fc4b816a72459f8e0ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DragPendulum2D
+  targetCamera: {fileID: 0}
+  targetTransform: {fileID: 1592659731093254881}
+  holdOffset: {x: 0, y: 0.6}
+  rotateAmount: 180
+  rotateSmooth: 10
 --- !u!1 &5983384052930126618
 GameObject:
   m_ObjectHideFlags: 0
@@ -859,7 +908,6 @@ GameObject:
   - component: {fileID: 1592659731093254881}
   - component: {fileID: 7595189625648295525}
   - component: {fileID: 2188207816268681392}
-  - component: {fileID: 1037364146972516958}
   m_Layer: 11
   m_Name: PF_Player
   m_TagString: PlayerCharacter
@@ -881,9 +929,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8567239547543776976}
-  - {fileID: 1490457996884186002}
   - {fileID: 4990200996504493943}
   - {fileID: 5938421778205350249}
+  - {fileID: 3269049231463703233}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7595189625648295525
@@ -917,90 +965,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.PlayerController
   spriteRenderer: {fileID: 4698189444536495477}
+  animator: {fileID: 6506947027681853864}
   model: {fileID: 7595189625648295525}
   hitFlashColor: {r: 1, g: 0, b: 0, a: 1}
   hitFlashDuration: 0.08
-  dragPendulum: {fileID: 0}
---- !u!114 &1037364146972516958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9046667874142349478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9e4348982fc0fc4b816a72459f8e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DragPendulum2D
-  targetCamera: {fileID: 0}
-  followSmoothTime: 0
-  holdOffset: {x: 0, y: -0.3}
-  rotateAmount: 180
-  rotateSmooth: 10
---- !u!1001 &6010627104468674252
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1592659731093254881}
-    m_Modifications:
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.10667
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7942428256377247354, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_Name
-      value: PF_ObjectSelector
-      objectReference: {fileID: 0}
-    - target: {fileID: 7942428256377247354, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 123a10618a299144eb73806cba138cf4, type: 3}
---- !u!4 &1490457996884186002 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5171577301222864222, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-  m_PrefabInstance: {fileID: 6010627104468674252}
-  m_PrefabAsset: {fileID: 0}
+  actionFlags: 0
+  preLandingOffset: {x: 0, y: 0.6, z: 0}
+  moveDelay: 0.02
+  stompDelay: 0.03
+  dragger: {fileID: 7493720225627253240}

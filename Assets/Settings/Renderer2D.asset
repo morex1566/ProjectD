@@ -66,10 +66,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b00045f12942b46c698459096c89274e, type: 3}
+  m_Script: {fileID: 11500000, guid: 84c8d974c7434520a15a32e4e4272bf3, type: 3}
   m_Name: CRT Full Screen Pass
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.FullScreenPassRendererFeature
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.RuntimeOnlyFullScreenPassRendererFeature
   m_Active: 1
+  includeSceneView: 0
   injectionPoint: 600
   fetchColorBuffer: 1
   requirements: 0

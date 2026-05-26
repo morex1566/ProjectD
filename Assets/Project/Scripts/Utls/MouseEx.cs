@@ -14,19 +14,19 @@ namespace TRPG.Runtime
         /// <summary>
         /// 현재 마우스 화면 좌표에 대한 월드 좌표를 가져옵니다.
         /// </summary>
-        public static Vector3 GetMouseWorldPosition(Camera camera)
+        public static Vector3 GetMouseWorldPos(Camera camera)
         {
-            TryGetMouseWorldPosition(camera, out Vector3 worldPosition);
+            TryGetMouseWorldPos(camera, out Vector3 worldPos);
 
-            return worldPosition;
+            return worldPos;
         }
 
         /// <summary>
         /// 현재 포인터 화면 좌표에 대한 z=0 평면의 월드 좌표를 가져옵니다.
         /// </summary>
-        public static bool TryGetMouseWorldPosition(Camera camera, out Vector3 worldPosition)
+        public static bool TryGetMouseWorldPos(Camera camera, out Vector3 worldPos)
         {
-            worldPosition = default;
+            worldPos = default;
 
             if (camera == null) return false;
             if (Pointer.current == null) return false;
@@ -42,8 +42,8 @@ namespace TRPG.Runtime
 
             if (!worldPlane.Raycast(ray, out float distance)) return false;
 
-            worldPosition = ray.GetPoint(distance);
-            worldPosition.z = 0f;
+            worldPos = ray.GetPoint(distance);
+            worldPos.z = 0f;
 
             return true;
         }

@@ -5,8 +5,14 @@ using UnityEngine.UI;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 게임플레이 UI 루트와 공통 UI 프리팹 생성을 관리합니다.
+    /// </summary>
     public class UIManager : MonoBehaviourSingleton<UIManager>
     {
+        /// <summary>
+        /// UIManager가 생성하거나 제어하는 UI 종류입니다.
+        /// </summary>
         public enum UIType
         {
             Damage
@@ -30,8 +36,30 @@ namespace TRPG.Runtime
             GetInstance();
             settings = Resources.Load<UIManagerSettingsData>("SO_UIManagerSettings");
             Gameplay = GameObject.FindGameObjectWithTag(UnityConstant.Tags.GameplayCanvas).GetComponent<Canvas>();
+            ConfigureCanvasesForCrt(Gameplay.transform.root, Camera.main);
             topLayout = GameObject.FindGameObjectWithTag(UnityConstant.Tags.GameplayTopLayout).GetComponent<RectTransform>();
             centerLayout = GameObject.FindGameObjectWithTag(UnityConstant.Tags.GameplayCenterLayout).GetComponent<RectTransform>();
+        }
+
+        /// <summary>
+        /// Overlay Canvas는 카메라 후처리 뒤에 그려지므로 CRT가 적용되도록 카메라 렌더 경로로 옮깁니다.
+        /// </summary>
+        private static void ConfigureCanvasesForCrt(Transform canvasRoot, Camera renderCamera)
+        {
+            if (renderCamera == null)
+            {
+                Debug.LogWarning("[UIManager] CRT 적용을 위한 MainCamera를 찾지 못했습니다.");
+                return;
+            }
+
+            Canvas[] canvases = canvasRoot.GetComponentsInChildren<Canvas>(true);
+
+            foreach (Canvas canvas in canvases)
+            {
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = renderCamera;
+                canvas.planeDistance = 100f;
+            }
         }
 
         /// <summary>
@@ -64,7 +92,7 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 지정한 UI를 Off
+        /// 현재 열려 있는 UI를 닫습니다.
         /// </summary>
         public void Close()
         {
@@ -72,7 +100,7 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 지정한 UI를 획득/인스턴싱
+        /// 지정한 UI 타입의 인스턴스를 가져오거나 생성합니다.
         /// </summary>
         //public T Get<T>()
         //{

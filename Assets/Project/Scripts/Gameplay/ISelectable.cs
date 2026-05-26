@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 월드 좌표 기반 선택 대상이 구현해야 하는 공통 계약입니다.
+    /// </summary>
     public interface ISelectable
     {
         /// <summary>

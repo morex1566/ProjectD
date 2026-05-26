@@ -58,7 +58,7 @@ namespace TRPG.Runtime
     ///
     ///     #region Interface implementation of MyActions.IPlayerActions
     ///
-    ///     // Invoked when "TryMove" action is either started, performed or canceled.
+    ///     // Invoked when "Move" action is either started, performed or canceled.
     ///     public void OnMove(InputAction.CallbackContext context)
     ///     {
     ///         Debug.Log($"OnMove: {context.ReadValue&lt;Vector2&gt;()}");
@@ -95,7 +95,7 @@ namespace TRPG.Runtime
             ""id"": ""df70fa95-8a34-4494-b137-73ab6b9c7d37"",
             ""actions"": [
                 {
-                    ""name"": ""TryMove"",
+                    ""name"": ""Move"",
                     ""type"": ""Value"",
                     ""id"": ""351f2ccd-1f9f-44bf-9bec-d62ac5c5f408"",
                     ""expectedControlType"": ""Vector2"",
@@ -211,7 +211,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -222,7 +222,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -233,7 +233,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -244,7 +244,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -255,7 +255,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -266,7 +266,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -277,7 +277,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -288,7 +288,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -299,7 +299,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -310,7 +310,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -321,7 +321,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -332,7 +332,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Joystick"",
-                    ""action"": ""TryMove"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1239,7 +1239,7 @@ namespace TRPG.Runtime
 }");
             // Player
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
-            m_Player_Move = m_Player.FindAction("TryMove", throwIfNotFound: true);
+            m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
             m_Player_ScrollWheel = m_Player.FindAction("ScrollWheel", throwIfNotFound: true);
             m_Player_RightClick = m_Player.FindAction("RightClick", throwIfNotFound: true);
             m_Player_LeftClick = m_Player.FindAction("LeftClick", throwIfNotFound: true);
@@ -1368,7 +1368,7 @@ namespace TRPG.Runtime
             /// </summary>
             public PlayerActions(@InputMappingContext wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access to the underlying input action "Player/TryMove".
+            /// Provides access to the underlying input action "Player/Move".
             /// </summary>
             public InputAction @Move => m_Wrapper.m_Player_Move;
             /// <summary>
@@ -1825,7 +1825,7 @@ namespace TRPG.Runtime
         public interface IPlayerActions
         {
             /// <summary>
-            /// Method invoked when associated input action "TryMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Move" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />

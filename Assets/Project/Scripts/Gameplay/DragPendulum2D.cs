@@ -2,78 +2,70 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 드래그 중 대상 Transform을 마우스 위치에 맞춰 이동시키고 회전 흔들림을 적용합니다.
+    /// </summary>
     [DisallowMultipleComponent]
     public class DragPendulum2D : MonoBehaviour
     {
-        [Header("Drag")]
-        [SerializeField] private Camera targetCamera;
-        [SerializeField] private float followSmoothTime = 0f;
+        [SerializeField, ReadOnly] private Camera targetCamera;
+
+        [SerializeField] private Transform targetTransform;
+
         [SerializeField] private Vector2 holdOffset = new Vector2(0f, 0f);
 
-        [Header("Rotation")]
         [SerializeField] private float rotateAmount = 30f;
+
         [SerializeField] private float rotateSmooth = 6f;
 
-        private bool isDragging;
-        private Vector3 velocity;
-        private Vector3 previousMouseWorldPos;
+        private Vector3 prevMouseWorldPos;
+
+
 
         private void Awake()
         {
-            ResolveTargetCamera();
+            targetCamera = Camera.main;
         }
 
         private void Update()
         {
-            if (!isDragging) return;
-            if (!MouseEx.TryGetMouseWorldPosition(ResolveTargetCamera(), out Vector3 mouseWorldPos)) return;
-
-            FollowMouseWithInertia(mouseWorldPos);
+            FollowMouse();
         }
 
         /// <summary>
         /// PlayerController의 입력 이벤트에서 드래그를 시작합니다.
         /// </summary>
-        public void BeginDrag(Vector3 mouseWorldPos)
+        private void OnEnable()
         {
-            isDragging = true;
-            velocity = Vector3.zero;
-            previousMouseWorldPos = mouseWorldPos;
+            Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(targetCamera);
+
+            prevMouseWorldPos = mouseWorldPos;
+        }
+
+        private void OnDisable()
+        {
+            
         }
 
         /// <summary>
-        /// PlayerController의 입력 이벤트에서 드래그를 종료합니다.
+        /// 대상 Transform을 보정된 마우스 위치로 이동시키고 이동 방향에 따른 회전을 적용합니다.
         /// </summary>
-        public void EndDrag()
+        private void FollowMouse()
         {
-            isDragging = false;
-            velocity = Vector3.zero;
-        }
+            Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(targetCamera);
 
-        private void FollowMouseWithInertia(Vector3 mouseWorldPos)
-        {
             // 캐릭터가 마우스 아래에 대롱대롱 매달리도록 오프셋 적용
             Vector3 targetPos = mouseWorldPos + (Vector3)holdOffset;
-            targetPos.z = transform.position.z;
-
-            transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, followSmoothTime);
+            targetPos.z = targetTransform.position.z;
+            targetTransform.position = targetPos;
 
             // 마우스 이동 방향에 따라 캐릭터가 살짝 기울어짐
-            Vector3 mouseDelta = mouseWorldPos - previousMouseWorldPos;
+            Vector3 mouseDelta = mouseWorldPos - prevMouseWorldPos;
             float targetZRot = -mouseDelta.x * rotateAmount;
-
             Quaternion targetRot = Quaternion.Euler(0f, 0f, targetZRot);
+            targetTransform.rotation = Quaternion.Lerp(targetTransform.rotation, targetRot, Time.deltaTime * rotateSmooth);
 
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * rotateSmooth);
-
-            previousMouseWorldPos = mouseWorldPos;
-        }
-
-        private Camera ResolveTargetCamera()
-        {
-            if (targetCamera == null) targetCamera = Camera.main;
-
-            return targetCamera;
+            prevMouseWorldPos = mouseWorldPos;
         }
     }
 }

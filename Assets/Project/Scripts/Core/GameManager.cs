@@ -7,6 +7,9 @@ using UnityEditor;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 클라이언트 전역 시스템의 초기화 순서를 관리하는 진입점입니다.
+    /// </summary>
 #if UNITY_EDITOR
     [InitializeOnLoad]
 #endif

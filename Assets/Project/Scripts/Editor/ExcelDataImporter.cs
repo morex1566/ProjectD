@@ -16,6 +16,9 @@ using TRPG.Runtime;
 
 namespace TRPG.Editor
 {
+    /// <summary>
+    /// Excel 테이블을 읽어 런타임 데이터 스키마와 ScriptableObject 에셋을 생성합니다.
+    /// </summary>
     public static class ExcelDataImporter
     {
         private const string ExcelDirectory = "Excels";

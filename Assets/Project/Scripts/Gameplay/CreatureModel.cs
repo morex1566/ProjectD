@@ -5,6 +5,9 @@ using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 크리처의 런타임 위치와 전투 스탯을 보관하는 모델 컴포넌트입니다.
+    /// </summary>
     public class CreatureModel : MonoBehaviour
     {
         [Header("Runtime")]

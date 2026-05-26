@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 몬스터 전용 데이터 접근을 제공하는 크리처 모델입니다.
+    /// </summary>
     [RequireComponent(typeof(MonsterController))]
     public class MonsterModel : CreatureModel
     {

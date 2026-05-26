@@ -6,6 +6,9 @@ using UnityEditor;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 클라이언트 네트워크 연결 방식입니다.
+    /// </summary>
     public enum NetProtocolType
     {
         TCP,
@@ -13,6 +16,9 @@ namespace TRPG.Runtime
         HTTP
     }
 
+    /// <summary>
+    /// 네트워크 연결 초기화와 연결 상태 관리를 담당할 전역 관리자입니다.
+    /// </summary>
     public class NetManager : MonoBehaviourSingleton<NetManager>
     {
         private static NetManagerSettingsData data;

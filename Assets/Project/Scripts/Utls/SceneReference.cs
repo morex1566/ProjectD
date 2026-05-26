@@ -5,15 +5,28 @@ using UnityEditor;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 빌드에 포함된 씬의 이름과 에셋 경로를 직렬화해 참조합니다.
+    /// </summary>
     [System.Serializable]
     public struct SceneReference
     {
         [SerializeField] private string sceneName;
         [SerializeField] private string scenePath;
 
+        /// <summary>
+        /// 씬 에셋의 이름입니다.
+        /// </summary>
         public string SceneName => sceneName;
+
+        /// <summary>
+        /// 프로젝트 기준 씬 에셋 경로입니다.
+        /// </summary>
         public string ScenePath => scenePath;
 
+        /// <summary>
+        /// 씬 참조를 씬 이름 문자열로 변환합니다.
+        /// </summary>
         public static implicit operator string(SceneReference sceneReference)
             => sceneReference.sceneName;
 
@@ -27,9 +40,15 @@ namespace TRPG.Runtime
     }
 
 #if UNITY_EDITOR
+    /// <summary>
+    /// SceneReference를 Inspector에서 SceneAsset 필드처럼 편집하게 해주는 드로어입니다.
+    /// </summary>
     [CustomPropertyDrawer(typeof(SceneReference))]
     public class SceneReferenceDrawer : PropertyDrawer
     {
+        /// <summary>
+        /// SceneAsset 선택값을 씬 이름과 에셋 경로 문자열에 동기화합니다.
+        /// </summary>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);

@@ -5,6 +5,9 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// Addressables에서 게임 데이터를 로드하고 ID 기반 조회 테이블을 제공합니다.
+    /// </summary>
     public class GameDatabase
     {
         private const string CreatureDataLabel = "CreatureData";

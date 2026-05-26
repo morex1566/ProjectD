@@ -2,15 +2,16 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 전역 안내 메시지를 화면에 표시하는 UI 컴포넌트입니다.
+    /// </summary>
     public class BroadcastMessageUI : MonoBehaviour
     {
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
         
         }
 
-        // Update is called once per frame
         void Update()
         {
         

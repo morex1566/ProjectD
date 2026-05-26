@@ -7,6 +7,9 @@ using UnityEditor;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 기준 Canvas의 CanvasScaler 설정을 하위 Canvas들에 복사합니다.
+    /// </summary>
     public class CanvasScalerPropagator : MonoBehaviour
     {
         [Header("Reference Canvas")]
@@ -25,10 +28,10 @@ namespace TRPG.Runtime
 #endif
         }
 
-        [ContextMenu("Sync Canvas Scaler Settings")]
         /// <summary>
         /// 기준 CanvasScaler 설정을 모든 하위 Canvas에 복사합니다.
         /// </summary>
+        [ContextMenu("Sync Canvas Scaler Settings")]
         public void Sync()
         {
             if (referenceCanvas == null)
@@ -53,8 +56,6 @@ namespace TRPG.Runtime
 
                 SyncCanvasScaler(sourceScaler, targetCanvas);
             }
-
-            Debug.Log("[CanvasScalerPropagator] CanvasScaler 설정 동기화 완료");
         }
 
         /// <summary>

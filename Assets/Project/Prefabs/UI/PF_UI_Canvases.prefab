@@ -595,12 +595,28 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 107570599760162807, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 220
+      objectReference: {fileID: 0}
+    - target: {fileID: 107570599760162807, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 80
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 107570599760162807, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 185
+      objectReference: {fileID: 0}
+    - target: {fileID: 1547998817161044924, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3131794394913814277, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 3131794394913814277, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 4068608969131197583, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
       propertyPath: m_Name
@@ -609,6 +625,14 @@ PrefabInstance:
     - target: {fileID: 4068608969131197583, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
       propertyPath: m_TagString
       value: GameplayTopLayout
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356671763252675864, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356671763252675864, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 141
       objectReference: {fileID: 0}
     - target: {fileID: 4664476124816746616, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
       propertyPath: m_Pivot.x
@@ -689,6 +713,22 @@ PrefabInstance:
     - target: {fileID: 4664476124816746616, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7652364325143954911, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_text
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7652364325143954911, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_fontSize
+      value: 37.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7652364325143954911, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 7652364325143954911, guid: 0e6451354fc47e54187dba8c306c0a10, type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

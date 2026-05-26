@@ -3,6 +3,9 @@ using System;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// Unity 기본 로그 핸들러 앞에 시간과 로그 레벨을 붙이는 로그 핸들러입니다.
+    /// </summary>
     public class CustomLogHandler : ILogHandler
     {
         private readonly ILogHandler m_DefaultHandler = Debug.unityLogger.logHandler;
@@ -35,7 +38,9 @@ namespace TRPG.Runtime
         }
     }
 
-    // 초기화 스크립트
+    /// <summary>
+    /// 애플리케이션 시작 시 커스텀 로그 핸들러를 등록합니다.
+    /// </summary>
     public static class LogInitializer
     {
         /// <summary>
