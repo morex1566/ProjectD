@@ -8,7 +8,8 @@ namespace TRPG.Runtime
     public enum ActionFlag
     {
         None = 0,
-        Moving = 1 << 0
+        Moving = 1 << 0,
+        Attacking = 1 << 1,
     }
 
     /// <summary>
@@ -26,6 +27,8 @@ namespace TRPG.Runtime
         [SerializeField] protected SpriteRenderer spriter = null;
 
         [SerializeField] protected SpriteRenderer outliner = null;
+
+        [SerializeField] protected PixelBreaker breaker = null;
 
         [Header("CreatureController.View")]
 
@@ -51,37 +54,28 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] protected ActionFlag actionFlags;
 
-        [SerializeField, ReadOnly] protected List<Vector3Int> movableCellPosList = new();
-
         /// <summary>
         /// 목표 타일 위에 살짝 띄운 도착 위치 오프셋
         /// </summary>
         [SerializeField] private Vector3 preLandingOffset = new Vector3(0f, 0.5f, 0f);
-
-        /// <summary>
-        /// 크리쳐를 이동할 때, 해당 타일 칸 위로 이동하는데 걸리는 시간(애니메이션)
-        /// </summary>
-        [SerializeField] private float moveDelay = 0.01f;
-
-        /// <summary>
-        /// 크리쳐를 이동할 때, 해당 타일 칸 위에서 정중앙으로 내려찍는데 걸리는 시간(애니메이션)
-        /// </summary>
-        [SerializeField] private float stompDelay = 0.05f;
-
-        /// <summary>
-        /// 맞았을 때 효과
-        /// </summary>
-        private Coroutine hitFlashCoroutine;
-
-        private Coroutine moving;
-
-
 
         public bool CanSelect { get; set; } = false;
 
         public bool IsSelected { get; set; } = false;
 
         public CreatureModel Model => model;
+
+        private CreatureMotionSettingsData BattleMotionSettings => Model != null ? Model.BattleMotionSettings : null;
+
+        private float MoveDelay => BattleMotionSettings != null ? BattleMotionSettings.MoveDelay : CreatureMotionSettingsData.DefaultMoveDelay;
+
+        private float StompDelay => BattleMotionSettings != null ? BattleMotionSettings.StompDelay : CreatureMotionSettingsData.DefaultStompDelay;
+
+        private float CollideDelay => BattleMotionSettings != null ? BattleMotionSettings.CollideDelay : CreatureMotionSettingsData.DefaultCollideDelay;
+
+        private float BattleMoveDelay => BattleMotionSettings != null ? BattleMotionSettings.BattleMoveDelay : CreatureMotionSettingsData.DefaultBattleMoveDelay;
+
+        private float BattleStompDelay => BattleMotionSettings != null ? BattleMotionSettings.BattleStompDelay : CreatureMotionSettingsData.DefaultBattleStompDelay;
 
 
 
@@ -130,58 +124,28 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 화면 좌표가 Tilemap 레이어의 유효한 셀이면 해당 셀로 이동합니다.
+        /// 크리처 이동 코루틴을 시작합니다.
         /// </summary>
-        protected void Move(Vector3 targetWorldPos, Vector3Int targetCellPos, Quaternion targetRot, bool usePreLanding = true)
+        protected void Move(Vector3 targetWorldPos, Vector3Int targetCellPos, Quaternion targetRot)
         {
             // 이동 시작했으니 이동 플래그, 이동 가능한 지역 해제
             actionFlags |= ActionFlag.Moving;
 
-            WorldManager.GetInstance().RemoveTileIndicators(this);
-
-            StartCoroutine(MoveCo(targetWorldPos, targetCellPos, usePreLanding));
+            StartCoroutine(MoveDampCo(targetWorldPos, targetCellPos, MoveDelay, StompDelay));
             StartCoroutine(RotCo(targetRot));
         }
 
-        protected IEnumerator MoveCo(Vector3 targetWorldPos, Vector3Int targetCellPos, bool usePreLanding)
+        protected IEnumerator MoveDampCo(Vector3 targetWorldPos, Vector3Int targetCellPos, float moveDelay, float stompDelay)
         {
             targetWorldPos.z = transform.position.z;
 
-            if (!usePreLanding)
-            {
-                yield return MoveDirectCo(targetWorldPos);
-
-                transform.position = targetWorldPos;
-                Model.SetCellPos(targetCellPos);
-                actionFlags &= ~ActionFlag.Moving;
-
-                yield break;
-            }
+            Vector3 preLandingWorldPos = targetWorldPos + preLandingOffset;
 
             // 크리쳐가 cellPos 위로 이동
-            Vector3 preLandingWorldPos = targetWorldPos + preLandingOffset;
-            Vector3 moveVelocity = Vector3.zero;
-            float elapsedTime = 0f;
-            while (elapsedTime < moveDelay)
-            {
-                elapsedTime += Time.deltaTime;
-
-                transform.position = Vector3.SmoothDamp(transform.position, preLandingWorldPos, ref moveVelocity, moveDelay);
-
-                yield return null;
-            }
+            yield return MovePartCo(preLandingWorldPos, moveDelay);
 
             // 크리쳐가 cellPos에 스톰핑
-            Vector3 stompVelocity = Vector3.zero;
-            elapsedTime = 0f;
-            while (elapsedTime < stompDelay)
-            {
-                elapsedTime += Time.deltaTime;
-
-                transform.position = Vector3.SmoothDamp(transform.position, targetWorldPos, ref stompVelocity, stompDelay);
-
-                yield return null;
-            }
+            yield return StompPartCo(targetWorldPos, stompDelay);
 
             // 크리쳐가 전진 끝, 나머지 설정 후처리
             transform.position = targetWorldPos;
@@ -189,23 +153,68 @@ namespace TRPG.Runtime
             actionFlags &= ~ActionFlag.Moving;
         }
 
-        private IEnumerator MoveDirectCo(Vector3 targetWorldPos)
+        protected IEnumerator MoveDampDirectCo(Vector3 targetWorldPos, Vector3Int targetCellPos, float moveDelay, float stompDelay)
         {
-            Vector3 moveVelocity = Vector3.zero;
-            float elapsedTime = 0f;
-            float returnDelay = moveDelay + stompDelay;
+            targetWorldPos.z = transform.position.z;
 
-            while (elapsedTime < returnDelay)
+            // preLanding/stomp 없이 목표 위치로 바로 이동하되, 전체 이동 시간은 기존 이동+착지 시간과 맞춥니다.
+            yield return MovePartCo(targetWorldPos, moveDelay + stompDelay);
+
+            transform.position = targetWorldPos;
+            Model.SetCellPos(targetCellPos);
+            actionFlags &= ~ActionFlag.Moving;
+        }
+
+        protected IEnumerator MoveAccelerateDirectCo(Vector3 targetWorldPos, Vector3Int targetCellPos, float moveDelay, float stompDelay)
+        {
+            targetWorldPos.z = transform.position.z;
+
+            Vector3 startWorldPos = transform.position;
+            float moveDuration = moveDelay + stompDelay;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < moveDuration)
             {
                 elapsedTime += Time.deltaTime;
 
-                transform.position = Vector3.SmoothDamp
-                (
-                    transform.position,
-                    targetWorldPos,
-                    ref moveVelocity,
-                    moveDelay
-                );
+                // 충돌 직전으로 갈수록 더 빠르게 붙도록 ease-in quadratic 보간을 사용합니다.
+                float linearTime = Mathf.Clamp01(elapsedTime / moveDuration);
+                float accelerateTime = linearTime * linearTime * linearTime;
+                transform.position = Vector3.LerpUnclamped(startWorldPos, targetWorldPos, accelerateTime);
+
+                yield return null;
+            }
+
+            transform.position = targetWorldPos;
+            Model.SetCellPos(targetCellPos);
+            actionFlags &= ~ActionFlag.Moving;
+        }
+
+        private IEnumerator MovePartCo(Vector3 targetWorldPos, float moveDelay)
+        {
+            Vector3 moveVelocity = Vector3.zero;
+
+            float elapsedTime = 0f;
+            while (elapsedTime < moveDelay)
+            {
+                elapsedTime += Time.deltaTime;
+
+                transform.position = Vector3.SmoothDamp(transform.position, targetWorldPos, ref moveVelocity, moveDelay);
+
+                yield return null;
+            }
+        }
+
+        private IEnumerator StompPartCo(Vector3 targetWorldPos, float stompDelay)
+        {
+            Vector3 stompVelocity = Vector3.zero;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < stompDelay)
+            {
+                elapsedTime += Time.deltaTime;
+
+                transform.position = Vector3.SmoothDamp(transform.position, targetWorldPos, ref stompVelocity, stompDelay);
 
                 yield return null;
             }
@@ -217,6 +226,7 @@ namespace TRPG.Runtime
             Vector3 targetEuler = targetWorldRot.eulerAngles;
 
             // 크리쳐가 worldRot으로 회전
+            float moveDelay = MoveDelay;
             float elapsedTime = 0f;
             while (elapsedTime < moveDelay)
             {
@@ -235,6 +245,57 @@ namespace TRPG.Runtime
 
             // 크리쳐가 회전 끝, 나머지 설정 후처리
             transform.rotation = targetWorldRot;
+        }
+
+        public void Attack(Vector3 battleCellWorldPos, Vector3Int battleCellPos, MonsterController targetController)
+        {
+            // 타겟도 같은 전투 셀 기준으로 방어 이동을 시작합니다.
+            targetController.Defend(battleCellWorldPos, battleCellPos, this);
+
+            StartCoroutine(AttackCo(battleCellWorldPos, battleCellPos, BattleMoveDelay, BattleStompDelay, CollideDelay));
+        }
+
+        public void Defend(Vector3 battleCellWorldPos, Vector3Int battleCellPos, CreatureController attackerController)
+        {
+            StartCoroutine(DefendCo(battleCellWorldPos, battleCellPos, BattleMoveDelay, BattleStompDelay, CollideDelay));
+        }
+
+        /// <summary>
+        /// 공격/방어 공통 이동/충돌 연출
+        /// </summary>
+        public IEnumerator AttackCo(Vector3 battleCellWorldPos, Vector3Int battleCellPos, float moveDelay, float stompDelay, float collideDelay)
+        {
+            // 공격자는 전투 셀의 한쪽으로 이동합니다.
+            Vector3 battleStartCellWorldPos = battleCellWorldPos - WorldManager.GetInstance().GetCellWorldSize() / 2;
+            Vector3 battleEndCellWorldPos = battleCellWorldPos;
+
+            // 전투 준비 위치로 이동해 양쪽이 잠깐 벌어지는 구도를 만듭니다.
+            yield return MoveDampDirectCo(battleStartCellWorldPos, battleCellPos, moveDelay, stompDelay);
+
+            // 대기
+            yield return new WaitForSeconds(collideDelay);
+
+            // 전투 시작, 양쪽에서 서로 부딪힘
+            yield return MoveAccelerateDirectCo(battleEndCellWorldPos, battleCellPos, moveDelay, stompDelay);
+        }
+
+        public IEnumerator DefendCo(Vector3 battleCellWorldPos, Vector3Int battleCellPos, float moveDelay, float stompDelay, float collideDelay)
+        {
+            // 방어자는 공격자와 반대 방향의 전투 셀 위치로 이동합니다.
+            Vector3 battleStartCellWorldPos = battleCellWorldPos + WorldManager.GetInstance().GetCellWorldSize() / 2;
+            Vector3 battleEndCellWorldPos = battleCellWorldPos;
+            Vector3 hitDirection = battleStartCellWorldPos - battleEndCellWorldPos;
+
+            // 전투 준비 위치로 이동해 양쪽이 잠깐 벌어지는 구도를 만듭니다.
+            yield return MoveDampDirectCo(battleStartCellWorldPos, battleCellPos, moveDelay, stompDelay);
+
+            // 대기
+            yield return new WaitForSeconds(collideDelay);
+
+            // 전투 시작, 양쪽에서 서로 부딪힘
+            yield return MoveAccelerateDirectCo(battleEndCellWorldPos, battleCellPos, moveDelay, stompDelay);
+
+            breaker.Break(hitDirection);
         }
 
         protected bool HasActionFlag(ActionFlag flag)

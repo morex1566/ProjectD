@@ -14,6 +14,8 @@ namespace TRPG.Runtime
 
         [SerializeField] protected CreatureData data;
 
+        [SerializeField] protected CreatureMotionSettingsData battleMotionSettings = null;
+
         [Header(nameof(CreatureModel) + ".Runtime")]
 
         [SerializeField, ReadOnly] private Vector3Int cellPos;
@@ -33,6 +35,8 @@ namespace TRPG.Runtime
 
         public Vector3Int CellPos => cellPos;
 
+        public Vector3 CellWorldPos => WorldManager.GetInstance().TryGetGroundWorldPos(cellPos, out Vector3 cellWorldPos)
+                                    ? cellWorldPos : default;
         public int Damage => damage;
 
         public int Hp => hp;
@@ -44,6 +48,8 @@ namespace TRPG.Runtime
         public bool IsMoveRepeatable => isMoveRepeatable;
 
         public List<Vector3Int> Directions => directions;
+        
+        public CreatureMotionSettingsData BattleMotionSettings => battleMotionSettings;
 
 
 

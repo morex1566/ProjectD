@@ -335,7 +335,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// originCellPos 기준 현재 tilemap에서 이동가능한 셀 위치를 가져옵니다.
         /// </summary>
-        public List<Vector3Int> GetMovableCellPos(Vector3Int originCellPos, List<Vector3Int> directions, bool isRepeatable, bool isIncludeCreature)
+        public List<Vector3Int> GetMovableCellPosList(Vector3Int originCellPos, List<Vector3Int> directions, bool isRepeatable, bool isIncludeCreature)
         {
             List<Vector3Int> movableCellPosList = new();
 
@@ -362,6 +362,11 @@ namespace TRPG.Runtime
             }
 
             return movableCellPosList;
+        }
+
+        public Vector3 GetCellWorldSize()
+        {
+            return Vector3.Scale(tilemaps[0].layoutGrid.cellSize, tilemaps[0].layoutGrid.transform.lossyScale);
         }
     }
 

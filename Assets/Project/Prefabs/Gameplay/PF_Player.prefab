@@ -569,6 +569,60 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
+--- !u!1 &4886650767258293793
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3552642537684208304}
+  - component: {fileID: 1655133028014654049}
+  m_Layer: 11
+  m_Name: PixelBreaker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3552642537684208304
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886650767258293793}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1592659731093254881}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1655133028014654049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886650767258293793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9b0446fb11472e478dfb7d1cd48f922, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.PixelBreakEffect
+  targetSpriteRenderer: {fileID: 4698189444536495477}
+  pixelPiecePb: {fileID: 2746114701456241168, guid: a267929d7aa2775458ac3530f11dfb1b, type: 3}
+  sampleStep: 4
+  borderPixelWidth: 1
+  borderColor: {r: 0, g: 0, b: 0, a: 1}
+  explosionForce: 4
+  randomForce: 0.5
+  upwardForce: 1.2
+  angularForce: 360
+  lifeTime: 0.6
 --- !u!1 &5983384052930126618
 GameObject:
   m_ObjectHideFlags: 0
@@ -1024,6 +1078,7 @@ Transform:
   - {fileID: 4990200996504493943}
   - {fileID: 5938421778205350249}
   - {fileID: 3269049231463703233}
+  - {fileID: 3552642537684208304}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7595189625648295525
@@ -1039,6 +1094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.PlayerModel
   data: {fileID: 11400000, guid: ac908ac551fa0d941930811ce672e40c, type: 2}
+  battleMotionSettings: {fileID: 11400000, guid: dff4aeef40b54639bc0fdf21b6693aa0, type: 2}
   cellPos: {x: 0, y: 0, z: 0}
   hp: 0
   damage: 0
@@ -1062,11 +1118,9 @@ MonoBehaviour:
   animator: {fileID: 6506947027681853864}
   spriter: {fileID: 4698189444536495477}
   outliner: {fileID: 6553556130000401305}
+  breaker: {fileID: 1655133028014654049}
   outlineColor: {r: 0, g: 0.74509805, b: 0.22352941, a: 1}
   outlinePixelWidth: 1
   actionFlags: 0
-  movableCellPosList: []
   preLandingOffset: {x: 0, y: 0.6, z: 0}
-  moveDelay: 0.02
-  stompDelay: 0.03
   dragger: {fileID: 7493720225627253240}

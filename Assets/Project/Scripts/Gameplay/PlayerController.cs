@@ -40,11 +40,52 @@ namespace TRPG.Runtime
         /// </summary>
         private void RequestShowOutline(bool active)
         {
+            WorldManager worldManager = WorldManager.GetInstance();
+            var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+
             List<CreatureController> creatureControllers = WorldManager.GetInstance().GetCreaturesInCellPosList(movableCellPosList);
             foreach (CreatureController creatureController in creatureControllers)
             {
                 creatureController.SetOutline(active);
             }
+        }
+
+        /// <summary>
+        /// 마우스 호버링이 적에 있는지?
+        /// 이동 가능한 범위에 적이 있는지?
+        /// </summary>
+        private bool IsAttackable(Vector3 mouseWorldPos, out MonsterController monsterController)
+        {
+            WorldManager worldManager = WorldManager.GetInstance();
+            var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+            worldManager.TryGetGroundCellPos(mouseWorldPos, out Vector3Int mouseCellPos);
+
+            bool isAttackable = worldManager.HasMonsterInCellPos(mouseCellPos, out MonsterController outMonsterController) &&
+                                movableCellPosList.Contains(mouseCellPos);
+
+            monsterController = outMonsterController;
+
+            return isAttackable;
+        }
+
+        /// <summary>
+        /// 이동 가능한 타일인지?
+        /// 이동 가능한 범위인지?
+        /// </summary>
+        private bool IsMovable(Vector3 mouseWorldPos, out Vector3 mouseCellWorldPos, out Vector3Int mouseCellPos)
+        {
+            WorldManager worldManager = WorldManager.GetInstance();
+            var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+
+            bool isMovable = worldManager.TryGetGroundCellPos(mouseWorldPos, out Vector3Int outMouseCellPos) &&
+                             movableCellPosList.Contains(outMouseCellPos);
+
+            worldManager.TryGetGroundWorldPos(outMouseCellPos, out Vector3 outMouseCellWorldPos);
+
+            mouseCellPos = outMouseCellPos;
+            mouseCellWorldPos = outMouseCellWorldPos;
+
+            return isMovable;
         }
     }
 
@@ -71,6 +112,8 @@ namespace TRPG.Runtime
         {
             WorldManager worldManager = WorldManager.GetInstance();
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
+            var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+            var indicatorCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, false);
 
             // 플레이어 이동중?
             if (HasActionFlag(ActionFlag.Moving)) return;
@@ -84,11 +127,10 @@ namespace TRPG.Runtime
             // 드래깅 시작
             // 이동 범위 요청
             // 이동 범위에 있는 크리쳐에게 외곽선 효과 요청
-            movableCellPosList = worldManager.GetMovableCellPos(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
-            var indicatorCellPosList = worldManager.GetMovableCellPos(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, false);
             worldManager.AddAllyTileIndicator(indicatorCellPosList, this);
             dragger.gameObject.SetActive(true);
             RequestShowOutline(true);
+
             PlayPick();
         }
 
@@ -96,7 +138,8 @@ namespace TRPG.Runtime
         {
             WorldManager worldManager = WorldManager.GetInstance();
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
-            worldManager.TryGetGroundWorldPos(Model.CellPos, out Vector3 modelWorldPos);
+            bool isAttackable = IsAttackable(mouseWorldPos, out MonsterController monsterController);
+            bool isMovable = IsMovable(mouseWorldPos, out Vector3 mouseCellWorldPos, out Vector3Int mouseCellPos);
 
             // 플레이어 이동중?
             if (HasActionFlag(ActionFlag.Moving)) return;
@@ -104,26 +147,32 @@ namespace TRPG.Runtime
             // 드래깅 중임?
             if (!dragger.gameObject.activeSelf) return;
 
-            // 마우스 커서가 있는 Ground 타일로 이동
-            if (worldManager.TryGetGroundCellPos(mouseWorldPos, out Vector3Int mouseCellPos) &&
-                worldManager.TryGetGroundWorldPos(mouseCellPos, out mouseWorldPos) &&
-                movableCellPosList.Contains(mouseCellPos))
+            // 공격 가능함?
+            if (isAttackable)
             {
-                Move(mouseWorldPos, mouseCellPos, Quaternion.identity);
+                Attack(mouseCellWorldPos, mouseCellPos, monsterController);
             }
-            // 이동 실패. 원래 타일로 이동
+            else
+            // 이동 가능함?
+            if (isMovable)
+            {
+                // 마우스 커서가 있는 Ground 타일로 이동
+                Move(mouseCellWorldPos, mouseCellPos, Quaternion.identity);
+            }
             else
             {
-                Move(modelWorldPos, Model.CellPos, Quaternion.identity);
+                // 원래 타일로 이동
+                Move(Model.CellWorldPos, Model.CellPos, Quaternion.identity);
             }
 
+            // 다른 대상 외곽선 쉐이더 종료
             // 드래깅 끝
             // 이동 범위 초기화
-            PlayDrop();
             RequestShowOutline(false);
             dragger.gameObject.SetActive(false);
             worldManager.RemoveTileIndicators(this);
-            movableCellPosList = new();
+
+            PlayDrop();
         }
     }
 }
