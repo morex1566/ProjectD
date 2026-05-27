@@ -126,13 +126,13 @@ namespace TRPG.Runtime
         /// <summary>
         /// 크리처 이동 코루틴을 시작합니다.
         /// </summary>
-        protected void Move(Vector3 targetWorldPos, Vector3Int targetCellPos, Quaternion targetRot)
+        protected void Move(Vector3 targetWorldPos, Vector3Int targetCellPos)
         {
             // 이동 시작했으니 이동 플래그, 이동 가능한 지역 해제
             actionFlags |= ActionFlag.Moving;
 
             StartCoroutine(MoveDampCo(targetWorldPos, targetCellPos, MoveDelay, StompDelay));
-            StartCoroutine(RotCo(targetRot));
+            StartCoroutine(RotCo(Quaternion.identity));
         }
 
         protected IEnumerator MoveDampCo(Vector3 targetWorldPos, Vector3Int targetCellPos, float moveDelay, float stompDelay)
@@ -253,6 +253,7 @@ namespace TRPG.Runtime
             targetController.Defend(battleCellWorldPos, battleCellPos, this);
 
             StartCoroutine(AttackCo(battleCellWorldPos, battleCellPos, BattleMoveDelay, BattleStompDelay, CollideDelay));
+            StartCoroutine(RotCo(Quaternion.identity));
         }
 
         public void Defend(Vector3 battleCellWorldPos, Vector3Int battleCellPos, CreatureController attackerController)

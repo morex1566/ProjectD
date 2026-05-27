@@ -157,12 +157,12 @@ namespace TRPG.Runtime
             if (isMovable)
             {
                 // 마우스 커서가 있는 Ground 타일로 이동
-                Move(mouseCellWorldPos, mouseCellPos, Quaternion.identity);
+                Move(mouseCellWorldPos, mouseCellPos);
             }
             else
             {
                 // 원래 타일로 이동
-                Move(Model.CellWorldPos, Model.CellPos, Quaternion.identity);
+                Move(Model.CellWorldPos, Model.CellPos);
             }
 
             // 다른 대상 외곽선 쉐이더 종료

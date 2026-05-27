@@ -45,8 +45,8 @@ namespace TRPG.Runtime
             ResourceManager.Database.Load();
 
             // 임시 전투 배치를 생성합니다.
-            SpawnMonster(ResourceManager.Database.GetMonsterData("Monster_00"), new Vector3Int(0, 2, 0));
-            SpawnPlayer(new Vector3Int(0, 0, 0));
+            SpawnMonster(ResourceManager.Database.GetMonsterData("Monster_00"), new Vector3Int(0, 0, 0));
+            SpawnPlayer(new Vector3Int(0, -1, 0));
         }
 
         private void Init()
@@ -375,6 +375,11 @@ namespace TRPG.Runtime
     /// </summary>
     public partial class WorldManager : MonoBehaviourSingleton<WorldManager>
     {
+        public static class BackgroundColor
+        {
+            public static readonly string Sky = "#1E202A";
 
+            public static readonly string Stone = "#1E1E1E";
+        }
     }
 }

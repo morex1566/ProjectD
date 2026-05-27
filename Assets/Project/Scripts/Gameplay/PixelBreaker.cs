@@ -9,23 +9,17 @@ namespace TRPG.Runtime
         [SerializeField] private GameObject pixelPiecePb;
 
         [Header("Pixel Piece")]
-        [SerializeField] private int sampleStep = 4;
-        [SerializeField] private int borderPixelWidth = 1;
-        [SerializeField] private Color borderColor = new Color(0.08f, 0.08f, 0.08f, 1f);
+        [SerializeField] private int sampleStep = 2;
 
         [Header("Explosion")]
         [SerializeField] private float explosionForce = 4f;
         [SerializeField] private float randomForce = 0.5f;
         [SerializeField] private float upwardForce = 1.2f;
         [SerializeField] private float angularForce = 360f;
-        [SerializeField] private float lifeTime = 0.6f;
+        [SerializeField] private float lifeTime = 2f;
 
         public void Break(Vector2 hitDirection)
         {
-            if (targetSpriteRenderer == null) return;
-            if (targetSpriteRenderer.sprite == null) return;
-            if (pixelPiecePb == null) return;
-
             Sprite sprite = targetSpriteRenderer.sprite;
             Texture2D texture = sprite.texture;
             Rect textureRect = sprite.textureRect;
@@ -36,12 +30,7 @@ namespace TRPG.Runtime
             {
                 for (int x = 0; x < textureRect.width; x += sampleStep)
                 {
-                    int textureX = (int)textureRect.x + x;
-                    int textureY = (int)textureRect.y + y;
-
-                    Color pixelColor = texture.GetPixel(textureX, textureY);
-
-                    if (pixelColor.a <= 0.1f) continue;
+                    if (!TrySampleBlockColor(texture, textureRect, x, y, out Color pixelColor)) continue;
 
                     Vector3 worldPos = GetPixelWorldPos(sprite, x, y);
 
@@ -50,6 +39,45 @@ namespace TRPG.Runtime
             }
 
             targetSpriteRenderer.enabled = false;
+        }
+
+        private bool TrySampleBlockColor(Texture2D texture, Rect textureRect, int startX, int startY, out Color color)
+        {
+            Color weightedColorSum = Color.clear;
+            float alphaSum = 0f;
+            int validPixelCount = 0;
+
+            int endX = Mathf.Min(startX + sampleStep, (int)textureRect.width);
+            int endY = Mathf.Min(startY + sampleStep, (int)textureRect.height);
+
+            for (int y = startY; y < endY; y++)
+            {
+                for (int x = startX; x < endX; x++)
+                {
+                    int textureX = (int)textureRect.x + x;
+                    int textureY = (int)textureRect.y + y;
+
+                    Color pixelColor = texture.GetPixel(textureX, textureY);
+
+                    // 투명 픽셀은 빈 공간으로 보고 조각 색상 평균에서 제외합니다.
+                    if (pixelColor.a <= 0.1f) continue;
+
+                    weightedColorSum += pixelColor * pixelColor.a;
+                    alphaSum += pixelColor.a;
+                    validPixelCount++;
+                }
+            }
+
+            if (validPixelCount == 0)
+            {
+                color = Color.clear;
+                return false;
+            }
+
+            color = weightedColorSum / alphaSum;
+            color.a = Mathf.Clamp01(alphaSum / validPixelCount);
+
+            return true;
         }
 
         private Vector3 GetPixelWorldPos(Sprite sprite, int x, int y)
@@ -73,16 +101,13 @@ namespace TRPG.Runtime
 
             float pixelWorldSize = 1f / sprite.pixelsPerUnit;
             float pieceWorldSize = sampleStep * pixelWorldSize;
-            float borderWorldSize = borderPixelWidth * pixelWorldSize;
 
             if (piece.TryGetComponent(out PixelPiece pixelPiece))
             {
                 pixelPiece.Setup
                 (
                     color,
-                    borderColor,
                     pieceWorldSize,
-                    borderWorldSize,
                     targetSpriteRenderer.sortingLayerID,
                     targetSpriteRenderer.sortingOrder + 1
                 );

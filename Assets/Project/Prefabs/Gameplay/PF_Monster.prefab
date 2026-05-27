@@ -314,7 +314,7 @@ MonoBehaviour:
   randomForce: 0.5
   upwardForce: 1.2
   angularForce: 360
-  lifeTime: 0.6
+  lifeTime: 2
 --- !u!1 &8033693440990095445
 GameObject:
   m_ObjectHideFlags: 0

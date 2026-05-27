@@ -5,28 +5,19 @@ namespace TRPG.Runtime
     public class PixelPiece : MonoBehaviour
     {
         [Header(nameof(PixelPiece))]
-        [SerializeField] private SpriteRenderer borderRenderer;
         [SerializeField] private SpriteRenderer fillRenderer;
 
-        public void Setup(Color fillColor, Color borderColor, float pieceWorldSize, float borderWorldSize, int sortingLayerID, int sortingOrder)
+        public void Setup(Color fillColor, float pieceWorldSize, int sortingLayerID, int sortingOrder)
         {
-            if (borderRenderer != null)
-            {
-                borderRenderer.color = borderColor;
-                borderRenderer.sortingLayerID = sortingLayerID;
-                borderRenderer.sortingOrder = sortingOrder;
-                SetSpriteWorldSize(borderRenderer, pieceWorldSize);
-            }
+            if (fillRenderer == null) return;
 
-            if (fillRenderer != null)
-            {
-                fillRenderer.color = fillColor;
-                fillRenderer.sortingLayerID = sortingLayerID;
-                fillRenderer.sortingOrder = sortingOrder + 1;
+            fillRenderer.color = fillColor;
+            fillRenderer.sortingLayerID = sortingLayerID;
+            fillRenderer.sortingOrder = sortingOrder;
 
-                float fillWorldSize = Mathf.Max(0f, pieceWorldSize - borderWorldSize * 2f);
-                SetSpriteWorldSize(fillRenderer, fillWorldSize);
-            }
+            // Border가 없으므로 fill이 piece 전체 크기를 그대로 차지합니다.
+            float fillWorldSize = Mathf.Max(0f, pieceWorldSize);
+            SetSpriteWorldSize(fillRenderer, fillWorldSize);
         }
 
         private void SetSpriteWorldSize(SpriteRenderer spriteRenderer, float worldSize)
