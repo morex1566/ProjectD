@@ -5,13 +5,16 @@ namespace TRPG.Runtime
     public class PixelBreaker : MonoBehaviour
     {
         [Header(nameof(PixelBreaker))]
+
         [SerializeField] private SpriteRenderer targetSpriteRenderer;
         [SerializeField] private GameObject pixelPiecePb;
 
         [Header("Pixel Piece")]
+
         [SerializeField] private int sampleStep = 2;
 
         [Header("Explosion")]
+
         [SerializeField] private float explosionForce = 4f;
         [SerializeField] private float randomForce = 0.5f;
         [SerializeField] private float upwardForce = 1.2f;

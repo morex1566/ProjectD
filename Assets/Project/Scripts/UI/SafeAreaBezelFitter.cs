@@ -25,7 +25,7 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 런타임 RectTransform 크기 변경 시 Safe Area 배치를 다시 계산합니다.
+        /// 런타임 rectTransform 크기 변경 시 Safe Area 배치를 다시 계산합니다.
         /// </summary>
         private void OnRectTransformDimensionsChange()
         {

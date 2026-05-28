@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6dc9798d1f5f9274dade0825f4d06ca0, type: 3}
   m_Name: SO_UIManagerSettings
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.UIManagerSettingsData
-  damageUIPb: {fileID: 1668317966724903760, guid: 711c0b2cc4be8bf43b4533a7cf1a2b18, type: 3}
+  cursorShape: {fileID: 2395158100669332950, guid: aaeb50aa63f9a864ba854e0ea63f6365, type: 3}
+  creatureStatsUIPb: {fileID: 4915705643797020768, guid: ebf3300b7829eeb4fbe13843d1f9b8a9, type: 3}

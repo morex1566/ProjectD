@@ -9,6 +9,7 @@ namespace TRPG.Runtime
     public class NetManagerSettingsData : ScriptableObject
     {
         [Header("TCP")]
+
         [SerializeField] private string tcpHost = "192.168.0.3";
         [SerializeField] private int tcpPort = 60000;
 
@@ -18,6 +19,7 @@ namespace TRPG.Runtime
 
 
         [Header("HTTP")]
+
         [SerializeField] private string httpHost = "192.168.0.3";
         [SerializeField] private int httpPort = 60000;
 

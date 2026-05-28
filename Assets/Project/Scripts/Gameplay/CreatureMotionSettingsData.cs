@@ -5,7 +5,7 @@ namespace TRPG.Runtime
     /// <summary>
     /// 모든 크리처가 공유하는 전투 충돌 연출 타이밍 설정입니다.
     /// </summary>
-    [CreateAssetMenu(fileName = "SO_CreatureBattleMotionSettings", menuName = "TRPG/Gameplay/Creature Battle Motion Settings")]
+    [CreateAssetMenu(fileName = "SO_CreatureBattleMotionSettings", menuName = "TRPG/overlayCanvas/Creature Battle Motion Settings")]
     public class CreatureMotionSettingsData : ScriptableObject
     {
         public const float DefaultMoveDelay = 0.02f;

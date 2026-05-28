@@ -5,6 +5,7 @@ namespace TRPG.Runtime
     public class PixelPiece : MonoBehaviour
     {
         [Header(nameof(PixelPiece))]
+
         [SerializeField] private SpriteRenderer fillRenderer;
 
         public void Setup(Color fillColor, float pieceWorldSize, int sortingLayerID, int sortingOrder)

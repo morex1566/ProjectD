@@ -13,6 +13,7 @@ namespace TRPG.Runtime
     public class CanvasScalerPropagator : MonoBehaviour
     {
         [Header("Reference Canvas")]
+
         [SerializeField] private Canvas referenceCanvas;
 
         /// <summary>

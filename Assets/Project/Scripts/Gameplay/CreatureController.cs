@@ -18,11 +18,15 @@ namespace TRPG.Runtime
     [DisallowMultipleComponent]
     public abstract partial class CreatureController : MonoBehaviour, ISelectable
     {
-        [Header("CreatureController.Comp")]
+        [Header(nameof(CreatureController) + ".Comp")]
 
         [SerializeField, ReadOnly] private CreatureModel model = null;
 
         [SerializeField, ReadOnly] protected Animator animator = null;
+
+        [SerializeField, ReadOnly] protected CreatureStatsUI statsUI = null;
+
+        [SerializeField] protected DragPendulum2D dragger;
 
         [SerializeField] protected SpriteRenderer spriter = null;
 
@@ -30,14 +34,30 @@ namespace TRPG.Runtime
 
         [SerializeField] protected PixelBreaker breaker = null;
 
-        [Header("CreatureController.View")]
+
+        [Header(nameof(CreatureController) + ".Setup")]
+
+        [SerializeField] private Transform statsPivot;
+
+
+        [Header(nameof(CreatureController) + ".View")]
 
         [SerializeField] private Color outlineColor = Color.green;
 
         [SerializeField, Min(1)] private int outlinePixelWidth = 1;
 
+
+        [Header(nameof(CreatureController) + ".Runtime")]
+
+        [SerializeField, ReadOnly] protected ActionFlag actionFlags;
+
+        /// <summary>
+        /// 목표 타일 위에 살짝 띄운 도착 위치 오프셋
+        /// </summary>
+        [SerializeField] private Vector3 preLandingOffset = new Vector3(0f, 0.5f, 0f);
+
         private static readonly Vector3[] OutlineDirections =
-        {
+{
             Vector3.up,
             Vector3.down,
             Vector3.left,
@@ -49,15 +69,6 @@ namespace TRPG.Runtime
         };
 
         private readonly List<SpriteRenderer> outliners = new();
-
-        [Header("CreatureController.Runtime")]
-
-        [SerializeField, ReadOnly] protected ActionFlag actionFlags;
-
-        /// <summary>
-        /// 목표 타일 위에 살짝 띄운 도착 위치 오프셋
-        /// </summary>
-        [SerializeField] private Vector3 preLandingOffset = new Vector3(0f, 0.5f, 0f);
 
         public bool CanSelect { get; set; } = false;
 
@@ -79,20 +90,17 @@ namespace TRPG.Runtime
 
 
 
-        private void OnValidate()
-        {
-            Init();
-        }
-
         protected virtual void Awake()
-        {
-            Init();
-        }
-
-        private void Init()
         {
             model = GetComponent<CreatureModel>();
             animator = GetComponentInChildren<Animator>();
+        }
+
+        protected virtual void Start()
+        {
+            // UI 생성
+            statsUI = UIManager.GetInstance().Open<CreatureStatsUI>(UIManager.RenderSpace.Overlay);
+            statsUI.rectTransform.localPosition = UIManager.GetInstance().WorldPosToUIPos(statsPivot.position, statsUI.rectTransformParent);
         }
 
         private void OnEnable()

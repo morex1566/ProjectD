@@ -3,11 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags:
-  - PlayerCharacter
-  - GameplayCanvas
-  - GameplayTopLayout
-  - GameplayCenterLayout
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -15,9 +11,9 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
+  - OverlayUI
+  - WorldUI
+  - CameraUI
   - 
   - Enemy
   - Ally

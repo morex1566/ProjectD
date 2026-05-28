@@ -10,10 +10,6 @@ namespace TRPG.Runtime
     /// </summary>
     public partial class PlayerController : CreatureController
     {
-        [Header("PlayerController")]
-
-        [SerializeField] private DragPendulum2D dragger;
-
         public new PlayerModel Model => base.Model as PlayerModel;
 
         protected override void Awake()

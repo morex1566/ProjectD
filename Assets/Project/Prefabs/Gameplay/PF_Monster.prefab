@@ -91,6 +91,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1481738751763060245
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 930279820395697875}
+  m_Layer: 11
+  m_Name: Stats_Pivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &930279820395697875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1481738751763060245}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.7, z: 0}
+  m_LocalScale: {x: 1.1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6404244827999971861}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2896748450618422044
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,6 +244,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4677240042914659085}
+  - {fileID: 930279820395697875}
   - {fileID: 5365206451783976147}
   - {fileID: 1420707979934502016}
   - {fileID: 6874033779020079137}
@@ -254,9 +287,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MonsterController
   model: {fileID: 3184946928956853724}
   animator: {fileID: 8124359199729283323}
+  statsUI: {fileID: 0}
+  dragger: {fileID: 1198415780469704080}
   spriter: {fileID: 7906818696702885716}
   outliner: {fileID: 1078979194409940324}
   breaker: {fileID: 1022251383177044628}
+  statsPivot: {fileID: 930279820395697875}
   outlineColor: {r: 0.8627451, g: 0.15686275, b: 0, a: 1}
   outlinePixelWidth: 1
   actionFlags: 0
@@ -308,8 +344,6 @@ MonoBehaviour:
   targetSpriteRenderer: {fileID: 7906818696702885716}
   pixelPiecePb: {fileID: 2746114701456241168, guid: a267929d7aa2775458ac3530f11dfb1b, type: 3}
   sampleStep: 4
-  borderPixelWidth: 1
-  borderColor: {r: 0, g: 0, b: 0, a: 1}
   explosionForce: 4
   randomForce: 0.5
   upwardForce: 1.2
@@ -429,3 +463,52 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &8933904193423755337
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4677240042914659085}
+  - component: {fileID: 1198415780469704080}
+  m_Layer: 11
+  m_Name: Dragger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &4677240042914659085
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8933904193423755337}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6404244827999971861}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1198415780469704080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8933904193423755337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9e4348982fc0fc4b816a72459f8e0ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DragPendulum2D
+  targetCamera: {fileID: 0}
+  targetTransform: {fileID: 0}
+  holdOffset: {x: 0, y: 0.6}
+  rotateAmount: 180
+  rotateSmooth: 10
