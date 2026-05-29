@@ -48,7 +48,33 @@ namespace TRPG.Runtime
         /// <summary>
         /// 월드 좌표를 화면 좌표로 변환합니다.
         /// </summary>
-        public Vector3 WorldPosToUIPos(Vector3 worldPosition, RectTransform targetRect = null, Camera worldCamera = null)
+        public static Vector3 WorldPosToUIPos(Vector3 worldPosition, RectTransform targetRect = null, Camera worldCamera = null)
+        {
+            return GetInstance().WorldPosToUIPosInternal(worldPosition, targetRect, worldCamera);
+        }
+
+        /// <summary>
+        /// 현재 열려 있는 UI를 닫습니다.
+        /// </summary>
+        public static void Close(int instanceId)
+        {
+            GetInstance().CloseInternal(instanceId);
+        }
+
+        /// <summary>
+        /// 지정한 UI 타입의 인스턴스를 가져오거나 생성합니다.
+        /// </summary>
+        public static T Open<T>(RenderSpace renderSpace) where T : UIBase
+        {
+            return GetInstance().OpenInternal<T>(renderSpace);
+        }
+
+
+
+        /// <summary>
+        /// 현재 Canvas 설정을 기준으로 월드 좌표를 UI 로컬 좌표로 변환합니다.
+        /// </summary>
+        private Vector3 WorldPosToUIPosInternal(Vector3 worldPosition, RectTransform targetRect = null, Camera worldCamera = null)
         {
             worldCamera ??= Camera.main;
             targetRect ??= overlayCanvas.transform as RectTransform;
@@ -68,7 +94,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 현재 열려 있는 UI를 닫습니다.
         /// </summary>
-        public void Close(int instanceId)
+        private void CloseInternal(int instanceId)
         {
             uiInsts.Remove(instanceId);
         }
@@ -76,7 +102,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 지정한 UI 타입의 인스턴스를 가져오거나 생성합니다.
         /// </summary>
-        public T Open<T>(RenderSpace renderSpace) where T : UIBase
+        private T OpenInternal<T>(RenderSpace renderSpace) where T : UIBase
         {
             T pb = settings.Get<T>();
 

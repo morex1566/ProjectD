@@ -28,9 +28,9 @@ namespace TRPG.Runtime
         {
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
 
-            if (WorldManager.GetInstance().TryGetMapCellPos(mouseWorldPos, out Vector3Int cellPos))
+            if (WorldManager.TryGetMapCellPos(mouseWorldPos, out Vector3Int cellPos))
             {
-                WorldManager.GetInstance().TryGetMapWorldPos(cellPos, out Vector3 worldPos);
+                WorldManager.TryGetMapWorldPos(cellPos, out Vector3 worldPos);
 
                 cursor.SetActive(true);
                 cursor.transform.position = worldPos;

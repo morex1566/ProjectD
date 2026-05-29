@@ -24,6 +24,9 @@ namespace TRPG.Runtime
         // Addressables.Release는 로드 때 받은 handle 기준으로 처리합니다.
         private static readonly Dictionary<string, AsyncOperationHandle<Object>> cachedHandles = new();
 
+        // 같은 label이 로드 중이면 기존 작업을 공유해 Addressables 중복 호출을 막습니다.
+        private static readonly Dictionary<string, AsyncLazy<IList<Object>>> pendingLoadTasks = new();
+
 
 
 
@@ -36,11 +39,39 @@ namespace TRPG.Runtime
             settings = Resources.Load<ResourceManagerSettingsData>("SO_ResourceManagerSettings");
         }
 
+        /// <summary>
+        /// 지정한 Addressables label의 리소스를 로드하고, 로드 중인 같은 label 요청은 기존 작업을 공유합니다.
+        /// </summary>
         public static async UniTask<IList<Object>> LoadAsync(string label)
         {
-            return await GetInstance().LoadInternalAsync(label);
+            ResourceManager inst = GetInstance();
+
+            if (cachedLabelPrimaryKeys.TryGetValue(label, out List<string> cachedPrimaryKeys))
+            {
+                return GetCachedAssets(cachedPrimaryKeys);
+            }
+
+            if (pendingLoadTasks.TryGetValue(label, out AsyncLazy<IList<Object>> pendingLoadTask))
+            {
+                return await pendingLoadTask;
+            }
+
+            AsyncLazy<IList<Object>> loadTask = new AsyncLazy<IList<Object>>(() => inst.LoadInternalAsync(label));
+            pendingLoadTasks[label] = loadTask;
+
+            try
+            {
+                return await loadTask;
+            }
+            finally
+            {
+                pendingLoadTasks.Remove(label);
+            }
         }
 
+        /// <summary>
+        /// 선로드된 리소스 캐시에서 AssetReference에 대응하는 리소스를 반환합니다.
+        /// </summary>
         public static T GetResource<T>(AssetReferenceT<T> reference) where T : Object
         {
             if (typeof(Component).IsAssignableFrom(typeof(T)))
@@ -64,20 +95,27 @@ namespace TRPG.Runtime
             return cachedResources.TryGetValue(primaryKey, out Object resource) ? resource as T : null;
         }
 
+        /// <summary>
+        /// 지정한 label의 로드가 진행 중이면 완료를 기다린 뒤 캐시와 Addressables handle을 해제합니다.
+        /// </summary>
         public static async UniTask UnloadAsync(string label)
         {
+            if (pendingLoadTasks.TryGetValue(label, out AsyncLazy<IList<Object>> pendingLoadTask))
+            {
+                await pendingLoadTask;
+            }
+
             await GetInstance().UnloadInternalAsync(label);
         }
 
 
+
+
+        /// <summary>
+        /// Addressables에서 location과 asset을 실제로 로드하고 캐시에 등록합니다.
+        /// </summary>
         private async UniTask<IList<Object>> LoadInternalAsync(string label)
         {
-            // 이미 로드된 label이면 Addressables를 다시 호출하지 않고 캐시만 반환합니다.
-            if (cachedLabelPrimaryKeys.TryGetValue(label, out List<string> cachedPrimaryKeys))
-            {
-                return GetCachedAssets(cachedPrimaryKeys);
-            }
-
             AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(Object));
 
             try
@@ -129,6 +167,9 @@ namespace TRPG.Runtime
             }
         }
 
+        /// <summary>
+        /// label에 연결된 primary key 목록을 기준으로 캐시와 handle을 정리합니다.
+        /// </summary>
         private UniTask UnloadInternalAsync(string label)
         {
             // 로드된 적 없는 label은 언로드할 리소스가 없습니다.
@@ -154,6 +195,9 @@ namespace TRPG.Runtime
             return UniTask.CompletedTask;
         }
 
+        /// <summary>
+        /// primary key 목록에 대응하는 유효한 캐시 리소스만 모아서 반환합니다.
+        /// </summary>
         private static List<Object> GetCachedAssets(List<string> primaryKeys)
         {
             List<Object> assets = new();
@@ -169,6 +213,9 @@ namespace TRPG.Runtime
             return assets;
         }
 
+        /// <summary>
+        /// Addressables locator에서 runtime key와 타입에 맞는 primary key를 찾습니다.
+        /// </summary>
         private static bool TryGetPrimaryKey(object runtimeKey, System.Type type, out string primaryKey)
         {
             foreach (IResourceLocator locator in Addressables.ResourceLocators)

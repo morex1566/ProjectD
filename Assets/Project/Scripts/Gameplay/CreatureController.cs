@@ -93,8 +93,8 @@ namespace TRPG.Runtime
         protected virtual void Start()
         {
             // UI 생성
-            //statsUI = UIManager.GetInstance().Open<CreatureStatsUI>(UIManager.RenderSpace.Overlay);
-            //statsUI.rectTransform.localPosition = UIManager.GetInstance().WorldPosToUIPos(statsPivot.position, statsUI.rectTransformParent);
+            //statsUI = UIManager.Open<CreatureStatsUI>(UIManager.RenderSpace.Overlay);
+            //statsUI.rectTransform.localPosition = UIManager.WorldPosToUIPos(statsPivot.position, statsUI.rectTransformParent);
         }
 
         private void OnEnable()

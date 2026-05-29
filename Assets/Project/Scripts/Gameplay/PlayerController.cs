@@ -36,10 +36,9 @@ namespace TRPG.Runtime
         /// </summary>
         private void RequestShowOutline(bool active)
         {
-            WorldManager worldManager = WorldManager.GetInstance();
-            var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+            var movableCellPosList = WorldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
 
-            List<CreatureController> creatureControllers = WorldManager.GetInstance().GetCreaturesInCellPosList(movableCellPosList);
+            List<CreatureController> creatureControllers = WorldManager.GetCreaturesInCellPosList(movableCellPosList);
             foreach (CreatureController creatureController in creatureControllers)
             {
                 creatureController.SetOutline(active);
@@ -52,11 +51,10 @@ namespace TRPG.Runtime
         /// </summary>
         private bool IsAttackable(Vector3 mouseWorldPos, out MonsterController monsterController)
         {
-            WorldManager worldManager = WorldManager.GetInstance();
-            var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
-            worldManager.TryGetMapCellPos(mouseWorldPos, out Vector3Int mouseCellPos);
+            var movableCellPosList = WorldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+            WorldManager.TryGetMapCellPos(mouseWorldPos, out Vector3Int mouseCellPos);
 
-            bool isAttackable = worldManager.HasMonsterInCellPos(mouseCellPos, out MonsterController outMonsterController) &&
+            bool isAttackable = WorldManager.HasMonsterInCellPos(mouseCellPos, out MonsterController outMonsterController) &&
                                 movableCellPosList.Contains(mouseCellPos);
 
             monsterController = outMonsterController;
@@ -70,13 +68,12 @@ namespace TRPG.Runtime
         /// </summary>
         private bool IsMovable(Vector3 mouseWorldPos, out Vector3 mouseCellWorldPos, out Vector3Int mouseCellPos)
         {
-            WorldManager worldManager = WorldManager.GetInstance();
-            var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+            var movableCellPosList = WorldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
 
-            bool isMovable = worldManager.TryGetMapCellPos(mouseWorldPos, out Vector3Int outMouseCellPos) &&
+            bool isMovable = WorldManager.TryGetMapCellPos(mouseWorldPos, out Vector3Int outMouseCellPos) &&
                              movableCellPosList.Contains(outMouseCellPos);
 
-            worldManager.TryGetMapWorldPos(outMouseCellPos, out Vector3 outMouseCellWorldPos);
+            WorldManager.TryGetMapWorldPos(outMouseCellPos, out Vector3 outMouseCellWorldPos);
 
             mouseCellPos = outMouseCellPos;
             mouseCellWorldPos = outMouseCellWorldPos;
@@ -106,9 +103,8 @@ namespace TRPG.Runtime
 
         private void OnClickPerformed(InputAction.CallbackContext context)
         {
-            WorldManager worldManager = WorldManager.GetInstance();
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
-            var indicatorCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, false);
+            var indicatorCellPosList = WorldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, false);
 
             // 플레이어 이동중?
             if (HasActionFlag(ActionFlag.Moving)) return;
@@ -117,12 +113,12 @@ namespace TRPG.Runtime
             if (!Contains(mouseWorldPos)) return;
 
             // 이동할 수 없는 타일 선택?
-            if (!worldManager.TryGetMapCellPos(mouseWorldPos, out _)) return;
+            if (!WorldManager.TryGetMapCellPos(mouseWorldPos, out _)) return;
 
             // 드래깅 시작
             // 이동 범위 요청
             // 이동 범위에 있는 크리쳐에게 외곽선 효과 요청
-            worldManager.AddAllyTileIndicator(indicatorCellPosList, this);
+            WorldManager.AddAllyTileIndicator(indicatorCellPosList, this);
             dragger.gameObject.SetActive(true);
             RequestShowOutline(true);
 
@@ -131,7 +127,6 @@ namespace TRPG.Runtime
 
         private void OnClickCanceled(InputAction.CallbackContext context)
         {
-            WorldManager worldManager = WorldManager.GetInstance();
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
             bool isAttackable = IsAttackable(mouseWorldPos, out MonsterController monsterController);
             bool isMovable = IsMovable(mouseWorldPos, out Vector3 mouseCellWorldPos, out Vector3Int mouseCellPos);
@@ -165,7 +160,7 @@ namespace TRPG.Runtime
             // 이동 범위 초기화
             RequestShowOutline(false);
             dragger.gameObject.SetActive(false);
-            worldManager.RemoveTileIndicators(this);
+            WorldManager.RemoveTileIndicators(this);
 
             PlayDrop();
         }

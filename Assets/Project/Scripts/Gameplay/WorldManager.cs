@@ -39,6 +39,9 @@ namespace TRPG.Runtime
             tileIndicators = new Dictionary<Vector3Int, TileIndicator>();
         }
 
+        /// <summary>
+        /// 월드 매니저 인스턴스와 설정 데이터를 준비합니다.
+        /// </summary>
         public static void Init()
         {
             GetInstance();
@@ -48,10 +51,120 @@ namespace TRPG.Runtime
 
 
         /// <summary>
+        /// 월드 좌표에 대응하는 유효한 맵 CellPos를 찾습니다.
+        /// </summary>
+        public static bool TryGetMapCellPos(Vector3 worldPos, out Vector3Int cellPos)
+        {
+            return GetInstance().TryGetMapCellPosInternal(worldPos, out cellPos);
+        }
+
+        /// <summary>
+        /// 맵 CellPos에 대응하는 월드 중심 좌표를 찾습니다.
+        /// </summary>
+        public static bool TryGetMapWorldPos(Vector3Int cellPos, out Vector3 worldPos)
+        {
+            return GetInstance().TryGetMapWorldPosInternal(cellPos, out worldPos);
+        }
+
+        /// <summary>
+        /// 기준 CellPos와 이동 방향 데이터로 현재 맵에서 이동 가능한 CellPos 목록을 계산합니다.
+        /// </summary>
+        public static List<Vector3Int> GetMovableCellPosList(
+            Vector3Int originCellPos,
+            List<Vector3Int> directions,
+            bool isRepeatable,
+            bool isIncludeCreature)
+        {
+            return GetInstance().GetMovableCellPosListInternal(originCellPos, directions, isRepeatable, isIncludeCreature);
+        }
+
+        /// <summary>
+        /// 지정 CellPos에 owner가 소유한 타일 인디케이터가 있는지 확인합니다.
+        /// </summary>
+        public static bool HasIndicatorInCellPos(Vector3Int cellPos, CreatureController owner)
+        {
+            return GetInstance().HasIndicatorInCellPosInternal(cellPos, owner);
+        }
+
+        /// <summary>
+        /// 지정 CellPos를 점유한 몬스터를 찾습니다.
+        /// </summary>
+        public static bool HasMonsterInCellPos(Vector3Int cellPos, out MonsterController monsterController)
+        {
+            return GetInstance().HasMonsterInCellPosInternal(cellPos, out monsterController);
+        }
+
+        /// <summary>
+        /// 월드 좌표가 가리키는 CellPos를 점유한 몬스터를 찾습니다.
+        /// </summary>
+        public static bool HasMonsterInWorldPos(Vector3 worldPos, out MonsterController monsterController)
+        {
+            return GetInstance().HasMonsterInWorldPosInternal(worldPos, out monsterController);
+        }
+
+        /// <summary>
+        /// 지정 CellPos 목록에 있는 모든 크리처를 반환합니다.
+        /// </summary>
+        public static List<CreatureController> GetCreaturesInCellPosList(List<Vector3Int> cellPosList)
+        {
+            return GetInstance().GetCreaturesInCellPosListInternal(cellPosList);
+        }
+
+        /// <summary>
+        /// 지정 CellPos에 몬스터를 생성하고 월드 점유 목록에 등록합니다.
+        /// </summary>
+        public static void SpawnMonster(CreatureData monsterData, Vector3Int cellPos)
+        {
+            GetInstance().SpawnMonsterInternal(monsterData, cellPos);
+        }
+
+        /// <summary>
+        /// 지정 CellPos에 플레이어를 생성하고 월드 점유 목록에 등록합니다.
+        /// </summary>
+        public static void SpawnPlayer(Vector3Int cellPos)
+        {
+            GetInstance().SpawnPlayerInternal(cellPos);
+        }
+
+        /// <summary>
+        /// instanceId에 해당하는 크리처를 제거하고 월드 점유 목록에서 해제합니다.
+        /// </summary>
+        public static void Despawn(int instanceId)
+        {
+            GetInstance().DespawnInternal(instanceId);
+        }
+
+        /// <summary>
+        /// owner의 기존 인디케이터를 지우고 아군 이동 범위 인디케이터를 표시합니다.
+        /// </summary>
+        public static void AddAllyTileIndicator(List<Vector3Int> cellPosList, CreatureController owner)
+        {
+            GetInstance().AddAllyTileIndicatorInternal(cellPosList, owner);
+        }
+
+        /// <summary>
+        /// owner의 기존 인디케이터를 지우고 적 대상 범위 인디케이터를 표시합니다.
+        /// </summary>
+        public static void AddEnemyTileIndicator(List<Vector3Int> cellPosList, CreatureController owner)
+        {
+            GetInstance().AddEnemyTileIndicatorInternal(cellPosList, owner);
+        }
+
+        /// <summary>
+        /// owner가 소유한 모든 타일 인디케이터를 제거합니다.
+        /// </summary>
+        public static void RemoveTileIndicators(CreatureController owner)
+        {
+            GetInstance().RemoveTileIndicatorsInternal(owner);
+        }
+
+
+
+        /// <summary>
         /// 월드 좌표에 대응하는 Ground CellPos를 반환합니다.
         /// 타일 크기는 1이므로 WorldPosition (0, 0, 0)은 CellPos (0, 0)에 대응합니다.
         /// </summary>
-        public bool TryGetMapCellPos(Vector3 worldPos, out Vector3Int cellPos)
+        private bool TryGetMapCellPosInternal(Vector3 worldPos, out Vector3Int cellPos)
         {
             cellPos = WorldToCellPos(worldPos);
 
@@ -62,7 +175,7 @@ namespace TRPG.Runtime
         /// Ground CellPos가 유효하면 월드 중심 좌표를 반환합니다.
         /// 타일 크기는 1이므로 CellPos (0, 0)은 WorldPosition (0, 0, 0)에 대응합니다.
         /// </summary>
-        public bool TryGetMapWorldPos(Vector3Int cellPos, out Vector3 worldPos)
+        private bool TryGetMapWorldPosInternal(Vector3Int cellPos, out Vector3 worldPos)
         {
             if (!tiles.ContainsKey(cellPos))
             {
@@ -74,6 +187,9 @@ namespace TRPG.Runtime
             return true;
         }
 
+        /// <summary>
+        /// 월드 좌표를 논리 CellPos로 변환합니다.
+        /// </summary>
         public static Vector3Int WorldToCellPos(Vector3 worldPos)
         {
             // 타일 크기는 1입니다. WorldPosition (0, 0, 0)은 CellPos (0, 0)에 매핑되고 z는 논리 좌표에서 사용하지 않습니다.
@@ -83,6 +199,9 @@ namespace TRPG.Runtime
                 0);
         }
 
+        /// <summary>
+        /// 논리 CellPos를 월드 중심 좌표로 변환합니다.
+        /// </summary>
         public static Vector3 CellPosToWorldPos(Vector3Int cellPos)
         {
             return new Vector3(cellPos.x, cellPos.y, cellPos.z);
@@ -91,7 +210,11 @@ namespace TRPG.Runtime
         /// <summary>
         /// originCellPos 기준 현재 맵에서 이동가능한 CellPos를 가져옵니다.
         /// </summary>
-        public List<Vector3Int> GetMovableCellPosList(Vector3Int originCellPos, List<Vector3Int> directions, bool isRepeatable, bool isIncludeCreature)
+        private List<Vector3Int> GetMovableCellPosListInternal(
+            Vector3Int originCellPos,
+            List<Vector3Int> directions,
+            bool isRepeatable,
+            bool isIncludeCreature)
         {
             List<Vector3Int> movableCellPosList = new();
 
@@ -102,7 +225,7 @@ namespace TRPG.Runtime
                 if (direction == Vector3Int.zero) continue;
 
                 Vector3Int candidateCellPos = originCellPos + direction;
-                while (TryGetMapWorldPos(candidateCellPos, out _))
+                while (TryGetMapWorldPosInternal(candidateCellPos, out _))
                 {
                     // 다른 크리처가 점유한 CellPos는 이동 가능 목록에서 제외하고, 반복 이동도 그 지점에서 멈춥니다.
                     if (!isIncludeCreature && HasCreatureInCellPos(candidateCellPos)) break;
@@ -125,7 +248,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 내가 소유한 타일 인디케이터인지?
         /// </summary>
-        public bool HasIndicatorInCellPos(Vector3Int cellPos, CreatureController owner)
+        private bool HasIndicatorInCellPosInternal(Vector3Int cellPos, CreatureController owner)
         {
             return tileIndicators.ContainsKey(cellPos) && tileIndicators[cellPos].Owner == owner;
         }
@@ -133,7 +256,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 이 위치에 몬스터가 있는지 확인합니다.
         /// </summary>
-        public bool HasMonsterInCellPos(Vector3Int cellPos, out MonsterController monsterController)
+        private bool HasMonsterInCellPosInternal(Vector3Int cellPos, out MonsterController monsterController)
         {
             foreach (KeyValuePair<int, CreatureController> pair in creatures)
             {
@@ -169,22 +292,22 @@ namespace TRPG.Runtime
         /// <summary>
         /// 이 위치에 몬스터가 있는지 확인합니다.
         /// </summary>
-        public bool HasMonsterInWorldPos(Vector3 worldPos, out MonsterController monsterController)
+        private bool HasMonsterInWorldPosInternal(Vector3 worldPos, out MonsterController monsterController)
         {
-            if (!TryGetMapCellPos(worldPos, out Vector3Int cellPos))
+            if (!TryGetMapCellPosInternal(worldPos, out Vector3Int cellPos))
             {
                 monsterController = null;
                 return false;
             }
 
             // 타일 기반 클릭 판정은 스프라이트 bounds가 아니라 점유 CellPos를 기준으로 합니다.
-            return HasMonsterInCellPos(cellPos, out monsterController);
+            return HasMonsterInCellPosInternal(cellPos, out monsterController);
         }
 
         /// <summary>
         /// 위치에 있는 Creature들을 리턴
         /// </summary>
-        public List<CreatureController> GetCreaturesInCellPosList(List<Vector3Int> cellPosList)
+        private List<CreatureController> GetCreaturesInCellPosListInternal(List<Vector3Int> cellPosList)
         {
             List<CreatureController> results = new();
 
@@ -204,10 +327,13 @@ namespace TRPG.Runtime
 
 
 
-        public void SpawnMonster(CreatureData monsterData, Vector3Int cellPos)
+        /// <summary>
+        /// 몬스터 프리팹을 실제로 인스턴스화하고 모델 데이터를 초기화합니다.
+        /// </summary>
+        private void SpawnMonsterInternal(CreatureData monsterData, Vector3Int cellPos)
         {
             // Ground 타일이 없는 CellPos에는 몬스터를 생성하지 않습니다.
-            if (!TryGetMapWorldPos(cellPos, out Vector3 worldPos)) return;
+            if (!TryGetMapWorldPosInternal(cellPos, out Vector3 worldPos)) return;
 
             // 몬스터 프리팹을 생성하고 모델 데이터를 초기화합니다.
             CreatureController monsterPb = settings.MonsterPb;
@@ -223,10 +349,13 @@ namespace TRPG.Runtime
             creatures.Add(monsterController.GetInstanceID(), monsterController);
         }
 
-        public void SpawnPlayer(Vector3Int cellPos)
+        /// <summary>
+        /// 플레이어 프리팹을 실제로 인스턴스화하고 모델 데이터를 초기화합니다.
+        /// </summary>
+        private void SpawnPlayerInternal(Vector3Int cellPos)
         {
             // Ground 타일이 없는 CellPos에는 플레이어를 생성하지 않습니다.
-            if (!TryGetMapWorldPos(cellPos, out Vector3 worldPos)) return;
+            if (!TryGetMapWorldPosInternal(cellPos, out Vector3 worldPos)) return;
 
             // 플레이어 프리팹을 생성하고 모델 데이터를 초기화합니다.
             CreatureController playerPb = settings.PlayerPb;
@@ -245,7 +374,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 크리처 삭제
         /// </summary>
-        public void Despawn(int instanceId)
+        private void DespawnInternal(int instanceId)
         {
             Destroy(creatures[instanceId].gameObject);
             creatures.Remove(instanceId);
@@ -254,13 +383,13 @@ namespace TRPG.Runtime
         /// <summary>
         /// 타일에 표식 넣기
         /// </summary>
-        public void AddAllyTileIndicator(List<Vector3Int> cellPosList, CreatureController owner)
+        private void AddAllyTileIndicatorInternal(List<Vector3Int> cellPosList, CreatureController owner)
         {
-            RemoveTileIndicators(owner);
+            RemoveTileIndicatorsInternal(owner);
 
             foreach (Vector3Int cellPos in cellPosList)
             {
-                if (!TryGetMapWorldPos(cellPos, out Vector3 indicatorWorldPos)) continue;
+                if (!TryGetMapWorldPosInternal(cellPos, out Vector3 indicatorWorldPos)) continue;
 
                 RemoveTileIndicator(cellPos);
 
@@ -271,13 +400,16 @@ namespace TRPG.Runtime
             }
         }
 
-        public void AddEnemyTileIndicator(List<Vector3Int> cellPosList, CreatureController owner)
+        /// <summary>
+        /// 적 대상 범위 CellPos마다 타일 인디케이터를 생성합니다.
+        /// </summary>
+        private void AddEnemyTileIndicatorInternal(List<Vector3Int> cellPosList, CreatureController owner)
         {
-            RemoveTileIndicators(owner);
+            RemoveTileIndicatorsInternal(owner);
 
             foreach (Vector3Int cellPos in cellPosList)
             {
-                if (!TryGetMapWorldPos(cellPos, out Vector3 indicatorWorldPos)) continue;
+                if (!TryGetMapWorldPosInternal(cellPos, out Vector3 indicatorWorldPos)) continue;
 
                 RemoveTileIndicator(cellPos);
 
@@ -291,7 +423,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 인디케이터 삭제
         /// </summary>
-        public void RemoveTileIndicators(CreatureController owner)
+        private void RemoveTileIndicatorsInternal(CreatureController owner)
         {
             List<Vector3Int> removeCellPosList = new();
             foreach (KeyValuePair<Vector3Int, TileIndicator> pair in tileIndicators)
@@ -313,6 +445,9 @@ namespace TRPG.Runtime
             }
         }
 
+        /// <summary>
+        /// 지정 CellPos의 인디케이터 오브젝트와 조회 항목을 함께 제거합니다.
+        /// </summary>
         private void RemoveTileIndicator(Vector3Int cellPos)
         {
             if (!tileIndicators.TryGetValue(cellPos, out TileIndicator tileIndicator)) return;
@@ -325,6 +460,9 @@ namespace TRPG.Runtime
 
 
 
+        /// <summary>
+        /// 맵 데이터를 월드 타일 오브젝트로 인스턴스화하고 현재 맵 상태로 등록합니다.
+        /// </summary>
         private void LoadMapData(MapData mapData)
         {
             if (mapData == null) return;
@@ -347,6 +485,9 @@ namespace TRPG.Runtime
             }
         }
 
+        /// <summary>
+        /// 현재 맵, 크리처, 타일 인디케이터 런타임 오브젝트를 모두 정리합니다.
+        /// </summary>
         private void UnloadMapData()
         {
             foreach (KeyValuePair<int, CreatureController> pair in creatures)
@@ -375,6 +516,9 @@ namespace TRPG.Runtime
             tileIndicators.Clear();
         }
 
+        /// <summary>
+        /// 플레이 모드와 에디터 메뉴 실행 상태에 맞는 방식으로 런타임 오브젝트를 제거합니다.
+        /// </summary>
         private static void DestroyRuntimeObject(GameObject target)
         {
             if (target == null) return;
@@ -454,12 +598,13 @@ namespace TRPG.Runtime
             settings = Resources.Load<WorldManagerSettingsData>("SO_WorldManagerSettings");
             var awaiter = ResourceManager.LoadAsync(UnityConstant.Addressable.Label.Core).GetAwaiter();
 
-            GetInstance().UnloadMapData();
+            WorldManager inst = GetInstance();
+            inst.UnloadMapData();
 
             awaiter.OnCompleted(() =>
             {
                 MapData testMapData = ResourceManager.GetResource(settings.TestMapData);          
-                WorldManager.GetInstance().LoadMapData(testMapData);
+                inst.LoadMapData(testMapData);
             });
         }
     }
