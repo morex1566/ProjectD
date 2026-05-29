@@ -44,4 +44,16 @@ namespace TRPG.Runtime
             return UnityEngine.Random.Range(Min, Max);
         }
     }
+
+    [System.Serializable]
+    public struct IntRange
+    {
+        public int Min;
+        public int Max;
+
+        public int Random()
+        {
+            return UnityEngine.Random.Range(Min, Max);
+        }
+    }
 }

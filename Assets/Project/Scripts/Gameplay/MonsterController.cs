@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -7,7 +8,51 @@ namespace TRPG.Runtime
     /// </summary>
     public class MonsterController : CreatureController
     {
+        [Header(nameof(MonsterController) + ".Setup")]
+
+        [SerializeField, ReadOnly] private DOTweenAnimation moveAnim;
+
+        [SerializeField] private Vector3Range moveAnimFromOffsetRange;
+
+        [SerializeField] private FloatRange moveAnimDurationRange;
+
+
         public new MonsterModel Model => base.Model as MonsterModel;
 
+
+        private void Reset()
+        {
+            Bind();
+        }
+
+        private void OnValidate()
+        {
+            Bind();
+        }
+
+        private void Bind()
+        {
+            DOTweenAnimation[] anims = GetComponentsInChildren<DOTweenAnimation>();
+            foreach (var anim in anims)
+            {
+                if (anim.animationType == DOTweenAnimation.AnimationType.Move)
+                {
+                    moveAnim = anim;
+                    continue;
+                }
+            }
+        }
+
+        public void OnEnable()
+        {
+            if (!Application.isPlaying) return;
+
+            // Move
+            if (moveAnim == null) return;
+            moveAnim.isFrom = true;
+            moveAnim.endValueV3 = moveAnimFromOffsetRange.Random();
+            moveAnim.duration = moveAnimDurationRange.Random();
+            moveAnim.DORestart();
+        }
     }
 }

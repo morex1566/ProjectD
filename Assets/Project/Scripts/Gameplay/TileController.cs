@@ -47,7 +47,6 @@ namespace TRPG.Runtime
 
         public void OnEnable()
         {
-            // Scene 기반 맵 편집 중에는 타일 프리팹을 정적으로 배치해야 하므로 생성 애니메이션을 실행하지 않습니다.
             if (!Application.isPlaying) return;
 
             // Move

@@ -10,23 +10,20 @@ using System.Xml.Linq;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
-using UnityEditor.Callbacks;
 using UnityEngine;
 using TRPG.Runtime;
 
 namespace TRPG.Editor
 {
     /// <summary>
-    /// Excel 테이블을 읽어 런타임 데이터 스키마와 ScriptableObject 에셋을 생성합니다.
+    /// Excel 테이블을 읽어 기존 ScriptableObject 데이터 에셋을 생성하거나 갱신합니다.
     /// </summary>
     public static class ExcelDataImporter
     {
-        private const string ExcelDirectory = "Excels";
-        private const string SchemaDirectory = "Assets/Project/Scripts/Data";
+        private const string ExcelDirectory = "Assets/Excels";
         private const string AssetRootDirectory = "Assets/Project/Datas";
         private const string AddressableGroupName = "Remote_Core";
         private const string CreatureDataLabel = "CreatureData";
-        private const string PendingAssetImportKey = "TRPG.ExcelDataImporter.PendingAssetImport";
 
         [MenuItem("TRPG/Data/Import Excel Tables")]
         public static void ImportExcelTables()
@@ -35,32 +32,6 @@ namespace TRPG.Editor
             if (tables.Count == 0)
             {
                 Debug.LogWarning($"Excel table not found: {GetExcelDirectoryPath()}");
-                return;
-            }
-
-            bool schemaChanged = GenerateSchemaScripts(tables);
-            if (schemaChanged)
-            {
-                // 스키마 타입이 새로 컴파일된 뒤 같은 Excel을 다시 읽어 에셋을 생성합니다.
-                SessionState.SetBool(PendingAssetImportKey, true);
-                AssetDatabase.Refresh();
-                return;
-            }
-
-            CreateScriptableObjectAssets(tables);
-        }
-
-        [DidReloadScripts]
-        private static void ImportPendingAssets()
-        {
-            if (!SessionState.GetBool(PendingAssetImportKey, false)) return;
-
-            SessionState.EraseBool(PendingAssetImportKey);
-
-            List<TableData> tables = LoadTables();
-            if (tables.Count == 0)
-            {
-                Debug.LogWarning($"Pending excel import skipped. Excel table not found: {GetExcelDirectoryPath()}");
                 return;
             }
 
@@ -169,83 +140,10 @@ namespace TRPG.Editor
             }
 
             List<string> headers = rows.FirstOrDefault(row => row.Any(value => !string.IsNullOrWhiteSpace(value))) ?? new List<string>();
-            List<FieldData> fields = CreateFields(headers, rows.Skip(1).ToList());
+            List<FieldData> fields = CreateFields(headers);
             List<Dictionary<string, string>> records = CreateRecords(fields, rows.Skip(1));
 
             return new TableData(sheetName, GetClassName(sheetName), fields, records);
-        }
-
-        private static bool GenerateSchemaScripts(List<TableData> tables)
-        {
-            EnsureAssetFolder(SchemaDirectory);
-
-            bool changed = false;
-            foreach (TableData table in tables)
-            {
-                string scriptPath = $"{SchemaDirectory}/{table.ClassName}.cs";
-                string content = CreateSchemaScript(table);
-                string currentContent = File.Exists(scriptPath) ? File.ReadAllText(scriptPath, Encoding.UTF8) : string.Empty;
-
-                if (NormalizeLineEndings(currentContent) == content) continue;
-
-                File.WriteAllText(scriptPath, content, new UTF8Encoding(false));
-                changed = true;
-            }
-
-            if (changed)
-            {
-                Debug.Log("Excel schema scripts generated. Unity recompilation will create ScriptableObject assets afterward.");
-            }
-
-            return changed;
-        }
-
-        private static string CreateSchemaScript(TableData table)
-        {
-            string baseClassName = table.ClassName == "MonsterData" ? "CreatureData" : "ScriptableObject";
-            string menuName = table.ClassName == "MonsterData"
-                ? "Scriptable Objects/Creature/Monster"
-                : $"Scriptable Objects/Data/{table.SchemaName}";
-            string fileName = $"SO_{table.SchemaName}";
-
-            StringBuilder builder = new StringBuilder();
-            builder.AppendLine("using System;");
-            builder.AppendLine("using UnityEngine;");
-            builder.AppendLine();
-            builder.AppendLine("namespace TRPG.Runtime");
-            builder.AppendLine("{");
-            builder.AppendLine($"    [CreateAssetMenu(fileName = \"{fileName}\", menuName = \"{menuName}\")]");
-            builder.AppendLine($"    public class {table.ClassName} : {baseClassName}");
-            builder.AppendLine("    {");
-
-            foreach (FieldData field in table.Fields)
-            {
-                builder.AppendLine($"        public {field.TypeName} {field.FieldName};");
-                builder.AppendLine();
-            }
-
-            if (table.ClassName == "CreatureData" && table.Fields.All(field => field.FieldName != "Cost"))
-            {
-                builder.AppendLine("        public int Cost;");
-                builder.AppendLine();
-            }
-
-            if (table.ClassName == "CreatureData" && table.Fields.All(field => field.FieldName != "MoveRangeData"))
-            {
-                builder.AppendLine($"        public {nameof(MoveRangeData)} MoveRangeData;");
-                builder.AppendLine();
-            }
-
-            if (table.ClassName == "CreatureData" && table.Fields.All(field => field.FieldName != "SkillData"))
-            {
-                builder.AppendLine($"        public {nameof(SkillData)} SkillData;");
-                builder.AppendLine();
-            }
-
-            builder.AppendLine("    }");
-            builder.AppendLine("}");
-
-            return NormalizeLineEndings(builder.ToString());
         }
 
         private static void CreateScriptableObjectAssets(List<TableData> tables)
@@ -268,8 +166,24 @@ namespace TRPG.Editor
                 for (int i = 0; i < table.Records.Count; i++)
                 {
                     Dictionary<string, string> record = table.Records[i];
-                    string assetName = GetAssetName(table, record, i);
+                    string assetName = GetAssetName(table, record);
+                    if (string.IsNullOrWhiteSpace(assetName))
+                    {
+                        Debug.LogWarning($"Excel row skipped because first column id is empty. Sheet: {table.SheetName}, Row: {i + 2}");
+                        continue;
+                    }
+
                     string assetPath = $"{tableAssetDirectory}/{assetName}.asset";
+                    string legacyAssetPath = $"{tableAssetDirectory}/SO_{assetName}.asset";
+
+                    if (!File.Exists(assetPath) && File.Exists(legacyAssetPath))
+                    {
+                        string moveError = AssetDatabase.MoveAsset(legacyAssetPath, assetPath);
+                        if (!string.IsNullOrWhiteSpace(moveError))
+                        {
+                            Debug.LogWarning($"Legacy excel asset rename failed. From: {legacyAssetPath}, To: {assetPath}, Error: {moveError}");
+                        }
+                    }
 
                     ScriptableObject asset = AssetDatabase.LoadAssetAtPath(assetPath, schemaType) as ScriptableObject;
                     if (asset == null)
@@ -327,6 +241,8 @@ namespace TRPG.Editor
                 if (fieldInfo == null) continue;
 
                 record.TryGetValue(field.FieldName, out string rawValue);
+                if (IsCommentValue(rawValue)) continue;
+
                 object value = ConvertValue(rawValue, fieldInfo.FieldType);
                 fieldInfo.SetValue(asset, value);
             }
@@ -339,9 +255,21 @@ namespace TRPG.Editor
             if (asset is not CreatureData creatureData) return;
 
             // DefaultSkillId는 데이터 식별자로 유지하고, 런타임 참조 필드는 import 시 자동 연결합니다.
-            if (record.TryGetValue("DefaultSkillId", out string defaultSkillId))
+            if (!record.TryGetValue("MoveRange", out string moveRangeName))
             {
-                creatureData.SkillData = LoadAssetByRecordValue(defaultSkillId, typeof(SkillData)) as SkillData;
+                record.TryGetValue("Type", out moveRangeName);
+            }
+
+            if (!string.IsNullOrWhiteSpace(moveRangeName) && !IsCommentValue(moveRangeName))
+            {
+                if (MoveRangeData.TryGetByName(moveRangeName, out MoveRangeData moveRangeData))
+                {
+                    creatureData.MoveRangeData = moveRangeData;
+                }
+                else
+                {
+                    Debug.LogWarning($"MoveRangeData not found. CreatureData: {creatureData.name}, MoveRange: {moveRangeName}");
+                }
             }
         }
 
@@ -375,53 +303,15 @@ namespace TRPG.Editor
                 return Enum.TryParse(targetType, rawValue, true, out object value) ? value : Activator.CreateInstance(targetType);
             }
 
-            if (typeof(ScriptableObject).IsAssignableFrom(targetType))
-            {
-                return LoadAssetByRecordValue(rawValue, targetType);
-            }
-
-            return null;
-        }
-
-        private static ScriptableObject LoadAssetByRecordValue(string rawValue, Type targetType)
-        {
-            rawValue = rawValue?.Trim() ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(rawValue)) return null;
-
             if (targetType == typeof(MoveRangeData))
             {
-                return LoadAssetByName($"SO_MoveRange_{rawValue}", targetType);
-            }
-
-            if (targetType == typeof(SkillData))
-            {
-                string compactId = rawValue.Replace("_", string.Empty);
-                return LoadAssetByName($"SO_Skill_{compactId}", targetType, false)
-                    ?? LoadAssetByName($"SO_Skill_{rawValue}", targetType, false)
-                    ?? LoadAssetByName(rawValue, targetType);
-            }
-
-            return LoadAssetByName(rawValue, targetType);
-        }
-
-        private static ScriptableObject LoadAssetByName(string assetName, Type targetType, bool logWarning = true)
-        {
-            foreach (string guid in AssetDatabase.FindAssets(assetName))
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                ScriptableObject asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
-                if (asset != null && targetType.IsInstanceOfType(asset)) return asset;
-            }
-
-            if (logWarning)
-            {
-                Debug.LogWarning($"ScriptableObject asset not found. Type: {targetType.Name}, Name: {assetName}");
+                return MoveRangeData.TryGetByName(rawValue, out MoveRangeData moveRangeData) ? moveRangeData : default(MoveRangeData);
             }
 
             return null;
         }
 
-        private static List<FieldData> CreateFields(List<string> headers, List<List<string>> dataRows)
+        private static List<FieldData> CreateFields(List<string> headers)
         {
             List<FieldData> fields = new List<FieldData>();
             for (int column = 0; column < headers.Count; column++)
@@ -430,8 +320,7 @@ namespace TRPG.Editor
                 if (string.IsNullOrWhiteSpace(header)) continue;
 
                 string fieldName = NormalizeFieldName(ToPascalCase(header));
-                string typeName = InferType(fieldName, dataRows.Select(row => column < row.Count ? row[column] : string.Empty));
-                fields.Add(new FieldData(header, fieldName, typeName, column));
+                fields.Add(new FieldData(fieldName, column));
             }
 
             return fields;
@@ -443,6 +332,7 @@ namespace TRPG.Editor
             foreach (List<string> row in dataRows)
             {
                 if (row.All(value => string.IsNullOrWhiteSpace(value))) continue;
+                if (row.Count > 0 && IsCommentValue(row[0])) continue;
 
                 Dictionary<string, string> record = new Dictionary<string, string>();
                 foreach (FieldData field in fields)
@@ -454,23 +344,6 @@ namespace TRPG.Editor
             }
 
             return records;
-        }
-
-        private static string InferType(string fieldName, IEnumerable<string> rawValues)
-        {
-            string lowerName = fieldName.ToLowerInvariant();
-            if (lowerName is "id" or "displayname" or "prefabaddress" or "defaultskillid" or "description") return "string";
-            if (lowerName == "moverangedata") return nameof(MoveRangeData);
-            if (lowerName is "hp" or "damage" or "armor" or "cost" or "level" or "count") return "int";
-
-            List<string> values = rawValues.Where(value => !string.IsNullOrWhiteSpace(value)).ToList();
-            if (values.Count == 0) return "string";
-
-            if (values.All(value => bool.TryParse(value, out _))) return "bool";
-            if (values.All(value => int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))) return "int";
-            if (values.All(value => float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out _))) return "float";
-
-            return "string";
         }
 
         private static string ReadCellValue(XElement cellElement, List<string> sharedStrings, XNamespace spreadsheetNs)
@@ -554,14 +427,14 @@ namespace TRPG.Editor
             return ToPascalCase(sheetName);
         }
 
-        private static string GetAssetName(TableData table, Dictionary<string, string> record, int rowIndex)
+        private static string GetAssetName(TableData table, Dictionary<string, string> record)
         {
-            string id = record.TryGetValue("Id", out string idValue) ? idValue : string.Empty;
-            string assetId = string.IsNullOrWhiteSpace(id)
-                ? (rowIndex + 1).ToString(CultureInfo.InvariantCulture)
-                : id;
+            FieldData firstField = table.Fields.OrderBy(field => field.ColumnIndex).FirstOrDefault();
+            string id = firstField != null && record.TryGetValue(firstField.FieldName, out string idValue)
+                ? idValue
+                : string.Empty;
 
-            return SanitizeFileName($"SO_{assetId}");
+            return SanitizeFileName(id.Trim());
         }
 
         private static int GetColumnIndex(string cellReference)
@@ -641,7 +514,6 @@ namespace TRPG.Editor
             {
                 "PrefabName" => "PrefabAddress",
                 "DefaultSkillID" => "DefaultSkillId",
-                "MoveRange" => "MoveRangeData",
                 _ => fieldName,
             };
         }
@@ -656,9 +528,9 @@ namespace TRPG.Editor
             return value;
         }
 
-        private static string NormalizeLineEndings(string value)
+        private static bool IsCommentValue(string value)
         {
-            return value.Replace("\r\n", "\n").Replace("\n", "\r\n");
+            return value != null && value.TrimStart().StartsWith("#", StringComparison.Ordinal);
         }
 
         private static void EnsureAssetFolder(string assetPath)
@@ -693,10 +565,6 @@ namespace TRPG.Editor
 
             public string ClassName { get; }
 
-            public string SchemaName => ClassName.EndsWith("Data", StringComparison.Ordinal)
-                ? ClassName.Substring(0, ClassName.Length - "Data".Length)
-                : ClassName;
-
             public List<FieldData> Fields { get; }
 
             public List<Dictionary<string, string>> Records { get; }
@@ -704,19 +572,13 @@ namespace TRPG.Editor
 
         private sealed class FieldData
         {
-            public FieldData(string header, string fieldName, string typeName, int columnIndex)
+            public FieldData(string fieldName, int columnIndex)
             {
-                Header = header;
                 FieldName = fieldName;
-                TypeName = typeName;
                 ColumnIndex = columnIndex;
             }
 
-            public string Header { get; }
-
             public string FieldName { get; }
-
-            public string TypeName { get; }
 
             public int ColumnIndex { get; }
         }

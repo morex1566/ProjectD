@@ -12,13 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcf51587bd553a54c870874518bda41c, type: 3}
   m_Name: SO_Monster_00
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureData
-  Id: Monster_00
+  Id: SO_Monster_00
+  Description: Default
   DisplayName: "\uC950"
-  MoveRangeData: {fileID: 11400000, guid: 98833fa063d44e409fca7d833bb9d74b, type: 2}
+  Type: Pawn
   DefaultSkillId: Attack_00
   Hp: 10
-  Damage: 1
-  Armor: 1
-  Description: "\uB354\uBBF8 \uBAAC\uC2A4\uD130"
-  Cost: 0
-  SkillData: {fileID: 11400000, guid: fe9e2a5e53c9bb441b1533e756212734, type: 2}
+  Damage: 10
+  Armor: 10
+  MoveRangeData:
+    isRepeatable: 0
+    directions:
+    - {x: 0, y: 1, z: 0}

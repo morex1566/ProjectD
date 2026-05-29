@@ -63,7 +63,6 @@ namespace TRPG.Runtime
             hp = initData.Hp;
             damage = initData.Damage;
             armor = initData.Armor;
-            cost = initData.Cost;
             isMoveRepeatable = initData.MoveRangeData.IsRepeatable;
             directions = initData.MoveRangeData.Directions;
         }

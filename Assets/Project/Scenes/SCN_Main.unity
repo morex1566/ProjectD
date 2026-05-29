@@ -330,6 +330,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6564672677110749043, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.21960784
+      objectReference: {fileID: 0}
+    - target: {fileID: 6564672677110749043, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.1254902
+      objectReference: {fileID: 0}
     - target: {fileID: 8696006802350935441, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
       propertyPath: m_Name
       value: PF_MainCamera
@@ -386,6 +394,10 @@ PrefabInstance:
     - target: {fileID: 1903749674788783344, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4417733885160864786, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -350
       objectReference: {fileID: 0}
     - target: {fileID: 6507398749872630000, guid: 47bd4f415b31fda4d95e1cbc95a72026, type: 3}
       propertyPath: m_Name

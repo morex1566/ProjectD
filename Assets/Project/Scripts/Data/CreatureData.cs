@@ -3,28 +3,25 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
-    [CreateAssetMenu(fileName = "SO_Creature", menuName = "Scriptable Objects/Data/Creature")]
+    [Serializable]
     public class CreatureData : ScriptableObject
     {
-        public string Id;
+        [ReadOnly] public string Id;
 
-        public string DisplayName;
+        [ReadOnly] public string Description;
+
+        [ReadOnly] public string DisplayName;
+
+        [ReadOnly] public string Type;
+
+        [ReadOnly] public string DefaultSkillId;
+
+        [ReadOnly] public int Hp;
+
+        [ReadOnly] public int Damage;
+
+        [ReadOnly] public int Armor;
 
         public MoveRangeData MoveRangeData;
-
-        public string DefaultSkillId;
-
-        public int Hp;
-
-        public int Damage;
-
-        public int Armor;
-
-        public string Description;
-
-        public int Cost;
-
-        public SkillData SkillData;
-
     }
 }

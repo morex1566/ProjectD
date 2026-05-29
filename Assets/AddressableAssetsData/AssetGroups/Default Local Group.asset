@@ -14,7 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Default Local Group
   m_GUID: 42a1b1741e064e84bae5590f7a550252
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 1c45cd45c63deb5409d61f11dc69efe0
+    m_Address: Assets/Project/Datas/StageData/SO_Stage_Tutorial_00.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 61c8a7f252422fc4492ff29b4cb7034a
+    m_Address: Assets/Project/Datas/CreatureData/SO_Monster_00.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b037aa227efd46939d87a6e1e1facefc
+    m_Address: Assets/Project/Datas/MapData/SO_Map_Tutorial_00.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: a4554c02061d64e4c9a9dca40a903723, type: 2}
   m_SchemaSet:
