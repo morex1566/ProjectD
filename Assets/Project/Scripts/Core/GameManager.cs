@@ -1,5 +1,9 @@
 using UnityEngine;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -25,17 +29,25 @@ namespace TRPG.Runtime
 
             DOTween.Init();
             InputManager.Init();     
-            ResourceManager.Init();
         }
 
         /// <summary>
         /// 씬 로드 후 씬 오브젝트 의존성이 있는 시스템을 초기화합니다.
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void OnAfterSceneLoaded()
+        private static async Task OnAfterSceneLoaded()
         {
-            UIManager.Init();
-            WorldManager.Init();
+            ResourceManager.Init();
+            try
+            {
+                await ResourceManager.LoadAsync(UnityConstant.Addressable.Label.Core);
+                UIManager.Init();
+                WorldManager.Init();
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogError(exception);
+            }
         }
 
         /// <summary>

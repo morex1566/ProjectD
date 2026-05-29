@@ -249,7 +249,7 @@ MonoBehaviour:
   targetGO: {fileID: 0}
   tweenTargetIsTargetGO: 1
   delay: 0
-  duration: 0.5
+  duration: 0.1
   easeType: 6
   easeCurve:
     serializedVersion: 2
@@ -465,8 +465,8 @@ MonoBehaviour:
   moveAnim: {fileID: 6771863868960902316}
   fadeAnim: {fileID: 4977984195673858116}
   moveAnimFromOffsetRange:
-    Min: {x: 0, y: -5, z: 0}
-    Max: {x: 0, y: -3, z: 0}
+    Min: {x: 0, y: -8, z: 0}
+    Max: {x: 0, y: -6, z: 0}
   moveAnimDurationRange:
-    Min: 0.8
-    Max: 1.2
+    Min: 0.6
+    Max: 0.8

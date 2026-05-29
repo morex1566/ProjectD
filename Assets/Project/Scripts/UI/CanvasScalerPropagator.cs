@@ -24,7 +24,7 @@ namespace TRPG.Runtime
 #if UNITY_EDITOR
             if (!Application.isPlaying)
             {
-                Sync();
+                SyncReference();
             }
 #endif
         }
@@ -32,8 +32,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 기준 CanvasScaler 설정을 모든 하위 Canvas에 복사합니다.
         /// </summary>
-        [ContextMenu("Sync Canvas Scaler Settings")]
-        public void Sync()
+        public void SyncReference()
         {
             if (referenceCanvas == null)
             {

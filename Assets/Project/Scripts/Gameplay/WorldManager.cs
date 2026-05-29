@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
+using System;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,7 +11,7 @@ using UnityEditor;
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// 월드 타일, 크리처 스폰, 점유 상태, 이동 범위 표시를 관리합니다.
+    /// 월드 시스템 진입점으로서 맵, 크리처, 인디케이터 기능을 중개합니다.
     /// </summary>
     public partial class WorldManager : MonoBehaviourSingleton<WorldManager>
     {
@@ -18,11 +20,7 @@ namespace TRPG.Runtime
 
         [Header(nameof(WorldManager) + ".Runtime")]
 
-        [SerializeField, ReadOnly] private MapData currMapData = null;
-
-        [SerializeField, ReadOnly] private GameObject currMap = null;
-
-        [SerializeField, ReadOnly] private Dictionary<Vector3Int, TileController> tiles = new();
+        [SerializeField, ReadOnly] private MapController currMapController = null;
 
         [SerializeField, ReadOnly] private Dictionary<int, CreatureController> creatures = new();
 
@@ -30,11 +28,14 @@ namespace TRPG.Runtime
 
 
 
+        public static Action<MapController> OnMapLoaded;
+
+
+
         private void Awake()
         {
             Init();
 
-            tiles = new Dictionary<Vector3Int, TileController>();
             creatures = new Dictionary<int, CreatureController>();
             tileIndicators = new Dictionary<Vector3Int, TileIndicator>();
         }
@@ -46,6 +47,22 @@ namespace TRPG.Runtime
         {
             GetInstance();
             settings = Resources.Load<WorldManagerSettingsData>("SO_WorldManagerSettings");
+        }
+
+        /// <summary>
+        /// MapController 프리팹을 생성하고 맵 데이터 로드를 위임합니다.
+        /// </summary>
+        public static void LoadMapData(MapData mapData)
+        {
+            GetInstance().LoadMapDataInternal(mapData);
+        }
+
+        /// <summary>
+        /// 현재 맵, 크리처, 타일 인디케이터 런타임 오브젝트를 모두 정리합니다.
+        /// </summary>
+        public static void UnloadMapData()
+        {
+            GetInstance().UnloadMapDataInternal();
         }
 
 
@@ -69,11 +86,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 기준 CellPos와 이동 방향 데이터로 현재 맵에서 이동 가능한 CellPos 목록을 계산합니다.
         /// </summary>
-        public static List<Vector3Int> GetMovableCellPosList(
-            Vector3Int originCellPos,
-            List<Vector3Int> directions,
-            bool isRepeatable,
-            bool isIncludeCreature)
+        public static List<Vector3Int> GetMovableCellPosList(Vector3Int originCellPos, List<Vector3Int> directions, bool isRepeatable, bool isIncludeCreature)
         {
             return GetInstance().GetMovableCellPosListInternal(originCellPos, directions, isRepeatable, isIncludeCreature);
         }
@@ -166,9 +179,13 @@ namespace TRPG.Runtime
         /// </summary>
         private bool TryGetMapCellPosInternal(Vector3 worldPos, out Vector3Int cellPos)
         {
-            cellPos = WorldToCellPos(worldPos);
+            if (currMapController != null)
+            {
+                return currMapController.TryGetMapCellPos(worldPos, out cellPos);
+            }
 
-            return tiles.ContainsKey(cellPos);
+            cellPos = default;
+            return false;
         }
 
         /// <summary>
@@ -177,14 +194,13 @@ namespace TRPG.Runtime
         /// </summary>
         private bool TryGetMapWorldPosInternal(Vector3Int cellPos, out Vector3 worldPos)
         {
-            if (!tiles.ContainsKey(cellPos))
+            if (currMapController != null)
             {
-                worldPos = default;
-                return false;
+                return currMapController.TryGetMapWorldPos(cellPos, out worldPos);
             }
 
-            worldPos = CellPosToWorldPos(cellPos);
-            return true;
+            worldPos = default;
+            return false;
         }
 
         /// <summary>
@@ -192,11 +208,7 @@ namespace TRPG.Runtime
         /// </summary>
         public static Vector3Int WorldToCellPos(Vector3 worldPos)
         {
-            // 타일 크기는 1입니다. WorldPosition (0, 0, 0)은 CellPos (0, 0)에 매핑되고 z는 논리 좌표에서 사용하지 않습니다.
-            return new Vector3Int(
-                Mathf.FloorToInt(worldPos.x + 0.5f),
-                Mathf.FloorToInt(worldPos.y + 0.5f),
-                0);
+            return MapController.WorldToCellPos(worldPos);
         }
 
         /// <summary>
@@ -204,17 +216,13 @@ namespace TRPG.Runtime
         /// </summary>
         public static Vector3 CellPosToWorldPos(Vector3Int cellPos)
         {
-            return new Vector3(cellPos.x, cellPos.y, cellPos.z);
+            return MapController.CellPosToWorldPos(cellPos);
         }
 
         /// <summary>
         /// originCellPos 기준 현재 맵에서 이동가능한 CellPos를 가져옵니다.
         /// </summary>
-        private List<Vector3Int> GetMovableCellPosListInternal(
-            Vector3Int originCellPos,
-            List<Vector3Int> directions,
-            bool isRepeatable,
-            bool isIncludeCreature)
+        private List<Vector3Int> GetMovableCellPosListInternal(Vector3Int originCellPos, List<Vector3Int> directions, bool isRepeatable, bool isIncludeCreature)
         {
             List<Vector3Int> movableCellPosList = new();
 
@@ -461,116 +469,53 @@ namespace TRPG.Runtime
 
 
         /// <summary>
-        /// 맵 데이터를 월드 타일 오브젝트로 인스턴스화하고 현재 맵 상태로 등록합니다.
+        /// MapController 프리팹을 생성하고 맵 데이터 로드를 위임합니다.
         /// </summary>
-        private void LoadMapData(MapData mapData)
+        private void LoadMapDataInternal(MapData mapData)
         {
             if (mapData == null) return;
 
-            UnloadMapData();
-            currMapData = mapData;
-
-            int topRowCellY = GetTopRowCellY(mapData.Tiles);
-            currMap = new GameObject("Map");
-
-            // 타일 데이터를 읽어와서 월드에 인스턴싱
-            foreach (MapTileData tileData in mapData.Tiles)
+            UnloadMapDataInternal();
+            if (settings.MapPb == null)
             {
-                if (tileData.TilePb == null) continue;
-
-                TileController tile = Instantiate(tileData.TilePb, CellPosToWorldPos(tileData.CellPos), Quaternion.identity, currMap.transform);
-
-                ApplyTileOrderInLayer(tile, topRowCellY - tileData.CellPos.y);
-                tiles.Add(tileData.CellPos, tile);
+                Debug.LogWarning("LoadMapData failed. MapController prefab is not assigned.");
+                return;
             }
+
+            // WorldManager는 MapController 인스턴스를 소유하고, 맵 관련 처리는 MapController에 위임합니다.
+            currMapController = Instantiate(settings.MapPb, transform);
+            currMapController.LoadMapData(mapData);
+            OnMapLoaded?.Invoke(currMapController);
         }
 
         /// <summary>
         /// 현재 맵, 크리처, 타일 인디케이터 런타임 오브젝트를 모두 정리합니다.
         /// </summary>
-        private void UnloadMapData()
+        private void UnloadMapDataInternal()
         {
             foreach (KeyValuePair<int, CreatureController> pair in creatures)
             {
                 if (pair.Value == null) continue;
 
-                DestroyRuntimeObject(pair.Value.gameObject);
+                Destroy(pair.Value.gameObject);
             }
 
             foreach (KeyValuePair<Vector3Int, TileIndicator> pair in tileIndicators)
             {
                 if (pair.Value == null) continue;
 
-                DestroyRuntimeObject(pair.Value.gameObject);
+                Destroy(pair.Value.gameObject);
             }
 
-            if (currMap != null)
+            if (currMapController != null)
             {
-                DestroyRuntimeObject(currMap);
+                currMapController.UnloadMapData();
+                Destroy(currMapController.gameObject);
             }
 
-            currMapData = null;
-            currMap = null;
-            tiles.Clear();
+            currMapController = null;
             creatures.Clear();
             tileIndicators.Clear();
-        }
-
-        /// <summary>
-        /// 플레이 모드와 에디터 메뉴 실행 상태에 맞는 방식으로 런타임 오브젝트를 제거합니다.
-        /// </summary>
-        private static void DestroyRuntimeObject(GameObject target)
-        {
-            if (target == null) return;
-
-#if UNITY_EDITOR
-            // 에디터 메뉴에서 테스트 맵을 교체할 때도 Scene 오브젝트가 즉시 정리되어야 합니다.
-            if (!Application.isPlaying)
-            {
-                DestroyImmediate(target);
-                return;
-            }
-#endif
-
-            Destroy(target);
-        }
-
-        /// <summary>
-        /// 타일 밑에 보면 음영이 있는데 이부분이 가려지도록 설계하기 위해
-        /// </summary>
-        private static int GetTopRowCellY(IReadOnlyList<MapTileData> tileDataList)
-        {
-            if (tileDataList.Count == 0) return 0;
-
-            int topRowCellY = tileDataList[0].CellPos.y;
-            foreach (MapTileData tileData in tileDataList)
-            {
-                topRowCellY = Mathf.Max(topRowCellY, tileData.CellPos.y);
-            }
-
-            return topRowCellY;
-        }
-
-        /// <summary>
-        /// CellPos y가 큰 최상단 행부터 SpriteRenderer Order in Layer를 0, 1, 2...로 배정합니다.
-        /// 타일 밑에 보면 음영이 있는데 이부분이 가려지도록 설계하기 위해
-        /// </summary>
-        private static void ApplyTileOrderInLayer(TileController tile, int baseOrderInLayer)
-        {
-            SpriteRenderer[] renderers = tile.GetComponentsInChildren<SpriteRenderer>(true);
-            if (renderers.Length == 0) return;
-
-            int minOrderInLayer = renderers[0].sortingOrder;
-            foreach (SpriteRenderer renderer in renderers)
-            {
-                minOrderInLayer = Mathf.Min(minOrderInLayer, renderer.sortingOrder);
-            }
-
-            foreach (SpriteRenderer renderer in renderers)
-            {
-                int relativeOrderInLayer = renderer.sortingOrder - minOrderInLayer;
-                renderer.sortingOrder = baseOrderInLayer + relativeOrderInLayer;
-            }
         }
     }
 
@@ -595,17 +540,33 @@ namespace TRPG.Runtime
         [MenuItem("TRPG/WorldManager/LoadTestMapData()")]
         private static void LoadTestMapData()
         {
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning("LoadTestMapData is only available in Play Mode.");
+                return;
+            }
+
             settings = Resources.Load<WorldManagerSettingsData>("SO_WorldManagerSettings");
             var awaiter = ResourceManager.LoadAsync(UnityConstant.Addressable.Label.Core).GetAwaiter();
 
-            WorldManager inst = GetInstance();
-            inst.UnloadMapData();
+            UnloadMapData();
 
             awaiter.OnCompleted(() =>
             {
+                if (!Application.isPlaying) return;
+
                 MapData testMapData = ResourceManager.GetResource(settings.TestMapData);          
-                inst.LoadMapData(testMapData);
+                LoadMapData(testMapData);
             });
+        }
+
+        /// <summary>
+        /// 플레이 모드에서만 테스트 맵 로드 메뉴를 활성화합니다.
+        /// </summary>
+        [MenuItem("TRPG/WorldManager/LoadTestMapData()", true)]
+        private static bool CanLoadTestMapData()
+        {
+            return Application.isPlaying;
         }
     }
 
