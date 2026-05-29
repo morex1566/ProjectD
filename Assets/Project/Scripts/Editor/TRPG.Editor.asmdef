@@ -6,7 +6,13 @@
         "Unity.Addressables.Editor",
         "DOTween.Modules",
         "DOTweenPro.EditorScripts",
-        "DOTweenPro.Scripts"
+        "DOTweenPro.Scripts",
+        "UniTask",
+        "UniTask.Addressables",
+        "UniTask.DOTween",
+        "UniTask.Editor",
+        "UniTask.Linq",
+        "UniTask.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"

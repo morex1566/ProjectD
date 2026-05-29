@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
@@ -35,7 +34,7 @@ namespace TRPG.Runtime
 
         public Vector3Int CellPos => cellPos;
 
-        public Vector3 CellWorldPos => WorldManager.GetInstance().TryGetGroundWorldPos(cellPos, out Vector3 cellWorldPos)
+        public Vector3 CellWorldPos => WorldManager.GetInstance().TryGetMapWorldPos(cellPos, out Vector3 cellWorldPos)
                                     ? cellWorldPos : default;
         public int Damage => damage;
 

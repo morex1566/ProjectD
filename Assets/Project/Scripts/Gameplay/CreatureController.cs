@@ -18,7 +18,7 @@ namespace TRPG.Runtime
     [DisallowMultipleComponent]
     public abstract partial class CreatureController : MonoBehaviour, ISelectable
     {
-        [Header(nameof(CreatureController) + ".Comp")]
+        [Header(nameof(CreatureController) + ".Setup")]
 
         [SerializeField, ReadOnly] private CreatureModel model = null;
 
@@ -35,26 +35,20 @@ namespace TRPG.Runtime
         [SerializeField] protected PixelBreaker breaker = null;
 
 
-        [Header(nameof(CreatureController) + ".Setup")]
-
         [SerializeField] private Transform statsPivot;
-
-
-        [Header(nameof(CreatureController) + ".View")]
 
         [SerializeField] private Color outlineColor = Color.green;
 
         [SerializeField, Min(1)] private int outlinePixelWidth = 1;
 
-
-        [Header(nameof(CreatureController) + ".Runtime")]
-
-        [SerializeField, ReadOnly] protected ActionFlag actionFlags;
-
         /// <summary>
         /// 목표 타일 위에 살짝 띄운 도착 위치 오프셋
         /// </summary>
         [SerializeField] private Vector3 preLandingOffset = new Vector3(0f, 0.5f, 0f);
+
+        [Header(nameof(CreatureController) + ".Runtime")]
+
+        [SerializeField, ReadOnly] protected ActionFlag actionFlags;
 
         private static readonly Vector3[] OutlineDirections =
 {
@@ -99,8 +93,8 @@ namespace TRPG.Runtime
         protected virtual void Start()
         {
             // UI 생성
-            statsUI = UIManager.GetInstance().Open<CreatureStatsUI>(UIManager.RenderSpace.Overlay);
-            statsUI.rectTransform.localPosition = UIManager.GetInstance().WorldPosToUIPos(statsPivot.position, statsUI.rectTransformParent);
+            //statsUI = UIManager.GetInstance().Open<CreatureStatsUI>(UIManager.RenderSpace.Overlay);
+            //statsUI.rectTransform.localPosition = UIManager.GetInstance().WorldPosToUIPos(statsPivot.position, statsUI.rectTransformParent);
         }
 
         private void OnEnable()
@@ -149,10 +143,10 @@ namespace TRPG.Runtime
 
             Vector3 preLandingWorldPos = targetWorldPos + preLandingOffset;
 
-            // 크리쳐가 cellPos 위로 이동
+            // 크리쳐가 목표 CellPos 위로 이동
             yield return MovePartCo(preLandingWorldPos, moveDelay);
 
-            // 크리쳐가 cellPos에 스톰핑
+            // 크리쳐가 목표 CellPos에 스톰핑
             yield return StompPartCo(targetWorldPos, stompDelay);
 
             // 크리쳐가 전진 끝, 나머지 설정 후처리
@@ -257,7 +251,7 @@ namespace TRPG.Runtime
 
         public void Attack(Vector3 battleCellWorldPos, Vector3Int battleCellPos, MonsterController targetController)
         {
-            // 타겟도 같은 전투 셀 기준으로 방어 이동을 시작합니다.
+            // 타겟도 같은 전투 CellPos 기준으로 방어 이동을 시작합니다.
             targetController.Defend(battleCellWorldPos, battleCellPos, this);
 
             StartCoroutine(AttackCo(battleCellWorldPos, battleCellPos, BattleMoveDelay, BattleStompDelay, CollideDelay));
@@ -274,8 +268,8 @@ namespace TRPG.Runtime
         /// </summary>
         public IEnumerator AttackCo(Vector3 battleCellWorldPos, Vector3Int battleCellPos, float moveDelay, float stompDelay, float collideDelay)
         {
-            // 공격자는 전투 셀의 한쪽으로 이동합니다.
-            Vector3 battleStartCellWorldPos = battleCellWorldPos - WorldManager.GetInstance().GetCellWorldSize() / 2;
+            // 공격자는 전투 CellPos의 한쪽으로 이동합니다.
+            Vector3 battleStartCellWorldPos = battleCellWorldPos - WorldManager.TileSize / 2;
             Vector3 battleEndCellWorldPos = battleCellWorldPos;
 
             // 전투 준비 위치로 이동해 양쪽이 잠깐 벌어지는 구도를 만듭니다.
@@ -290,8 +284,8 @@ namespace TRPG.Runtime
 
         public IEnumerator DefendCo(Vector3 battleCellWorldPos, Vector3Int battleCellPos, float moveDelay, float stompDelay, float collideDelay)
         {
-            // 방어자는 공격자와 반대 방향의 전투 셀 위치로 이동합니다.
-            Vector3 battleStartCellWorldPos = battleCellWorldPos + WorldManager.GetInstance().GetCellWorldSize() / 2;
+            // 방어자는 공격자와 반대 방향의 전투 CellPos 위치로 이동합니다.
+            Vector3 battleStartCellWorldPos = battleCellWorldPos + WorldManager.TileSize / 2;
             Vector3 battleEndCellWorldPos = battleCellWorldPos;
             Vector3 hitDirection = battleStartCellWorldPos - battleEndCellWorldPos;
 

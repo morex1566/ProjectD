@@ -19,7 +19,7 @@ namespace TRPG.Runtime
 
 
         /// <summary>
-        /// owner 기준 삭제를 위해 생성 시점의 소유자와 셀 좌표를 기록합니다.
+        /// owner 기준 삭제를 위해 생성 시점의 소유자와 CellPos를 기록합니다.
         /// </summary>
         public void Init(CreatureController owner, Vector3Int cellPos)
         {

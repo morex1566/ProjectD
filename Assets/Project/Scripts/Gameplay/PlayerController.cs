@@ -54,7 +54,7 @@ namespace TRPG.Runtime
         {
             WorldManager worldManager = WorldManager.GetInstance();
             var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
-            worldManager.TryGetGroundCellPos(mouseWorldPos, out Vector3Int mouseCellPos);
+            worldManager.TryGetMapCellPos(mouseWorldPos, out Vector3Int mouseCellPos);
 
             bool isAttackable = worldManager.HasMonsterInCellPos(mouseCellPos, out MonsterController outMonsterController) &&
                                 movableCellPosList.Contains(mouseCellPos);
@@ -73,10 +73,10 @@ namespace TRPG.Runtime
             WorldManager worldManager = WorldManager.GetInstance();
             var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
 
-            bool isMovable = worldManager.TryGetGroundCellPos(mouseWorldPos, out Vector3Int outMouseCellPos) &&
+            bool isMovable = worldManager.TryGetMapCellPos(mouseWorldPos, out Vector3Int outMouseCellPos) &&
                              movableCellPosList.Contains(outMouseCellPos);
 
-            worldManager.TryGetGroundWorldPos(outMouseCellPos, out Vector3 outMouseCellWorldPos);
+            worldManager.TryGetMapWorldPos(outMouseCellPos, out Vector3 outMouseCellWorldPos);
 
             mouseCellPos = outMouseCellPos;
             mouseCellWorldPos = outMouseCellWorldPos;
@@ -108,7 +108,6 @@ namespace TRPG.Runtime
         {
             WorldManager worldManager = WorldManager.GetInstance();
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
-            var movableCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
             var indicatorCellPosList = worldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, false);
 
             // 플레이어 이동중?
@@ -118,7 +117,7 @@ namespace TRPG.Runtime
             if (!Contains(mouseWorldPos)) return;
 
             // 이동할 수 없는 타일 선택?
-            if (!worldManager.TryGetGroundCellPos(mouseWorldPos, out Vector3Int mouseCellPos)) return;
+            if (!worldManager.TryGetMapCellPos(mouseWorldPos, out _)) return;
 
             // 드래깅 시작
             // 이동 범위 요청

@@ -16,16 +16,22 @@ MonoBehaviour:
   m_GUID: 244b5853c3b72284a8b05beca09e97a4
   m_SerializeEntries:
   - m_GUID: ac908ac551fa0d941930811ce672e40c
-    m_Address: SO_Player
+    m_Address: SO_Player_00
     m_ReadOnly: 0
     m_SerializedLabels:
-    - CreatureData
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b037aa227efd46939d87a6e1e1facefc
+    m_Address: SO_Map_00
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f11f9249b5db05845beb07934a8f9cb7
     m_Address: SO_Monster_00
     m_ReadOnly: 0
     m_SerializedLabels:
-    - CreatureData
+    - Core
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: a4554c02061d64e4c9a9dca40a903723, type: 2}

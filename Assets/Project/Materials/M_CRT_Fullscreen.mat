@@ -37,8 +37,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _CurveFalloff: 2.5
-    - _CurveStrength: 0.1
+    - _CurveFalloff: 1.5
+    - _CurveStrength: 0.0448
     - _ScanlineCount: 120
     - _ScanlineStrength: 0.35
     m_Colors: []

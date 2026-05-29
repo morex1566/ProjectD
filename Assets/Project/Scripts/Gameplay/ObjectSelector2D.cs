@@ -22,15 +22,15 @@ namespace TRPG.Runtime
 
 
         /// <summary>
-        /// 현재 마우스의 위치에 Ground 타일 있음? 있으면 커서 cellPos 이동
+        /// 현재 마우스의 위치에 Ground 타일 있음? 있으면 커서 CellPos로 이동
         /// </summary>
         private void Update()
         {
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
 
-            if (WorldManager.GetInstance().TryGetGroundCellPos(mouseWorldPos, out Vector3Int cellPos))
+            if (WorldManager.GetInstance().TryGetMapCellPos(mouseWorldPos, out Vector3Int cellPos))
             {
-                WorldManager.GetInstance().TryGetGroundWorldPos(cellPos, out Vector3 worldPos);
+                WorldManager.GetInstance().TryGetMapWorldPos(cellPos, out Vector3 worldPos);
 
                 cursor.SetActive(true);
                 cursor.transform.position = worldPos;

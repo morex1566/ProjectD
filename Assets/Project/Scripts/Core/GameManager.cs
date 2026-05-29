@@ -25,7 +25,6 @@ namespace TRPG.Runtime
 
             DOTween.Init();
             InputManager.Init();     
-            // NetManager.Init();
             ResourceManager.Init();
         }
 
@@ -36,6 +35,7 @@ namespace TRPG.Runtime
         private static void OnAfterSceneLoaded()
         {
             UIManager.Init();
+            WorldManager.Init();
         }
 
         /// <summary>

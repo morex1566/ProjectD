@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 42a1b1741e064e84bae5590f7a550252
   m_currentHash:
     serializedVersion: 2
-    Hash: 7ad9211ac8a249c0f957fa63618ab8a3
+    Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -102,6 +102,7 @@ MonoBehaviour:
   m_LabelTable:
     m_LabelNames:
     - CreatureData
+    - Core
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 67df9be4093f78946bd5edce5bc67270, type: 2}

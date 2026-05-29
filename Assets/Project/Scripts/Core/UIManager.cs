@@ -22,8 +22,6 @@ namespace TRPG.Runtime
 
         private static Canvas overlayCanvas;
 
-        private static Canvas worldCanvas;
-
         private static Canvas cameraCanvas;
 
         /// <summary>
@@ -42,7 +40,6 @@ namespace TRPG.Runtime
             settings = Resources.Load<UIManagerSettingsData>("SO_UIManagerSettings");
 
             overlayCanvas = GameObjectEx.FindByLayer<Canvas>(UnityConstant.Layers.OverlayUIIndex);
-            worldCanvas = GameObjectEx.FindByLayer<Canvas>(UnityConstant.Layers.WorldUIIndex);
             cameraCanvas = GameObjectEx.FindByLayer<Canvas>(UnityConstant.Layers.CameraUIIndex);
 
             Cursor.SetCursor(settings.CursorShape.texture, Vector2.zero, CursorMode.Auto);
@@ -88,24 +85,25 @@ namespace TRPG.Runtime
                 return null;
             }
 
-            Transform root = null;
+            T inst = null;
             switch (renderSpace)
             {
                 case RenderSpace.Overlay:
-                    root = overlayCanvas.transform;
-                    break;
-
-                case RenderSpace.World:
-                    root = worldCanvas.transform;
+                    inst = Instantiate(pb, overlayCanvas.transform, false);
                     break;
 
                 case RenderSpace.Camera:
+                    inst = Instantiate(pb, cameraCanvas.transform, false);
+                    break;
+
+                case RenderSpace.World:
+                    inst = Instantiate(pb);
+                    break;
+
                 default:
-                    root = cameraCanvas.transform;
                     break;
             }
 
-            T inst = Instantiate(pb, root, false);
             uiInsts.Add(inst.GetInstanceID(), inst);
 
             return inst;

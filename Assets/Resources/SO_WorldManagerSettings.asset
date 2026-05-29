@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70df97e9aae845a9a9a0179375846461, type: 3}
+  m_Name: SO_WorldManagerSettings
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldManagerSettingsData
+  monsterPb: {fileID: 5623844873239391356, guid: 669db6c883a1c0d48a770e4b3b66cae3, type: 3}
+  playerPb: {fileID: 2188207816268681392, guid: fe859d1a378664047919604f767dbe0f, type: 3}
+  allyTileIndicatorPb: {fileID: 8005795874296381529, guid: bd61225f71852ad4e8add82101bac98f, type: 3}
+  enemyTileIndicatorPb: {fileID: 8341206448957022298, guid: a403a12c171cc85448e8fb1dbbb1c15b, type: 3}
+  testMapData:
+    m_AssetGUID: b037aa227efd46939d87a6e1e1facefc
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
