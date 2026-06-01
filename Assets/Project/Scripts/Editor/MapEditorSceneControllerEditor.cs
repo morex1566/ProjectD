@@ -11,8 +11,10 @@ namespace TRPG.Editor
     public class MapEditorSceneControllerEditor : UnityEditor.Editor
     {
         private SerializedProperty enableScenePaintProperty = null;
+        private SerializedProperty editLayerProperty = null;
         private SerializedProperty eraseModeProperty = null;
         private SerializedProperty selectedPaletteIndexProperty = null;
+        private SerializedProperty selectedMonsterPaletteIndexProperty = null;
 
         private Vector3Int? lastPaintedCellPos = null;
 
@@ -21,20 +23,29 @@ namespace TRPG.Editor
         private void OnEnable()
         {
             enableScenePaintProperty = serializedObject.FindProperty("enableScenePaint");
+            editLayerProperty = serializedObject.FindProperty("editLayer");
             eraseModeProperty = serializedObject.FindProperty("eraseMode");
             selectedPaletteIndexProperty = serializedObject.FindProperty("selectedPaletteIndex");
+            selectedMonsterPaletteIndexProperty = serializedObject.FindProperty("selectedMonsterPaletteIndex");
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            DrawPropertiesExcluding(serializedObject, "m_Script", "enableScenePaint", "eraseMode", "selectedPaletteIndex");
+            DrawPropertiesExcluding(
+                serializedObject,
+                "m_Script",
+                "enableScenePaint",
+                "editLayer",
+                "eraseMode",
+                "selectedPaletteIndex",
+                "selectedMonsterPaletteIndex");
             DrawSceneBrushControls();
             serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
             EditorGUILayout.HelpBox(
-                "Scene 뷰에서 마우스 위치의 CellPos 인디케이터를 확인하고 좌클릭/드래그로 타일을 배치하거나 Erase로 삭제합니다. Save To MapData를 눌러 ScriptableObject에 기록합니다.",
+                "Scene 뷰에서 마우스 위치의 CellPos 인디케이터를 확인하고 좌클릭/드래그로 타일 또는 몬스터 스폰 위치를 배치합니다. Save To MapData를 눌러 ScriptableObject에 기록합니다.",
                 MessageType.Info);
 
             using (new EditorGUILayout.HorizontalScope())
@@ -105,33 +116,74 @@ namespace TRPG.Editor
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Scene Brush", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(enableScenePaintProperty, new GUIContent("Enable Scene Paint"));
+            EditorGUILayout.PropertyField(editLayerProperty, new GUIContent("Edit Layer"));
 
             using (new EditorGUI.DisabledScope(!enableScenePaintProperty.boolValue))
             {
+                MapEditorSceneController.EditLayer editLayer = (MapEditorSceneController.EditLayer)editLayerProperty.enumValueIndex;
                 bool eraseSelected = eraseModeProperty.boolValue;
                 if (GUILayout.Toggle(eraseSelected, "Erase", "Button") != eraseSelected)
                 {
                     eraseModeProperty.boolValue = true;
                     selectedPaletteIndexProperty.intValue = -1;
+                    selectedMonsterPaletteIndexProperty.intValue = -1;
                 }
 
-                for (int i = 0; i < Controller.TilePalette.Count; i++)
+                if (editLayer == MapEditorSceneController.EditLayer.Tile)
                 {
-                    TileController tilePb = Controller.TilePalette[i];
-                    string tileName = tilePb != null ? tilePb.name : "None";
-                    bool selected = !eraseModeProperty.boolValue && selectedPaletteIndexProperty.intValue == i;
-
-                    if (GUILayout.Toggle(selected, $"#{i} {tileName}", "Button") == selected) continue;
-
-                    eraseModeProperty.boolValue = false;
-                    selectedPaletteIndexProperty.intValue = i;
+                    DrawTileBrushButtons();
+                }
+                else
+                {
+                    DrawMonsterBrushButtons();
                 }
             }
 
-            if (!eraseModeProperty.boolValue &&
+            MapEditorSceneController.EditLayer currentEditLayer =
+                (MapEditorSceneController.EditLayer)editLayerProperty.enumValueIndex;
+            if (currentEditLayer == MapEditorSceneController.EditLayer.Tile &&
+                !eraseModeProperty.boolValue &&
                 (selectedPaletteIndexProperty.intValue < 0 || selectedPaletteIndexProperty.intValue >= Controller.TilePalette.Count))
             {
                 EditorGUILayout.HelpBox("배치할 타일 브러시가 선택되지 않았습니다.", MessageType.Warning);
+            }
+
+            if (currentEditLayer == MapEditorSceneController.EditLayer.Monster &&
+                !eraseModeProperty.boolValue &&
+                (selectedMonsterPaletteIndexProperty.intValue < 0 ||
+                 selectedMonsterPaletteIndexProperty.intValue >= Controller.MonsterPalette.Count))
+            {
+                EditorGUILayout.HelpBox("배치할 몬스터 데이터가 선택되지 않았습니다.", MessageType.Warning);
+            }
+        }
+
+        private void DrawTileBrushButtons()
+        {
+            for (int i = 0; i < Controller.TilePalette.Count; i++)
+            {
+                TileController tilePb = Controller.TilePalette[i];
+                string tileName = tilePb != null ? tilePb.name : "None";
+                bool selected = !eraseModeProperty.boolValue && selectedPaletteIndexProperty.intValue == i;
+
+                if (GUILayout.Toggle(selected, $"#{i} {tileName}", "Button") == selected) continue;
+
+                eraseModeProperty.boolValue = false;
+                selectedPaletteIndexProperty.intValue = i;
+            }
+        }
+
+        private void DrawMonsterBrushButtons()
+        {
+            for (int i = 0; i < Controller.MonsterPalette.Count; i++)
+            {
+                CreatureData monsterData = Controller.MonsterPalette[i];
+                string monsterName = monsterData != null ? monsterData.name : "None";
+                bool selected = !eraseModeProperty.boolValue && selectedMonsterPaletteIndexProperty.intValue == i;
+
+                if (GUILayout.Toggle(selected, $"#{i} {monsterName}", "Button") == selected) continue;
+
+                eraseModeProperty.boolValue = false;
+                selectedMonsterPaletteIndexProperty.intValue = i;
             }
         }
 
@@ -170,6 +222,10 @@ namespace TRPG.Editor
 
             ClearSceneTiles();
             Transform root = Controller.EnsureTileRoot();
+
+            Undo.RecordObject(Controller, "Load Map Monster Spawns");
+            Controller.SetMonsterSpawns(Controller.TargetMapData.MonsterSpawns);
+            EditorUtility.SetDirty(Controller);
 
             foreach (MapTileData tileData in Controller.TargetMapData.Tiles)
             {
@@ -231,13 +287,21 @@ namespace TRPG.Editor
                 .ThenBy(pair => pair.Key.x)
                 .Select(pair => pair.Value);
 
+            List<MapMonsterSpawnData> orderedMonsterSpawns = Controller.MonsterSpawns
+                .Where(monsterSpawn => monsterSpawn.HasMonsterDataReference)
+                .Where(monsterSpawn => tilesByCellPos.ContainsKey(monsterSpawn.CellPos))
+                .OrderBy(monsterSpawn => monsterSpawn.CellPos.y)
+                .ThenBy(monsterSpawn => monsterSpawn.CellPos.x)
+                .ToList();
+
             Undo.RecordObject(Controller.TargetMapData, "Save Scene Map Data");
             Controller.TargetMapData.SetTiles(orderedTiles);
+            Controller.TargetMapData.SetMonsterSpawns(orderedMonsterSpawns);
             EditorUtility.SetDirty(Controller.TargetMapData);
             AssetDatabase.SaveAssets();
             MarkSceneDirty();
 
-            Debug.Log($"Save To MapData complete. Tile Count: {tilesByCellPos.Count}");
+            Debug.Log($"Save To MapData complete. Tiles: {tilesByCellPos.Count}, Monster Spawns: {orderedMonsterSpawns.Count}");
         }
 
         private void SnapTiles()
@@ -258,13 +322,16 @@ namespace TRPG.Editor
         {
             bool confirmed = EditorUtility.DisplayDialog(
                 "Clear Scene Tiles",
-                "현재 Scene의 Tiles 하위 타일 오브젝트를 모두 삭제합니다. MapData 에셋은 Save 전까지 바뀌지 않습니다.",
+                "현재 Scene의 Tiles 하위 타일 오브젝트와 몬스터 스폰 배치를 모두 삭제합니다. MapData 에셋은 Save 전까지 바뀌지 않습니다.",
                 "Clear",
                 "Cancel");
 
             if (!confirmed) return;
 
             ClearSceneTiles();
+            Undo.RecordObject(Controller, "Clear Monster Spawns");
+            Controller.ClearMonsterSpawns();
+            EditorUtility.SetDirty(Controller);
             MarkSceneDirty();
         }
 
@@ -284,6 +351,17 @@ namespace TRPG.Editor
         }
 
         private void PaintCell(Vector3Int cellPos)
+        {
+            if (Controller.CurrentEditLayer == MapEditorSceneController.EditLayer.Monster)
+            {
+                PaintMonsterCell(cellPos);
+                return;
+            }
+
+            PaintTileCell(cellPos);
+        }
+
+        private void PaintTileCell(Vector3Int cellPos)
         {
             if (Controller.EraseMode || Controller.SelectedPaletteIndex < 0)
             {
@@ -322,6 +400,53 @@ namespace TRPG.Editor
             MarkSceneDirty();
         }
 
+        private void PaintMonsterCell(Vector3Int cellPos)
+        {
+            Undo.RecordObject(Controller, "Paint Monster Spawn");
+
+            if (Controller.EraseMode || Controller.SelectedMonsterPaletteIndex < 0)
+            {
+                Controller.RemoveMonsterSpawn(cellPos);
+                EditorUtility.SetDirty(Controller);
+                MarkSceneDirty();
+                return;
+            }
+
+            if (Controller.SelectedMonsterPaletteIndex >= Controller.MonsterPalette.Count)
+            {
+                Debug.LogWarning("Paint failed. 선택된 몬스터 브러시가 Monster Palette 범위를 벗어났습니다.");
+                return;
+            }
+
+            if (!HasSceneTile(cellPos))
+            {
+                Debug.LogWarning($"Paint failed. 몬스터 스폰은 타일이 있는 CellPos에만 배치할 수 있습니다. CellPos: {cellPos}");
+                return;
+            }
+
+            CreatureData monsterData = Controller.MonsterPalette[Controller.SelectedMonsterPaletteIndex];
+            if (monsterData == null)
+            {
+                Debug.LogWarning("Paint failed. 선택된 몬스터 데이터가 비어 있습니다.");
+                return;
+            }
+
+            Controller.SetMonsterSpawn(cellPos, monsterData);
+            EditorUtility.SetDirty(Controller);
+            MarkSceneDirty();
+        }
+
+        private bool HasSceneTile(Vector3Int cellPos)
+        {
+            foreach (TileController tile in Controller.GetSceneTiles())
+            {
+                Vector3Int tileCellPos = MapEditorSceneController.WorldPositionToCellPos(tile.transform.position);
+                if (tileCellPos == cellPos) return true;
+            }
+
+            return false;
+        }
+
         private void EraseTileAtCellPos(Vector3Int cellPos, bool applyAfterErase)
         {
             bool removed = false;
@@ -336,6 +461,9 @@ namespace TRPG.Editor
 
             if (!removed || !applyAfterErase) return;
 
+            Undo.RecordObject(Controller, "Remove Monster Spawn On Tile Erase");
+            Controller.RemoveMonsterSpawn(cellPos);
+            EditorUtility.SetDirty(Controller);
             ApplyTileOrderInLayer();
             MarkSceneDirty();
         }
@@ -383,17 +511,48 @@ namespace TRPG.Editor
 
         private void DrawCellLabels()
         {
-            if (Controller.TileRoot == null) return;
-
-            foreach (TileController tile in Controller.GetSceneTiles())
+            if (Controller.TileRoot != null)
             {
-                Vector3Int cellPos = MapEditorSceneController.WorldPositionToCellPos(tile.transform.position);
-                Vector3 worldPosition = MapEditorSceneController.CellPosToWorldPosition(cellPos);
+                foreach (TileController tile in Controller.GetSceneTiles())
+                {
+                    Vector3Int cellPos = MapEditorSceneController.WorldPositionToCellPos(tile.transform.position);
+                    Vector3 worldPosition = MapEditorSceneController.CellPosToWorldPosition(cellPos);
 
-                Handles.color = Color.cyan;
-                Handles.DrawWireCube(worldPosition, Vector3.one);
-                Handles.Label(worldPosition + Vector3.up * 0.45f, $"CellPos {cellPos.x}, {cellPos.y}");
+                    Handles.color = Color.cyan;
+                    Handles.DrawWireCube(worldPosition, Vector3.one);
+                    Handles.Label(worldPosition + Vector3.up * 0.45f, $"CellPos {cellPos.x}, {cellPos.y}");
+                }
             }
+
+            foreach (MapMonsterSpawnData monsterSpawn in Controller.MonsterSpawns)
+            {
+                if (!monsterSpawn.HasMonsterDataReference) continue;
+
+                Vector3 worldPosition = MapEditorSceneController.CellPosToWorldPosition(monsterSpawn.CellPos);
+                CreatureData editorMonsterData = monsterSpawn.EditorMonsterData;
+                string monsterName = editorMonsterData != null ? editorMonsterData.name : "Missing Monster";
+
+                DrawMonsterSpawnIndicator(worldPosition);
+                Handles.Label(worldPosition + Vector3.down * 0.55f, $"Spawn {monsterName}");
+            }
+        }
+
+        private void DrawMonsterSpawnIndicator(Vector3 worldPosition)
+        {
+            Vector3[] vertices =
+            {
+                worldPosition + new Vector3(-0.42f, -0.42f, 0f),
+                worldPosition + new Vector3(-0.42f, 0.42f, 0f),
+                worldPosition + new Vector3(0.42f, 0.42f, 0f),
+                worldPosition + new Vector3(0.42f, -0.42f, 0f),
+            };
+
+            Handles.DrawSolidRectangleWithOutline(
+                vertices,
+                new Color(1f, 0.18f, 0.18f, 0.16f),
+                new Color(1f, 0.18f, 0.18f, 0.95f));
+            Handles.color = new Color(1f, 0.18f, 0.18f, 0.95f);
+            Handles.DrawWireDisc(worldPosition, Vector3.forward, 0.24f);
         }
 
         private void DrawPaintIndicator(Vector3Int cellPos)

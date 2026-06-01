@@ -10,6 +10,13 @@ namespace TRPG.Runtime
     [DisallowMultipleComponent]
     public class MapEditorSceneController : MonoBehaviour
     {
+        public enum EditLayer
+        {
+            Tile,
+            Monster,
+        }
+
+
         [Header(nameof(MapEditorSceneController) + ".Setup")]
 
         [SerializeField] private MapData targetMapData = null;
@@ -18,11 +25,19 @@ namespace TRPG.Runtime
 
         [SerializeField] private List<TileController> tilePalette = new();
 
+        [SerializeField] private List<CreatureData> monsterPalette = new();
+
         [SerializeField] private bool enableScenePaint = true;
+
+        [SerializeField] private EditLayer editLayer = EditLayer.Tile;
 
         [SerializeField] private bool eraseMode = false;
 
         [SerializeField] private int selectedPaletteIndex = 0;
+
+        [SerializeField] private int selectedMonsterPaletteIndex = 0;
+
+        [SerializeField] private List<MapMonsterSpawnData> monsterSpawns = new();
 
 
         public MapData TargetMapData => targetMapData;
@@ -31,11 +46,19 @@ namespace TRPG.Runtime
 
         public IReadOnlyList<TileController> TilePalette => tilePalette;
 
+        public IReadOnlyList<CreatureData> MonsterPalette => monsterPalette;
+
         public bool EnableScenePaint => enableScenePaint;
+
+        public EditLayer CurrentEditLayer => editLayer;
 
         public bool EraseMode => eraseMode;
 
         public int SelectedPaletteIndex => selectedPaletteIndex;
+
+        public int SelectedMonsterPaletteIndex => selectedMonsterPaletteIndex;
+
+        public IReadOnlyList<MapMonsterSpawnData> MonsterSpawns => monsterSpawns;
 
 
         public Transform EnsureTileRoot()
@@ -62,6 +85,60 @@ namespace TRPG.Runtime
             Transform root = EnsureTileRoot();
 
             return root.GetComponentsInChildren<TileController>();
+        }
+
+        public void SetMonsterSpawns(IEnumerable<MapMonsterSpawnData> nextMonsterSpawns)
+        {
+            monsterSpawns.Clear();
+
+            foreach (MapMonsterSpawnData monsterSpawn in nextMonsterSpawns)
+            {
+                if (!monsterSpawn.HasMonsterDataReference) continue;
+                if (targetMapData != null && !targetMapData.HasTile(monsterSpawn.CellPos)) continue;
+
+                monsterSpawns.Add(monsterSpawn);
+#if UNITY_EDITOR
+                CreatureData editorMonsterData = monsterSpawn.EditorMonsterData;
+                if (editorMonsterData != null && !monsterPalette.Contains(editorMonsterData))
+                {
+                    monsterPalette.Add(editorMonsterData);
+                }
+#endif
+            }
+        }
+
+#if UNITY_EDITOR
+        public void SetMonsterSpawn(Vector3Int cellPos, CreatureData monsterData)
+        {
+            RemoveMonsterSpawn(cellPos);
+            if (monsterData == null) return;
+
+            monsterSpawns.Add(new MapMonsterSpawnData(cellPos, monsterData));
+        }
+#endif
+
+        public bool TryGetMonsterSpawn(Vector3Int cellPos, out MapMonsterSpawnData monsterSpawn)
+        {
+            foreach (MapMonsterSpawnData spawn in monsterSpawns)
+            {
+                if (spawn.CellPos != cellPos) continue;
+
+                monsterSpawn = spawn;
+                return true;
+            }
+
+            monsterSpawn = null;
+            return false;
+        }
+
+        public void RemoveMonsterSpawn(Vector3Int cellPos)
+        {
+            monsterSpawns.RemoveAll(monsterSpawn => monsterSpawn.CellPos == cellPos);
+        }
+
+        public void ClearMonsterSpawns()
+        {
+            monsterSpawns.Clear();
         }
 
         public static Vector3Int WorldPositionToCellPos(Vector3 worldPosition)

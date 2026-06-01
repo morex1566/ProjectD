@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcf51587bd553a54c870874518bda41c, type: 3}
+  m_Name: SO_Monster_04
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureData
+  Id: SO_Monster_04
+  PfId: PF_Queen
+  Description: Default
+  DisplayName: "\uD038"
+  Type: Queen
+  DefaultSkillId: Attack_00
+  Hp: 10
+  Damage: 10
+  Armor: 10
+  MoveRangeData:
+    isRepeatable: 1
+    directions:
+    - {x: 0, y: 1, z: 0}
+    - {x: 1, y: 0, z: 0}
+    - {x: 0, y: -1, z: 0}
+    - {x: -1, y: 0, z: 0}
+    - {x: 1, y: 1, z: 0}
+    - {x: 1, y: -1, z: 0}
+    - {x: -1, y: -1, z: 0}
+    - {x: -1, y: 1, z: 0}
+  CreatureType: 5
+  creaturePf: {fileID: 1584354125309072626, guid: b0bd5c6fe3404ff40acaa78dfaa55512, type: 3}

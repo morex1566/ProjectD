@@ -3,6 +3,7 @@
     "rootNamespace": "TRPG.Editor",
     "references": [
         "TRPG.Runtime",
+        "Unity.Addressables",
         "Unity.Addressables.Editor",
         "DOTween.Modules",
         "DOTweenPro.EditorScripts",

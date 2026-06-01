@@ -254,23 +254,33 @@ namespace TRPG.Editor
         {
             if (asset is not CreatureData creatureData) return;
 
-            // DefaultSkillId는 데이터 식별자로 유지하고, 런타임 참조 필드는 import 시 자동 연결합니다.
-            if (!record.TryGetValue("MoveRange", out string moveRangeName))
+            creatureData.RefreshDerivedData();
+            ApplyMoveRangeData(creatureData, record);
+            if (!TryGetRecordValue(record, "PfId", out string pfId)) return;
+            if (string.IsNullOrWhiteSpace(pfId)) return;
+
+            GameObject prefab = LoadPrefabByFileName(pfId);
+            if (prefab == null)
             {
-                record.TryGetValue("Type", out moveRangeName);
+                Debug.LogWarning($"Creature prefab not found. CreatureData: {creatureData.name}, PfId: {pfId}");
+                return;
             }
 
-            if (!string.IsNullOrWhiteSpace(moveRangeName) && !IsCommentValue(moveRangeName))
+            creatureData.creaturePf = prefab;
+        }
+
+        private static void ApplyMoveRangeData(CreatureData creatureData, Dictionary<string, string> record)
+        {
+            if (!TryGetRecordValue(record, "MoveRangeData", out string moveRangeName)) return;
+            if (string.IsNullOrWhiteSpace(moveRangeName)) return;
+
+            if (CreatureData.TryGetMoveRangeData(moveRangeName, out MoveRangeData moveRangeData))
             {
-                if (MoveRangeData.TryGetByName(moveRangeName, out MoveRangeData moveRangeData))
-                {
-                    creatureData.MoveRangeData = moveRangeData;
-                }
-                else
-                {
-                    Debug.LogWarning($"MoveRangeData not found. CreatureData: {creatureData.name}, MoveRange: {moveRangeName}");
-                }
+                creatureData.MoveRangeData = moveRangeData;
+                return;
             }
+
+            Debug.LogWarning($"MoveRangeData not found. CreatureData: {creatureData.name}, MoveRange: {moveRangeName}");
         }
 
         private static object ConvertValue(string rawValue, Type targetType)
@@ -305,10 +315,40 @@ namespace TRPG.Editor
 
             if (targetType == typeof(MoveRangeData))
             {
-                return MoveRangeData.TryGetByName(rawValue, out MoveRangeData moveRangeData) ? moveRangeData : default(MoveRangeData);
+                return CreatureData.TryGetMoveRangeData(rawValue, out MoveRangeData moveRangeData) ? moveRangeData : default(MoveRangeData);
+            }
+
+            if (targetType == typeof(GameObject))
+            {
+                return LoadPrefabByFileName(rawValue);
             }
 
             return null;
+        }
+
+        private static GameObject LoadPrefabByFileName(string prefabId)
+        {
+            if (string.IsNullOrWhiteSpace(prefabId)) return null;
+
+            prefabId = Path.GetFileNameWithoutExtension(prefabId.Trim());
+            string[] guids = AssetDatabase.FindAssets($"{prefabId} t:Prefab", new[] { "Assets/Project/Prefabs" });
+            foreach (string guid in guids)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                if (!string.Equals(Path.GetFileNameWithoutExtension(assetPath), prefabId, StringComparison.OrdinalIgnoreCase)) continue;
+
+                return AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            }
+
+            return null;
+        }
+
+        private static bool TryGetRecordValue(Dictionary<string, string> record, string fieldName, out string value)
+        {
+            if (record.TryGetValue(fieldName, out value) && !IsCommentValue(value)) return true;
+
+            value = string.Empty;
+            return false;
         }
 
         private static List<FieldData> CreateFields(List<string> headers)
@@ -512,7 +552,9 @@ namespace TRPG.Editor
         {
             return fieldName switch
             {
+                "PrefabId" => "PfId",
                 "PrefabName" => "PrefabAddress",
+                "MoveRange" => "MoveRangeData",
                 "DefaultSkillID" => "DefaultSkillId",
                 _ => fieldName,
             };

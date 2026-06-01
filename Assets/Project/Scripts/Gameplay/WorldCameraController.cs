@@ -8,9 +8,6 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private Camera cam;
 
-        [SerializeField, ReadOnly] private MapController mapController;
-
-
         private void Awake()
         {
             cam = GetComponent<Camera>();
@@ -34,18 +31,15 @@ namespace TRPG.Runtime
         /// <summary>
         /// world manager에서 맵이 로드되면 카메라가 맵의 정중앙을 바라봅니다.
         /// </summary>
-        private void LookAt(MapController mapController)
+        private void LookAt()
         {
-            this.mapController = mapController;
-
-            if (mapController == null) return;
-            if (!mapController.TryGetMapCenterWorldPos(out Vector3 mapCenterWorldPos)) return;
+            if (!WorldManager.TryGetMapCenterWorldPos(out Vector3 mapCenterWorldPos)) return;
 
             // 2D 카메라 깊이는 유지하고 맵 중심에 해당하는 x, y만 맞춥니다.
             transform.position = new Vector3(mapCenterWorldPos.x, mapCenterWorldPos.y, transform.position.z);
 
             // 화면에 맵 전체가 보이게 할 수 있도록
-            int rowCount = mapController.GetMapRowCount();
+            int rowCount = WorldManager.GetMapRowCount();
             cam.orthographicSize = rowCount * 0.6f;
         }
     }

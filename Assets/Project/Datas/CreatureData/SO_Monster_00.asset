@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: SO_Monster_00
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureData
   Id: SO_Monster_00
+  PfId: PF_Pawn
   Description: Default
-  DisplayName: "\uC950"
+  DisplayName: "\uD3F0"
   Type: Pawn
   DefaultSkillId: Attack_00
   Hp: 10
@@ -24,3 +25,5 @@ MonoBehaviour:
     isRepeatable: 0
     directions:
     - {x: 0, y: 1, z: 0}
+  CreatureType: 1
+  creaturePf: {fileID: 9212389859503149358, guid: 40a3d4a2d8ed1d245acfd4cad8b14982, type: 3}

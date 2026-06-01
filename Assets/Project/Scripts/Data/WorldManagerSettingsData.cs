@@ -19,8 +19,6 @@ namespace TRPG.Runtime
 
         [SerializeField] private TileIndicator enemyTileIndicatorPb = null;
 
-        [SerializeField] private MapController mapPb = null;
-
 
         public CreatureController MonsterPb => monsterPb;
 
@@ -29,8 +27,6 @@ namespace TRPG.Runtime
         public TileIndicator AllyTileIndicatorPb => allyTileIndicatorPb;
 
         public TileIndicator EnemyTileIndicatorPb => enemyTileIndicatorPb;
-
-        public MapController MapPb => mapPb;
     }
 
 #if UNITY_EDITOR

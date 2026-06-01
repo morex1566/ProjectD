@@ -16,7 +16,6 @@ MonoBehaviour:
   playerPb: {fileID: 2188207816268681392, guid: fe859d1a378664047919604f767dbe0f, type: 3}
   allyTileIndicatorPb: {fileID: 8005795874296381529, guid: bd61225f71852ad4e8add82101bac98f, type: 3}
   enemyTileIndicatorPb: {fileID: 8341206448957022298, guid: a403a12c171cc85448e8fb1dbbb1c15b, type: 3}
-  mapPb: {fileID: 5146828127127426422, guid: 48b1b7ba4bc00c345a136a15fa98aa65, type: 3}
   testMapData:
     m_AssetGUID: b037aa227efd46939d87a6e1e1facefc
     m_SubObjectName: 

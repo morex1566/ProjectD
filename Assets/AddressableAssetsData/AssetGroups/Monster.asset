@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Monster
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Monster
+  m_GUID: 8c330fcb9f99027498ad8fa1f9525276
+  m_SerializeEntries:
+  - m_GUID: 28409bf03088952489dea46f6f2f12da
+    m_Address: SO_Monster_02
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c51514fb70e6c047ac2679be544b945
+    m_Address: SO_Monster_03
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 61c8a7f252422fc4492ff29b4cb7034a
+    m_Address: SO_Monster_00
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c6466f80f99e7c4fb443d74312a1348
+    m_Address: SO_Monster_05
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ede14b99412d78d45b614570112f1e7d
+    m_Address: SO_Monster_01
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fff020ed5b65a274496032cfa0181cea
+    m_Address: SO_Monster_04
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: a4554c02061d64e4c9a9dca40a903723, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: f2f46e12fe4f2f44aaaf97505ca7b002, type: 2}
+    - {fileID: 11400000, guid: f7dc18f7576f9834ab835528d17cf4d1, type: 2}

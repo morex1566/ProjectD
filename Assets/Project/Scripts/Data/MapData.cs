@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace TRPG.Runtime
 {
@@ -9,7 +14,11 @@ namespace TRPG.Runtime
     {
         [SerializeField] private List<MapTileData> tiles = new();
 
+        [SerializeField] private List<MapMonsterSpawnData> monsterSpawns = new();
+
         public IReadOnlyList<MapTileData> Tiles => tiles;
+
+        public IReadOnlyList<MapMonsterSpawnData> MonsterSpawns => monsterSpawns;
 
         public bool TryGetTilePb(Vector3Int cellPos, out TileController tilePb)
         {
@@ -39,6 +48,19 @@ namespace TRPG.Runtime
                 if (tile.TilePb == null) continue;
 
                 tiles.Add(tile);
+            }
+        }
+
+        public void SetMonsterSpawns(IEnumerable<MapMonsterSpawnData> nextMonsterSpawns)
+        {
+            monsterSpawns.Clear();
+
+            foreach (MapMonsterSpawnData monsterSpawn in nextMonsterSpawns)
+            {
+                if (!monsterSpawn.HasMonsterDataReference) continue;
+                if (!HasTile(monsterSpawn.CellPos)) continue;
+
+                monsterSpawns.Add(monsterSpawn);
             }
         }
 
@@ -77,5 +99,44 @@ namespace TRPG.Runtime
             this.cellPos = cellPos;
             this.tilePb = tilePb;
         }
+    }
+
+    [Serializable]
+    public class MapMonsterSpawnData
+    {
+        [SerializeField] private Vector3Int cellPos = Vector3Int.zero;
+
+        [SerializeField] private AssetReferenceT<CreatureData> monsterDataReference = null;
+
+        public Vector3Int CellPos => cellPos;
+
+        public AssetReferenceT<CreatureData> MonsterDataReference => monsterDataReference;
+
+        public bool HasMonsterDataReference => monsterDataReference != null && monsterDataReference.RuntimeKeyIsValid();
+
+        public MapMonsterSpawnData(Vector3Int cellPos, AssetReferenceT<CreatureData> monsterDataReference)
+        {
+            this.cellPos = cellPos;
+            this.monsterDataReference = monsterDataReference;
+        }
+
+#if UNITY_EDITOR
+        public CreatureData EditorMonsterData => monsterDataReference != null ? monsterDataReference.editorAsset as CreatureData : null;
+
+        public MapMonsterSpawnData(Vector3Int cellPos, CreatureData monsterData)
+            : this(cellPos, CreateReference(monsterData))
+        {
+
+        }
+
+        private static AssetReferenceT<CreatureData> CreateReference(CreatureData monsterData)
+        {
+            if (monsterData == null) return null;
+
+            string assetPath = AssetDatabase.GetAssetPath(monsterData);
+            string guid = AssetDatabase.AssetPathToGUID(assetPath);
+            return string.IsNullOrWhiteSpace(guid) ? null : new AssetReferenceT<CreatureData>(guid);
+        }
+#endif
     }
 }
