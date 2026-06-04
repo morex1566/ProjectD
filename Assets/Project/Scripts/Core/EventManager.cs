@@ -1,7 +1,8 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace TRPG.Runtime
 {
@@ -12,7 +13,7 @@ namespace TRPG.Runtime
     {
         private static EventManagerSettingsData settings;
 
-        private readonly List<Event> activeEvents = new();
+        private static readonly Dictionary<int, Event> eventInsts = new();
 
         /// <summary>
         /// EventManager 싱글톤 인스턴스를 보장합니다.
@@ -21,14 +22,23 @@ namespace TRPG.Runtime
         {
             GetInstance();
             settings = Resources.Load<EventManagerSettingsData>("SO_EventManagerSettings");
+
+            // 시작 씬이여야만 
+            if (SceneManager.GetActiveScene().name == "SCN_Title") Trigger<TitleEvent>().Forget();
         }
 
         /// <summary>
         /// 설정에 등록된 이벤트 프리팹을 GameObject로 생성하고 실행합니다.
         /// </summary>
-        public static UniTask Play<T>() where T : Event
+        public static UniTask Trigger<T>() where T : Event
         {
             return GetInstance().PlayInternal<T>();
+        }
+
+        public static void Close(int instanceId)
+        {
+            Destroy(eventInsts[instanceId]);
+            eventInsts.Remove(instanceId);
         }
 
         private async UniTask PlayInternal<T>() where T : Event
@@ -55,7 +65,7 @@ namespace TRPG.Runtime
                 return;
             }
 
-            activeEvents.Add(eventInst);
+            eventInsts.Add(eventObj.GetInstanceID(), eventInst);
 
             try
             {
@@ -64,15 +74,7 @@ namespace TRPG.Runtime
             catch (Exception exception)
             {
                 Debug.LogError(exception);
-            }
-            finally
-            {
-                activeEvents.Remove(eventInst);
-
-                if (eventObj != null)
-                {
-                    Destroy(eventObj);
-                }
+                Close(eventObj.GetInstanceID());
             }
         }
     }

@@ -19,7 +19,6 @@ namespace TRPG.Runtime
 
         [SerializeField] private TileIndicator enemyTileIndicatorPb = null;
 
-
         public CreatureController MonsterPb => monsterPb;
 
         public CreatureController PlayerPb => playerPb;

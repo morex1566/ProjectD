@@ -17,5 +17,10 @@ namespace TRPG.Runtime
         {
             return eventCompletionSource.Task;
         }
+
+        public void Close()
+        {
+            EventManager.Close(gameObject.GetInstanceID());
+        }
     }
 }

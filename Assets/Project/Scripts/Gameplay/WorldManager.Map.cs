@@ -12,8 +12,6 @@ namespace TRPG.Runtime
         {
             if (mapData == null) return;
 
-            currMapData = mapData;
-
             Transform root = EnsureMapRoot();
             int topRowCellY = GetTopRowCellY(mapData.Tiles);
             foreach (MapTileData tileData in mapData.Tiles)
@@ -234,7 +232,6 @@ namespace TRPG.Runtime
                 }
             }
 
-            currMapData = null;
             mapRoot = null;
             tiles.Clear();
         }

@@ -14,8 +14,6 @@ namespace TRPG.Runtime
 
         [Header(nameof(WorldManager) + ".Runtime")]
 
-        [SerializeField, ReadOnly] private MapData currMapData = null;
-
         [SerializeField, ReadOnly] private Transform mapRoot = null;
 
         [SerializeField, ReadOnly] private Dictionary<Vector3Int, TileController> tiles = new();
@@ -25,6 +23,7 @@ namespace TRPG.Runtime
         [SerializeField, ReadOnly] private Dictionary<Vector3Int, TileIndicator> tileIndicators = new();
 
 
+        public static WorldManagerSettingsData Settings => settings;
 
         public static Action OnMapLoaded;
 

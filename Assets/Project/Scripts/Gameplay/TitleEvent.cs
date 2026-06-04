@@ -82,7 +82,7 @@ namespace TRPG.Runtime
                 // 튜토리얼 이벤트 시작
                 var loadingUI = UIManager.Open<LoadingUI>(UIManager.RenderSpace.Camera, Vector3.zero);
                 loadingUI.onLoadingCompleted.AddListener(UIManager.SetBackgroundColorBlack);
-                loadingUI.onLoadingExitAnimCompleted.AddListener(PlayTutorialEvent);
+                loadingUI.onLoadingExitAnimCompleted.AddListener(OnTriggerTutorialEvent);
 
                 await loadingUI.LoadAsync();
             }
@@ -93,12 +93,13 @@ namespace TRPG.Runtime
             finally
             {
                 eventCompletionSource?.TrySetResult();
+                Close();
             }
         }
 
-        private void PlayTutorialEvent()
+        private void OnTriggerTutorialEvent()
         {
-            EventManager.Play<TutorialEvent>();
+            EventManager.Trigger<TutorialEvent>();
         }
     }
 }

@@ -22,6 +22,8 @@ namespace TRPG.Runtime
             InputManager.InputMappingContext.Player.LeftClick.performed += OnClickPerformed;
             InputManager.InputMappingContext.Player.LeftClick.canceled += OnClickCanceled;
             InputManager.InputMappingContext.Player.Point.performed += OnPointPerformed;
+
+            PlaySpawnAnim();
         }
 
         private void OnDisable()
@@ -120,6 +122,7 @@ namespace TRPG.Runtime
             // 이동 범위에 있는 크리쳐에게 외곽선 효과 요청
             WorldManager.AddAllyTileIndicator(indicatorCellPosList, this);
             dragger.gameObject.SetActive(true);
+            SetOutline(false);
             RequestShowOutline(true);
 
             PlayPick();
@@ -163,6 +166,18 @@ namespace TRPG.Runtime
             WorldManager.RemoveTileIndicators(this);
 
             PlayDrop();
+        }
+    }
+
+    /// <summary>
+    /// 애니메이션
+    /// </summary>
+    public partial class PlayerController
+    {
+        private void PlaySpawnAnim()
+        {
+            // 플레이어 스폰 상태로 전환합니다.
+            animator.SetTrigger(UnityConstant.Animator.Parameters.AC_Gameplay_Creature.Trigger.OnSpawn);
         }
     }
 }

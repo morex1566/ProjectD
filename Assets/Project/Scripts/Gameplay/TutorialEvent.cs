@@ -1,19 +1,20 @@
 using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
     public class TutorialEvent : Event
     {
+        [SerializeField] private AssetReferenceT<MapData> tutorialMapDataRef;
+
         private Dialouge dialouge;
 
         private DialougeUI dialougeUI;
 
         private PanelUI panelUI;
-
-        private bool isInputRegistered;
 
         public override async UniTask ExecuteAsync()
         {
@@ -38,11 +39,6 @@ namespace TRPG.Runtime
             await eventCompletionSource.Task;
         }
 
-        private void OnDisable()
-        {
-            UnregisterInput();
-        }
-
         private void OnDestroy()
         {
             UnregisterInput();
@@ -54,30 +50,44 @@ namespace TRPG.Runtime
         {
             if (dialougeUI == null || dialouge == null) return;
 
+            // 현재 클릭으로 더 이상 출력할 문장이 없다고 확인.
+            // 다이얼로그의 이벤트로 넘어감.
             if (!dialougeUI.Play(dialouge))
             {
-                // 현재 클릭으로 더 이상 출력할 문장이 없다고 확인되면 이벤트 완료 흐름으로 넘어갑니다.
                 UnregisterInput();
                 dialougeUI.Close();
-                panelUI.PlayDitherRevealAsync(panelUI.Close).Forget();
+                panelUI.PlayDitherRevealAsync(() =>
+                {
+                    panelUI.Close();
+                    RequestSpawn().Forget();
+                }).Forget();
+
+                eventCompletionSource?.TrySetResult();
             }
         }
 
         private void RegisterInput()
         {
-            if (isInputRegistered || InputManager.InputMappingContext == null) return;
-
-            // 대화 진행은 UI 포인터 Click이 아니라 Submit 입력만 소비합니다.
+            InputManager.InputMappingContext.UI.Submit.performed -= OnPlayDialouge;
             InputManager.InputMappingContext.UI.Submit.performed += OnPlayDialouge;
-            isInputRegistered = true;
         }
 
         private void UnregisterInput()
         {
-            if (!isInputRegistered || InputManager.InputMappingContext == null) return;
-
             InputManager.InputMappingContext.UI.Submit.performed -= OnPlayDialouge;
-            isInputRegistered = false;
+        }
+
+        private async UniTask RequestSpawn()
+        {
+            var mapData = ResourceManager.GetResource<MapData>(tutorialMapDataRef);
+
+            // 맵 스폰
+            WorldManager.SpawnTiles(mapData);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
+
+            // 플레이어 스폰
+            WorldManager.SpawnPlayer(Vector3Int.zero);
         }
     }
 }

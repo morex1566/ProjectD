@@ -17,7 +17,7 @@ namespace TRPG.Runtime
         {
             if (!Application.isPlaying)
             {
-                Debug.LogWarning("LoadTestMapData is only available in Play Mode.");
+                Debug.LogWarning("LoadTestMapData is only available in Trigger Mode.");
                 return;
             }
 
@@ -35,12 +35,12 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 플레이 모드에서만 테스트 맵 로드 메뉴를 활성화합니다.
+        /// WorldManagerSettings의 TestMapData를 로드
         /// </summary>
-        [MenuItem("TRPG/WorldManager/LoadTestMapData()", true)]
-        private static bool CanLoadTestMapData()
+        [MenuItem("TRPG/WorldManager/PlayerSpawn()")]
+        private static void LoadPlayer()
         {
-            return Application.isPlaying;
+            SpawnPlayer(Vector3Int.zero);
         }
     }
 #endif

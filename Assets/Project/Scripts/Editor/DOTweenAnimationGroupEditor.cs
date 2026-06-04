@@ -28,7 +28,7 @@ namespace TRPG.Editor
 
             GUILayout.Space(5f);
 
-            if (GUILayout.Button("Play"))
+            if (GUILayout.Button("Trigger"))
             {
                 Play(group);
             }
@@ -101,7 +101,7 @@ namespace TRPG.Editor
         {
             if (state != PlayModeStateChange.ExitingEditMode || !isPreviewing) return;
 
-            // Entering Play Mode must not inherit temporary editor preview tweens.
+            // Entering Trigger Mode must not inherit temporary editor preview tweens.
             DOTweenEditorPreview.Stop(true, true);
             isPreviewing = false;
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
