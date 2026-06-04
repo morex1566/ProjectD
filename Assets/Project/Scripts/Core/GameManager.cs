@@ -26,8 +26,6 @@ namespace TRPG.Runtime
         {
             Init();
 
-            EventManager.Init();
-            DialogueManager.Init();
             DOTween.Init();
             InputManager.Init();     
         }
@@ -41,6 +39,8 @@ namespace TRPG.Runtime
             ResourceManager.Init();
             UIManager.Init();
             WorldManager.Init();
+            EventManager.Init();
+            DialogueManager.Init();
 
             // 시작 씬이여야만 
             if (SceneManager.GetActiveScene().name == "SCN_Title") EventManager.Play<TitleEvent>().Forget();
