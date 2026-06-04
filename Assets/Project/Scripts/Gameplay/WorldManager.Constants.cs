@@ -11,6 +11,10 @@ namespace TRPG.Runtime
             public static readonly string Sky = "#1E202A";
 
             public static readonly string Stone = "#1E1E1E";
+
+            public static readonly string Background = "#202038";
+
+            public static readonly string Black = "#000000";
         }
     }
 }

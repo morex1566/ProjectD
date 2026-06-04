@@ -28,6 +28,9 @@ namespace TRPG.Runtime
 
         public static Action OnMapLoaded;
 
+        public static Dictionary<Vector3Int, TileController> Tiles => GetInstance().tiles;
+
+        public static Dictionary<int, CreatureController> Creatures => GetInstance().creatures;
 
 
         private void Awake()
@@ -49,19 +52,19 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 지정 MapData를 현재 월드에 로드합니다.
+        /// 지정 MapData의 타일을 생성하여 로드합니다.
         /// </summary>
-        public static void LoadMapData(MapData mapData)
+        public static void SpawnTiles(MapData mapData)
         {
-            GetInstance().LoadMapDataInternal(mapData);
+            GetInstance().SpawnTilesInternal(mapData);
         }
 
         /// <summary>
-        /// 현재 맵, 크리처, 타일 인디케이터 런타임 오브젝트를 모두 정리합니다.
+        /// 지정 MapData의 몬스터를 스폰하고 등록합니다.
         /// </summary>
-        public static void UnloadMapData()
+        public static void SpawnMonsters(MapData mapData)
         {
-            GetInstance().UnloadMapDataInternal();
+            GetInstance().SpawnMonstersInternal(mapData);
         }
 
         /// <summary>
@@ -166,6 +169,15 @@ namespace TRPG.Runtime
         public static void Despawn(int instanceId)
         {
             GetInstance().DespawnInternal(instanceId);
+        }
+
+        /// <summary>
+        /// cellPos에 해당하는 타일을 제거하고 월드 점유 목록에서 해제합니다.
+        /// </summary>
+        /// <param name="cellPos"></param>
+        public static void Despawn(Vector3Int cellPos)
+        {
+
         }
 
         /// <summary>

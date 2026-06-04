@@ -6,13 +6,12 @@ namespace TRPG.Runtime
     public partial class WorldManager : MonoBehaviourSingleton<WorldManager>
     {
         /// <summary>
-        /// 지정 MapData를 WorldManager 하위 런타임 타일로 로드합니다.
+        /// 지정 MapData의 타일을 생성하여 로드합니다.
         /// </summary>
-        private void LoadMapDataInternal(MapData mapData)
+        private void SpawnTilesInternal(MapData mapData)
         {
             if (mapData == null) return;
 
-            UnloadMapDataInternal();
             currMapData = mapData;
 
             Transform root = EnsureMapRoot();
@@ -22,22 +21,13 @@ namespace TRPG.Runtime
                 if (tileData.TilePb == null) continue;
 
                 TileController tile = Instantiate(tileData.TilePb, CellPosToWorldPos(tileData.CellPos), Quaternion.identity, root);
+
                 ApplyTileOrderInLayer(tile, topRowCellY - tileData.CellPos.y);
                 tiles.Add(tileData.CellPos, tile);
+                tile.CellPos = tileData.CellPos;
             }
 
-            SpawnMapMonsters(mapData);
             OnMapLoaded?.Invoke();
-        }
-
-        /// <summary>
-        /// 현재 맵, 크리처, 타일 인디케이터 런타임 오브젝트를 모두 정리합니다.
-        /// </summary>
-        private void UnloadMapDataInternal()
-        {
-            DespawnAllCreatures();
-            RemoveAllTileIndicators();
-            UnloadMapTiles();
         }
 
         /// <summary>

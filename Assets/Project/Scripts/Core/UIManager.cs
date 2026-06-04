@@ -66,7 +66,35 @@ namespace TRPG.Runtime
         /// </summary>
         public static T Open<T>(RenderSpace renderSpace) where T : UIBase
         {
-            return GetInstance().OpenInternal<T>(renderSpace);
+            return Open<T>(renderSpace, Vector3.zero);
+        }
+
+        /// <summary>
+        /// 지정한 UI 타입의 인스턴스를 가져오거나 생성합니다.
+        /// </summary>
+        public static T Open<T>(RenderSpace renderSpace, Vector3 openPos, int? siblingIndex = null) where T : UIBase
+        {
+            return GetInstance().OpenInternal<T>(renderSpace, openPos, siblingIndex);
+        }
+
+        public static void SetBackgroundColor()
+        {
+            if (Camera.main == null) return;
+
+            if (ColorUtility.TryParseHtmlString(WorldManager.BackgroundColor.Background, out Color color))
+            {
+                Camera.main.backgroundColor = color;
+            }
+        }
+
+        public static void SetBackgroundColorBlack()
+        {
+            if (Camera.main == null) return;
+
+            if (ColorUtility.TryParseHtmlString(WorldManager.BackgroundColor.Black, out Color color))
+            {
+                Camera.main.backgroundColor = color;
+            }
         }
 
 
@@ -96,13 +124,19 @@ namespace TRPG.Runtime
         /// </summary>
         private void CloseInternal(int instanceId)
         {
+            if (!uiInsts.TryGetValue(instanceId, out UIBase uiInst))
+            {
+                return;
+            }
+
+            Destroy(uiInst.gameObject);
             uiInsts.Remove(instanceId);
         }
 
         /// <summary>
         /// 지정한 UI 타입의 인스턴스를 가져오거나 생성합니다.
         /// </summary>
-        private T OpenInternal<T>(RenderSpace renderSpace) where T : UIBase
+        private T OpenInternal<T>(RenderSpace renderSpace, Vector3 openPos, int? siblingIndex) where T : UIBase
         {
             T pb = settings.Get<T>();
 
@@ -116,14 +150,18 @@ namespace TRPG.Runtime
             {
                 case RenderSpace.Overlay:
                     inst = Instantiate(pb, overlayCanvas.transform, false);
+                    SetCanvasPosition(inst, openPos);
+                    SetCanvasSiblingIndex(inst, siblingIndex);
                     break;
 
                 case RenderSpace.Camera:
                     inst = Instantiate(pb, cameraCanvas.transform, false);
+                    SetCanvasPosition(inst, openPos);
+                    SetCanvasSiblingIndex(inst, siblingIndex);
                     break;
 
                 case RenderSpace.World:
-                    inst = Instantiate(pb);
+                    inst = Instantiate(pb, openPos, Quaternion.identity);
                     break;
 
                 default:
@@ -133,6 +171,37 @@ namespace TRPG.Runtime
             uiInsts.Add(inst.GetInstanceID(), inst);
 
             return inst;
+        }
+
+        /// <summary>
+        /// Canvas 하위 UI는 월드 좌표가 아니라 RectTransform 로컬 좌표로 배치합니다.
+        /// </summary>
+        private static void SetCanvasPosition(UIBase inst, Vector3 openPos)
+        {
+            RectTransform rectTransform = inst.transform as RectTransform;
+            if (rectTransform == null)
+            {
+                return;
+            }
+
+            rectTransform.anchoredPosition3D = openPos;
+        }
+
+        /// <summary>
+        /// Canvas 하위 UI의 형제 순서를 지정합니다. 값이 없으면 Instantiate 기본 순서를 유지합니다.
+        /// </summary>
+        private static void SetCanvasSiblingIndex(UIBase inst, int? siblingIndex)
+        {
+            if (!siblingIndex.HasValue)
+            {
+                return;
+            }
+
+            Transform target = inst.transform;
+            int maxIndex = target.parent != null ? target.parent.childCount - 1 : 0;
+            int clampedIndex = Mathf.Clamp(siblingIndex.Value, 0, maxIndex);
+
+            target.SetSiblingIndex(clampedIndex);
         }
     }
 }

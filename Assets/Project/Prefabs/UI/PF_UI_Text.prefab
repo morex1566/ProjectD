@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6970844033371542174}
   - component: {fileID: 9097250110904166642}
   - component: {fileID: 3362718364842979450}
+  - component: {fileID: 2788027993191543558}
   m_Layer: 0
   m_Name: PF_UI_Text
   m_TagString: Untagged
@@ -65,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "1 \uD134"
+  m_text: Text Hear
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eb971d6f8bcaa7141924ced9ad2911eb, type: 2}
   m_sharedMaterial: {fileID: -5142400763360651615, guid: eb971d6f8bcaa7141924ced9ad2911eb, type: 2}
@@ -74,8 +75,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4290566124
+  m_fontColor: {r: 0.9254902, g: 0.84313726, b: 0.7372549, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -92,12 +93,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
+  m_fontSize: 24
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 24
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -137,3 +138,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2788027993191543558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1181053942253718605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4619dbf6fa3bee148a097a5dfde588ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DialougeUI
+  speakerText: {fileID: 0}
+  dialogueText: {fileID: 0}
+  typeInterval: 0.04

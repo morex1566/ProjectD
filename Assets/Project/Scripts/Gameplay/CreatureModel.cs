@@ -60,6 +60,12 @@ namespace TRPG.Runtime
             data = initData;
             cellPos = initCellPos;
 
+            if (initData == null)
+            {
+                Debug.LogWarning($"CreatureModel.Init: initData is null. CellPos: {initCellPos}");
+                return;
+            }
+
             hp = initData.Hp;
             damage = initData.Damage;
             armor = initData.Armor;

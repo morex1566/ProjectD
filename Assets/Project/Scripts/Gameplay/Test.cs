@@ -7,20 +7,26 @@ namespace TRPG.Runtime
     {
         [SerializeField] private AssetReferenceT<MapData> mapDataRef;
 
+        private MapData mapData = null;
+
         public void RequestLoadMap()
         {
-            MapData mapData = ResourceManager.GetResource(mapDataRef);
-            WorldManager.LoadMapData(mapData);
-        }
+            var tiles =  WorldManager.Tiles;
+            foreach (var tile in tiles)
+            {
+                WorldManager.Despawn(tile.Value.CellPos);
+            }
 
-        public void RequestSpawnPlayer()
-        {
+            var creatures = WorldManager.Creatures;
+            foreach (var creature in creatures)
+            {
+                WorldManager.Despawn(creature.Value.GetInstanceID());
+            }
 
-        }
-
-        public void RequestSpawnMonster()
-        {
-
+            mapData = ResourceManager.GetResource(mapDataRef);
+            WorldManager.SpawnTiles(mapData);
+            WorldManager.SpawnMonsters(mapData);
+            WorldManager.SpawnPlayer(Vector3Int.zero);
         }
     }
 }

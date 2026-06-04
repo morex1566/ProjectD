@@ -24,6 +24,8 @@ namespace TRPG.Editor
         private const string AssetRootDirectory = "Assets/Project/Datas";
         private const string AddressableGroupName = "Remote_Core";
         private const string CreatureDataLabel = "CreatureData";
+        private const string ScriptableObjectAssetPrefix = "SO_";
+        private const string ExcelLineBreakMarker = @"\n";
 
         [MenuItem("TRPG/Data/Import Excel Tables")]
         public static void ImportExcelTables()
@@ -166,15 +168,16 @@ namespace TRPG.Editor
                 for (int i = 0; i < table.Records.Count; i++)
                 {
                     Dictionary<string, string> record = table.Records[i];
-                    string assetName = GetAssetName(table, record);
-                    if (string.IsNullOrWhiteSpace(assetName))
+                    string recordId = GetAssetName(table, record);
+                    if (string.IsNullOrWhiteSpace(recordId))
                     {
                         Debug.LogWarning($"Excel row skipped because first column id is empty. Sheet: {table.SheetName}, Row: {i + 2}");
                         continue;
                     }
 
+                    string assetName = GetScriptableObjectAssetName(recordId);
                     string assetPath = $"{tableAssetDirectory}/{assetName}.asset";
-                    string legacyAssetPath = $"{tableAssetDirectory}/SO_{assetName}.asset";
+                    string legacyAssetPath = $"{tableAssetDirectory}/{recordId}.asset";
 
                     if (!File.Exists(assetPath) && File.Exists(legacyAssetPath))
                     {
@@ -193,7 +196,7 @@ namespace TRPG.Editor
                     }
 
                     ApplyRecordToAsset(asset, table.Fields, record);
-                    RegisterCreatureDataAddressable(asset, assetPath, assetName);
+                    RegisterCreatureDataAddressable(asset, assetPath, recordId);
                     EditorUtility.SetDirty(asset);
                     createdOrUpdatedCount++;
                 }
@@ -241,7 +244,11 @@ namespace TRPG.Editor
                 if (fieldInfo == null) continue;
 
                 record.TryGetValue(field.FieldName, out string rawValue);
-                if (IsCommentValue(rawValue)) continue;
+                if (IsDefaultValueMarker(rawValue))
+                {
+                    fieldInfo.SetValue(asset, GetDefaultValue(fieldInfo.FieldType));
+                    continue;
+                }
 
                 object value = ConvertValue(rawValue, fieldInfo.FieldType);
                 fieldInfo.SetValue(asset, value);
@@ -287,7 +294,7 @@ namespace TRPG.Editor
         {
             rawValue ??= string.Empty;
 
-            if (targetType == typeof(string)) return rawValue;
+            if (targetType == typeof(string)) return ConvertStringValue(rawValue);
             if (targetType == typeof(int))
             {
                 return int.TryParse(rawValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value) ? value : 0;
@@ -326,6 +333,17 @@ namespace TRPG.Editor
             return null;
         }
 
+        private static string ConvertStringValue(string rawValue)
+        {
+            rawValue ??= string.Empty;
+
+            // Excel 셀의 수동 줄바꿈은 대화 페이지 전환 마커인 리터럴 "\n"으로 보관합니다.
+            return rawValue
+                .Replace("\r\n", ExcelLineBreakMarker)
+                .Replace("\r", ExcelLineBreakMarker)
+                .Replace("\n", ExcelLineBreakMarker);
+        }
+
         private static GameObject LoadPrefabByFileName(string prefabId)
         {
             if (string.IsNullOrWhiteSpace(prefabId)) return null;
@@ -345,7 +363,7 @@ namespace TRPG.Editor
 
         private static bool TryGetRecordValue(Dictionary<string, string> record, string fieldName, out string value)
         {
-            if (record.TryGetValue(fieldName, out value) && !IsCommentValue(value)) return true;
+            if (record.TryGetValue(fieldName, out value) && !IsDefaultValueMarker(value)) return true;
 
             value = string.Empty;
             return false;
@@ -372,7 +390,7 @@ namespace TRPG.Editor
             foreach (List<string> row in dataRows)
             {
                 if (row.All(value => string.IsNullOrWhiteSpace(value))) continue;
-                if (row.Count > 0 && IsCommentValue(row[0])) continue;
+                if (row.Any(IsIgnoredRowMarker)) continue;
 
                 Dictionary<string, string> record = new Dictionary<string, string>();
                 foreach (FieldData field in fields)
@@ -474,7 +492,17 @@ namespace TRPG.Editor
                 ? idValue
                 : string.Empty;
 
+            if (IsDefaultValueMarker(id)) return string.Empty;
+
             return SanitizeFileName(id.Trim());
+        }
+
+        private static string GetScriptableObjectAssetName(string recordId)
+        {
+            // Excel ID는 런타임 식별자로 유지하고, Unity 에셋 파일명에만 SO_ 접두사를 붙입니다.
+            return recordId.StartsWith(ScriptableObjectAssetPrefix, StringComparison.OrdinalIgnoreCase)
+                ? recordId
+                : $"{ScriptableObjectAssetPrefix}{recordId}";
         }
 
         private static int GetColumnIndex(string cellReference)
@@ -570,9 +598,22 @@ namespace TRPG.Editor
             return value;
         }
 
-        private static bool IsCommentValue(string value)
+        private static object GetDefaultValue(Type targetType)
         {
-            return value != null && value.TrimStart().StartsWith("#", StringComparison.Ordinal);
+            return targetType.IsValueType ? Activator.CreateInstance(targetType) : null;
+        }
+
+        private static bool IsDefaultValueMarker(string value)
+        {
+            if (value == null) return false;
+
+            string trimmedValue = value.TrimStart();
+            return trimmedValue.StartsWith("#", StringComparison.Ordinal) && !trimmedValue.StartsWith("##", StringComparison.Ordinal);
+        }
+
+        private static bool IsIgnoredRowMarker(string value)
+        {
+            return value != null && value.TrimStart().StartsWith("##", StringComparison.Ordinal);
         }
 
         private static void EnsureAssetFolder(string assetPath)

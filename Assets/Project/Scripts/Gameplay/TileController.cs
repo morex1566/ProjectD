@@ -7,6 +7,8 @@ namespace TRPG.Runtime
     {
         [Header(nameof(CreatureController) + ".Setup")]
 
+        [SerializeField] private SpriteRenderer spriter;
+
         [SerializeField, ReadOnly] private DOTweenAnimation moveAnim;
 
         [SerializeField, ReadOnly] private DOTweenAnimation fadeAnim;
@@ -14,6 +16,8 @@ namespace TRPG.Runtime
         [SerializeField] private Vector3Range moveAnimFromOffsetRange;
 
         [SerializeField] private FloatRange moveAnimDurationRange;
+
+        [ReadOnly] public Vector3Int CellPos;
 
 
         private void Reset()

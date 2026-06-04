@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcf51587bd553a54c870874518bda41c, type: 3}
   m_Name: SO_Monster_01
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureData
-  Id: SO_Monster_01
+  Id: Monster_01
   PfId: PF_Knight
   Description: Default
   DisplayName: "\uB098\uC774\uD2B8"

@@ -85,22 +85,17 @@ namespace TRPG.Runtime
             if (!TryGetMapWorldPosInternal(cellPos, out Vector3 worldPos)) return;
 
             // CreatureData에 지정된 프리팹을 우선 사용하고, 없으면 기본 몬스터 프리팹을 사용합니다.
-            CreatureController monsterPb = settings.MonsterPb;
-            if (monsterData != null && monsterData.creaturePf != null)
-            {
-                monsterPb = monsterData.creaturePf.GetComponent<CreatureController>();
-            }
-
-            if (monsterPb == null)
+            CreatureController monsterPf = monsterData.creaturePf.GetComponent<CreatureController>();
+            if (monsterPf == null)
             {
                 Debug.LogWarning($"SpawnMonster failed. Monster prefab is not assigned. CreatureData: {monsterData?.name}");
                 return;
             }
 
-            MonsterController monsterController = Instantiate(monsterPb, worldPos, Quaternion.identity) as MonsterController;
+            MonsterController monsterController = Instantiate(monsterPf, worldPos, Quaternion.identity) as MonsterController;
             if (monsterController == null)
             {
-                Debug.LogWarning($"SpawnMonster failed. MonsterController not found. Prefab: {monsterPb.name}");
+                Debug.LogWarning($"SpawnMonster failed. MonsterController not found. Prefab: {monsterPf.name}");
                 return;
             }
             monsterController.Model.Init(cellPos, monsterData);
@@ -141,6 +136,15 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// 타일 삭제
+        /// </summary>
+        private void DespawnInternal(Vector3Int cellPos)
+        {
+            Destroy(tiles[cellPos].gameObject);
+            tiles.Remove(cellPos);
+        }
+
+        /// <summary>
         /// 현재 월드에 등록된 모든 크리처를 제거합니다.
         /// </summary>
         private void DespawnAllCreatures()
@@ -158,26 +162,28 @@ namespace TRPG.Runtime
         /// <summary>
         /// MapData에 저장된 몬스터 배치 정보를 기준으로 초기 몬스터를 생성합니다.
         /// </summary>
-        private void SpawnMapMonsters(MapData mapData)
+        private void SpawnMonstersInternal(MapData mapData)
         {
+            if (mapData == null) return;
+
             foreach (MapMonsterSpawnData monsterSpawn in mapData.MonsterSpawns)
             {
                 CreatureData monsterData = ResourceManager.GetResource(monsterSpawn.MonsterDataReference);
                 if (monsterData == null)
                 {
-                    Debug.LogWarning($"SpawnMapMonsters skipped. Monster data is not loaded. RuntimeKey: {monsterSpawn.MonsterDataReference?.RuntimeKey}");
+                    Debug.LogWarning($"SpawnMonsters skipped. Monster data is not loaded. RuntimeKey: {monsterSpawn.MonsterDataReference?.RuntimeKey}");
                     continue;
                 }
 
                 if (HasCreatureInCellPos(monsterSpawn.CellPos))
                 {
-                    Debug.LogWarning($"SpawnMapMonsters skipped. CellPos already occupied: {monsterSpawn.CellPos}");
+                    Debug.LogWarning($"SpawnMonsters skipped. CellPos already occupied: {monsterSpawn.CellPos}");
                     continue;
                 }
 
                 if (!mapData.HasTile(monsterSpawn.CellPos))
                 {
-                    Debug.LogWarning($"SpawnMapMonsters skipped. Tile not found. CellPos: {monsterSpawn.CellPos}");
+                    Debug.LogWarning($"SpawnMonsters skipped. Tile not found. CellPos: {monsterSpawn.CellPos}");
                     continue;
                 }
 

@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3046058275729229627, guid: 669db6c883a1c0d48a770e4b3b66cae3, type: 3}
       propertyPath: m_Name
-      value: PF_Monster
+      value: PF_Pawn
       objectReference: {fileID: 0}
     - target: {fileID: 6404244827999971861, guid: 669db6c883a1c0d48a770e4b3b66cae3, type: 3}
       propertyPath: m_LocalPosition.x

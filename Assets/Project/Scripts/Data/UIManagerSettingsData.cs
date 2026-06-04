@@ -15,10 +15,13 @@ namespace TRPG.Runtime
 
         [SerializeField] protected Sprite cursorShape;
 
+        [SerializeField] protected LoadingUI loadingUI;
 
-        [Header(nameof(UIManagerSettingsData) + ".Prefab")]
+        [SerializeField] private TitleUI titleMessagePf;
 
-        [SerializeField] protected CreatureStatsUI creatureStatsUIPb;
+        [SerializeField] private DialougeUI dialougeUIPf;
+
+        [SerializeField] protected PanelUI panelUIPf;
 
 
 

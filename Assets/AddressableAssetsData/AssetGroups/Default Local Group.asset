@@ -15,11 +15,59 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 42a1b1741e064e84bae5590f7a550252
   m_SerializeEntries:
+  - m_GUID: 28409bf03088952489dea46f6f2f12da
+    m_Address: Monster_02
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c51514fb70e6c047ac2679be544b945
+    m_Address: Monster_03
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 61c8a7f252422fc4492ff29b4cb7034a
+    m_Address: Monster_00
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c6466f80f99e7c4fb443d74312a1348
+    m_Address: Monster_05
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 891000c716e2c6f469c68c0f26419be5
+    m_Address: SO_D_Tutorial_000
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b037aa227efd46939d87a6e1e1facefc
     m_Address: SO_Map_Tutorial_01
     m_ReadOnly: 0
     m_SerializedLabels:
     - Core
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ede14b99412d78d45b614570112f1e7d
+    m_Address: Monster_01
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fff020ed5b65a274496032cfa0181cea
+    m_Address: Monster_04
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    - CreatureData
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: a4554c02061d64e4c9a9dca40a903723, type: 2}

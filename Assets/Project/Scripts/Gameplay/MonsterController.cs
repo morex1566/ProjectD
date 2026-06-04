@@ -50,9 +50,10 @@ namespace TRPG.Runtime
             // Move
             if (moveAnim == null) return;
             moveAnim.isFrom = true;
+            moveAnim.delay = 1f;
             moveAnim.endValueV3 = moveAnimFromOffsetRange.Random();
             moveAnim.duration = moveAnimDurationRange.Random();
-            moveAnim.DORestart();
+            moveAnim.DORestart(true);
         }
     }
 }

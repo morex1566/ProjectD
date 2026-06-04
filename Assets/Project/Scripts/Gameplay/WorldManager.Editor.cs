@@ -24,14 +24,13 @@ namespace TRPG.Runtime
             settings = Resources.Load<WorldManagerSettingsData>("SO_WorldManagerSettings");
             var awaiter = ResourceManager.LoadAsync(UnityConstant.Addressable.Label.Core).GetAwaiter();
 
-            UnloadMapData();
-
             awaiter.OnCompleted(() =>
             {
                 if (!Application.isPlaying) return;
 
                 MapData testMapData = ResourceManager.GetResource(settings.TestMapData);
-                LoadMapData(testMapData);
+                SpawnTiles(testMapData);
+                SpawnMonsters(testMapData);
             });
         }
 

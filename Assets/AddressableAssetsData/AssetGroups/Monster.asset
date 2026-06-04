@@ -14,49 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Monster
   m_GUID: 8c330fcb9f99027498ad8fa1f9525276
-  m_SerializeEntries:
-  - m_GUID: 28409bf03088952489dea46f6f2f12da
-    m_Address: SO_Monster_02
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    - CreatureData
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3c51514fb70e6c047ac2679be544b945
-    m_Address: SO_Monster_03
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    - CreatureData
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 61c8a7f252422fc4492ff29b4cb7034a
-    m_Address: SO_Monster_00
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    - CreatureData
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6c6466f80f99e7c4fb443d74312a1348
-    m_Address: SO_Monster_05
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    - CreatureData
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ede14b99412d78d45b614570112f1e7d
-    m_Address: SO_Monster_01
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    - CreatureData
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fff020ed5b65a274496032cfa0181cea
-    m_Address: SO_Monster_04
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    - CreatureData
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: a4554c02061d64e4c9a9dca40a903723, type: 2}
   m_SchemaSet:

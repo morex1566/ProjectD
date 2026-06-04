@@ -4,6 +4,7 @@ using TRPG.Runtime;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace TRPG.Editor
 {
@@ -86,7 +87,7 @@ namespace TRPG.Editor
 
             if (!Controller.EnableScenePaint) return;
 
-            Event currentEvent = Event.current;
+            UnityEngine.Event currentEvent = UnityEngine.Event.current;
             if (currentEvent == null) return;
 
             if (currentEvent.rawType == EventType.MouseUp || currentEvent.type == EventType.MouseLeaveWindow)
@@ -485,7 +486,7 @@ namespace TRPG.Editor
             return TryGetPrefabAsset(sceneTile, out TileController tilePb) ? tilePb.name : sceneTile.name;
         }
 
-        private bool TryGetMouseCellPos(Event currentEvent, out Vector3Int cellPos)
+        private bool TryGetMouseCellPos(UnityEngine.Event currentEvent, out Vector3Int cellPos)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
             Plane groundPlane = new Plane(Vector3.forward, Vector3.zero);
@@ -499,7 +500,7 @@ namespace TRPG.Editor
             return true;
         }
 
-        private bool ShouldPaint(Event currentEvent, Vector3Int cellPos)
+        private bool ShouldPaint(UnityEngine.Event currentEvent, Vector3Int cellPos)
         {
             if (currentEvent.alt) return false;
             if (currentEvent.button != 0) return false;
