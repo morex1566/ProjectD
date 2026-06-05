@@ -10,11 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f7cc3bb6b9349d4a859df2d04b64f19, type: 3}
-  m_Name: SO_D_Tutorial_000
+  m_Name: SO_D_Tutorial_002
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DialogueData
-  Id: D_Tutorial_000
+  Id: D_Tutorial_002
   Speaker: "\uCCB4\uC154"
-  Description: "\uB098\uC758 \uBD80\uB984\uC5D0 \uC751\uB2F5\uD574. \uACC4\uC57D\uC790\\n...\\n\uC18C\uD658\uC2DD\uC5D0
-    \uD2C0\uB9B0\uAC74 \uC5C6\uB294\uB370 \uC774\uC0C1\uD558\uB124."
+  Description: "\uD6C4\uD6D7. \uC5ED\uC2DC \uB0B4\uAC00 \uC18C\uD658\uD55C \uD328\uBC00\uB9AC\uC5B4\uC57C."
   NextDialogueId: null
   EventId: null

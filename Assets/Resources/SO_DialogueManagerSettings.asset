@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b7a5d6e6544f50448a9f7626ec2ca26, type: 3}
-  m_Name: SO_DialougeManagerSettings
+  m_Name: SO_DialogueManagerSettings
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DialougeManagerSettingsData
   TutorialRef:
     m_AssetGUID: 891000c716e2c6f469c68c0f26419be5

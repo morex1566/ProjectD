@@ -39,7 +39,7 @@ namespace TRPG.Runtime
         public static void Init()
         {
             GetInstance();
-            settings = Resources.Load<DialougeManagerSettingsData>("SO_DialougeManagerSettings");
+            settings = Resources.Load<DialougeManagerSettingsData>("SO_DialogueManagerSettings");
         }
 
         public static Dialouge Load(AssetReferenceT<DialogueData> dialogueData)

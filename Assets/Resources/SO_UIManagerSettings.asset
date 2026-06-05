@@ -17,3 +17,4 @@ MonoBehaviour:
   titleMessagePf: {fileID: 9114265981720905673, guid: 1a386e79777e12c4a9b2e8764bff0271, type: 3}
   dialougeUIPf: {fileID: 7699668753354233414, guid: 745204b6e172d4641bef49befc635abe, type: 3}
   panelUIPf: {fileID: 6100000000000000003, guid: 31784c499dc655a4082ca7705461d62f, type: 3}
+  conversationUIPf: {fileID: 801062378317659510, guid: a42b2969c6a5cbd4f9de8e841d132e0a, type: 3}

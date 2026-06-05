@@ -53,7 +53,7 @@ MonoBehaviour:
   fadeInAnimation: {fileID: 6100000000000000001}
   fadeOutAnimation: {fileID: 5564842195480745122}
   ditherTransitionMaterial: {fileID: 2100000, guid: 7172973e6f17ba148af2a7e26fd15021, type: 2}
-  ditherDuration: 2.5
+  ditherDuration: 2
 --- !u!1 &3223089415568822571
 GameObject:
   m_ObjectHideFlags: 0

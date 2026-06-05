@@ -13,15 +13,17 @@ namespace TRPG.Runtime
     {
         [Header(nameof(UIManagerSettingsData) + ".Setup")]
 
-        [SerializeField] protected Sprite cursorShape;
+        [SerializeField] private Sprite cursorShape;
 
-        [SerializeField] protected LoadingUI loadingUI;
+        [SerializeField] private LoadingUI loadingUI;
 
         [SerializeField] private TitleUI titleMessagePf;
 
         [SerializeField] private DialougeUI dialougeUIPf;
 
-        [SerializeField] protected PanelUI panelUIPf;
+        [SerializeField] private PanelUI panelUIPf;
+
+        [SerializeField] private ConversationUI conversationUIPf;
 
 
 

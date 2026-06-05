@@ -66,7 +66,7 @@ namespace TRPG.Runtime
         /// </summary>
         public static T Open<T>(RenderSpace renderSpace) where T : UIBase
         {
-            return Open<T>(renderSpace, Vector3.zero);
+            return GetInstance().OpenInternal<T>(renderSpace, null, null);
         }
 
         /// <summary>
@@ -75,6 +75,30 @@ namespace TRPG.Runtime
         public static T Open<T>(RenderSpace renderSpace, Vector3 openPos, int? siblingIndex = null) where T : UIBase
         {
             return GetInstance().OpenInternal<T>(renderSpace, openPos, siblingIndex);
+        }
+
+        /// <summary>
+        /// 지정한 UI 타입의 인스턴스를 프리팹의 Stretch RectTransform 설정을 유지해 생성합니다.
+        /// </summary>
+        public static T OpenStretch<T>(RenderSpace renderSpace, int? siblingIndex = null) where T : UIBase
+        {
+            return GetInstance().OpenInternal<T>(renderSpace, null, siblingIndex);
+        }
+
+        /// <summary>
+        /// 지정한 UI 타입의 인스턴스를 부모 Canvas 영역에 Stretch로 맞추고 여백을 적용해 생성합니다.
+        /// </summary>
+        public static T OpenStretch<T>(RenderSpace renderSpace, Vector2 offsetMin, Vector2 offsetMax, int? siblingIndex = null) where T : UIBase
+        {
+            return GetInstance().OpenInternal<T>(renderSpace, null, siblingIndex, true, offsetMin, offsetMax);
+        }
+
+        /// <summary>
+        /// 지정한 UI 타입의 인스턴스를 RectTransform 앵커 설정으로 생성합니다.
+        /// </summary>
+        public static T OpenAnchored<T>(RenderSpace renderSpace, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta, int? siblingIndex = null) where T : UIBase
+        {
+            return GetInstance().OpenInternal<T>(renderSpace, null, siblingIndex, false, default, default, true, anchorMin, anchorMax, anchoredPosition, sizeDelta);
         }
 
         public static void SetBackgroundColor()
@@ -136,7 +160,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 지정한 UI 타입의 인스턴스를 가져오거나 생성합니다.
         /// </summary>
-        private T OpenInternal<T>(RenderSpace renderSpace, Vector3 openPos, int? siblingIndex) where T : UIBase
+        private T OpenInternal<T>(RenderSpace renderSpace, Vector3? openPos, int? siblingIndex, bool stretchCanvas = false, Vector2 offsetMin = default, Vector2 offsetMax = default, bool applyAnchor = false, Vector2 anchorMin = default, Vector2 anchorMax = default, Vector2 anchoredPosition = default, Vector2 sizeDelta = default) where T : UIBase
         {
             T pb = settings.Get<T>();
 
@@ -150,18 +174,18 @@ namespace TRPG.Runtime
             {
                 case RenderSpace.Overlay:
                     inst = Instantiate(pb, overlayCanvas.transform, false);
-                    SetCanvasPosition(inst, openPos);
+                    ApplyCanvasLayout(inst, openPos, stretchCanvas, offsetMin, offsetMax, applyAnchor, anchorMin, anchorMax, anchoredPosition, sizeDelta);
                     SetCanvasSiblingIndex(inst, siblingIndex);
                     break;
 
                 case RenderSpace.Camera:
                     inst = Instantiate(pb, cameraCanvas.transform, false);
-                    SetCanvasPosition(inst, openPos);
+                    ApplyCanvasLayout(inst, openPos, stretchCanvas, offsetMin, offsetMax, applyAnchor, anchorMin, anchorMax, anchoredPosition, sizeDelta);
                     SetCanvasSiblingIndex(inst, siblingIndex);
                     break;
 
                 case RenderSpace.World:
-                    inst = Instantiate(pb, openPos, Quaternion.identity);
+                    inst = Instantiate(pb, openPos ?? Vector3.zero, Quaternion.identity);
                     break;
 
                 default:
@@ -171,6 +195,29 @@ namespace TRPG.Runtime
             uiInsts.Add(inst.GetInstanceID(), inst);
 
             return inst;
+        }
+
+        /// <summary>
+        /// Canvas 하위 UI의 배치 방식을 적용합니다. 좌표가 없으면 프리팹의 RectTransform 값을 유지합니다.
+        /// </summary>
+        private static void ApplyCanvasLayout(UIBase inst, Vector3? openPos, bool stretchCanvas, Vector2 offsetMin, Vector2 offsetMax, bool applyAnchor, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta)
+        {
+            if (applyAnchor)
+            {
+                SetCanvasAnchoredLayout(inst, anchorMin, anchorMax, anchoredPosition, sizeDelta);
+                return;
+            }
+
+            if (stretchCanvas)
+            {
+                SetCanvasStretch(inst, offsetMin, offsetMax);
+                return;
+            }
+
+            if (openPos.HasValue)
+            {
+                SetCanvasPosition(inst, openPos.Value);
+            }
         }
 
         /// <summary>
@@ -185,6 +232,40 @@ namespace TRPG.Runtime
             }
 
             rectTransform.anchoredPosition3D = openPos;
+        }
+
+        /// <summary>
+        /// Canvas 하위 UI를 지정한 RectTransform 앵커 값으로 배치합니다.
+        /// </summary>
+        private static void SetCanvasAnchoredLayout(UIBase inst, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta)
+        {
+            RectTransform rectTransform = inst.transform as RectTransform;
+            if (rectTransform == null)
+            {
+                return;
+            }
+
+            rectTransform.anchorMin = anchorMin;
+            rectTransform.anchorMax = anchorMax;
+            rectTransform.anchoredPosition = anchoredPosition;
+            rectTransform.sizeDelta = sizeDelta;
+        }
+
+        /// <summary>
+        /// Canvas 하위 UI를 부모 영역 기준 Stretch로 배치합니다.
+        /// </summary>
+        private static void SetCanvasStretch(UIBase inst, Vector2 offsetMin, Vector2 offsetMax)
+        {
+            RectTransform rectTransform = inst.transform as RectTransform;
+            if (rectTransform == null)
+            {
+                return;
+            }
+
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.offsetMin = offsetMin;
+            rectTransform.offsetMax = offsetMax;
         }
 
         /// <summary>

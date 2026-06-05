@@ -11,12 +11,6 @@ namespace TRPG.Runtime
 
         public void RequestLoadMap()
         {
-            var tiles =  WorldManager.Tiles;
-            foreach (var tile in tiles)
-            {
-                WorldManager.Despawn(tile.Value.CellPos);
-            }
-
             var creatures = WorldManager.Creatures;
             foreach (var creature in creatures)
             {

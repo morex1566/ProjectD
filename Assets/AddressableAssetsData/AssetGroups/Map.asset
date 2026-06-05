@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Map
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Map
+  m_GUID: 8f2a03776a9939241a363fed9d9d0ad6
+  m_SerializeEntries:
+  - m_GUID: 07845caf2f4c7c949a0e6cdf514ecd71
+    m_Address: SO_Map_Tutorial_00
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b037aa227efd46939d87a6e1e1facefc
+    m_Address: SO_Map_Tutorial_01
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: a4554c02061d64e4c9a9dca40a903723, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 8e088ce451cb51d4caeaec8c4cc27c42, type: 2}
+    - {fileID: 11400000, guid: ca894b6acdf3b544aaba98f164dec627, type: 2}

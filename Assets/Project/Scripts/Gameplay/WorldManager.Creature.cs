@@ -105,6 +105,40 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// NPC 프리팹을 실제로 인스턴스화하고 모델 데이터를 초기화합니다.
+        /// </summary>
+        private void SpawnNPCInternal(CreatureData npcData, Vector3Int cellPos)
+        {
+            // Ground 타일이 없는 CellPos에는 NPC를 생성하지 않습니다.
+            if (!TryGetMapWorldPosInternal(cellPos, out Vector3 worldPos)) return;
+
+            if (npcData == null || npcData.creaturePf == null)
+            {
+                Debug.LogWarning($"SpawnNPC failed. NPC prefab is not assigned. CreatureData: {npcData?.name}");
+                return;
+            }
+
+            // CreatureData에 지정된 NPC 프리팹을 생성하고 모델 데이터를 초기화합니다.
+            CreatureController npcPf = npcData.creaturePf.GetComponent<CreatureController>();
+            if (npcPf == null)
+            {
+                Debug.LogWarning($"SpawnNPC failed. CreatureController not found. Prefab: {npcData.creaturePf.name}");
+                return;
+            }
+
+            NPCController npcController = Instantiate(npcPf, worldPos, Quaternion.identity) as NPCController;
+            if (npcController == null)
+            {
+                Debug.LogWarning($"SpawnNPC failed. NPCController not found. Prefab: {npcPf.name}");
+                return;
+            }
+            npcController.Model.Init(cellPos, npcData);
+
+            // 생성된 NPC를 월드 조회 테이블에 등록합니다.
+            creatures.Add(npcController.GetInstanceID(), npcController);
+        }
+
+        /// <summary>
         /// 플레이어 프리팹을 실제로 인스턴스화하고 모델 데이터를 초기화합니다.
         /// </summary>
         private void SpawnPlayerInternal(Vector3Int cellPos)

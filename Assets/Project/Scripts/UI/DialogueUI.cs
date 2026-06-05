@@ -4,6 +4,8 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 
 namespace TRPG.Runtime
@@ -44,6 +46,14 @@ namespace TRPG.Runtime
 
             // UI가 사라질 때 진행 중인 타자기 루프가 이후 UI를 만지지 못하게 무효화합니다.
             typingVersion++;
+        }
+
+        private void Update()
+        {
+            if (Keyboard.current == null || !Keyboard.current.spaceKey.wasPressedThisFrame) return;
+            if (dialogue == null) return;
+
+            Play(dialogue);
         }
 
 

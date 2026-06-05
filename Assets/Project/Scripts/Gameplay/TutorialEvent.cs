@@ -2,13 +2,20 @@ using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
     public class TutorialEvent : Event
     {
         [SerializeField] private AssetReferenceT<MapData> tutorialMapDataRef;
+
+        [SerializeField] private AssetReferenceT<CreatureData> cheshireDataRef;
+
+        [SerializeField] private AssetReferenceT<DialogueData> conversastionRef;
+
+        private Dialouge conversation;
+
+        private ConversationUI conversationUI;
 
         private Dialouge dialouge;
 
@@ -33,61 +40,44 @@ namespace TRPG.Runtime
             // 튜토리얼 다이얼로그 UI 오픈
             dialouge = DialogueManager.Load(DialogueManager.settings.TutorialRef);
             dialougeUI = UIManager.Open<DialougeUI>(UIManager.RenderSpace.Camera, Vector3.zero);
+            dialougeUI.OnCompleted += StartEvent;
             dialougeUI.Play(dialouge);
-            RegisterInput();
 
             await eventCompletionSource.Task;
         }
 
-        private void OnDestroy()
+        private void StartEvent()
         {
-            UnregisterInput();
+            // 이벤트 시작
+            dialougeUI.Close();
+            panelUI.PlayDitherRevealAsync(() => StartEventInternal().Forget()).Forget();
 
             eventCompletionSource?.TrySetResult();
         }
 
-        private void OnPlayDialouge(InputAction.CallbackContext context)
+        private async UniTask StartEventInternal()
         {
-            if (dialougeUI == null || dialouge == null) return;
-
-            // 현재 클릭으로 더 이상 출력할 문장이 없다고 확인.
-            // 다이얼로그의 이벤트로 넘어감.
-            if (!dialougeUI.Play(dialouge))
-            {
-                UnregisterInput();
-                dialougeUI.Close();
-                panelUI.PlayDitherRevealAsync(() =>
-                {
-                    panelUI.Close();
-                    RequestSpawn().Forget();
-                }).Forget();
-
-                eventCompletionSource?.TrySetResult();
-            }
-        }
-
-        private void RegisterInput()
-        {
-            InputManager.InputMappingContext.UI.Submit.performed -= OnPlayDialouge;
-            InputManager.InputMappingContext.UI.Submit.performed += OnPlayDialouge;
-        }
-
-        private void UnregisterInput()
-        {
-            InputManager.InputMappingContext.UI.Submit.performed -= OnPlayDialouge;
-        }
-
-        private async UniTask RequestSpawn()
-        {
-            var mapData = ResourceManager.GetResource<MapData>(tutorialMapDataRef);
+            // 기존 띄워진 UI 제거
+            panelUI.Close();
 
             // 맵 스폰
+            var mapData = ResourceManager.GetResource<MapData>(tutorialMapDataRef);
             WorldManager.SpawnTiles(mapData);
 
             await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
 
-            // 플레이어 스폰
+            // 크리쳐 스폰
+            var cheshireData = ResourceManager.GetResource<CreatureData>(cheshireDataRef);
             WorldManager.SpawnPlayer(Vector3Int.zero);
+            WorldManager.SpawnNPC(cheshireData, new Vector3Int(-1, 0, 0));
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
+
+            // 대화 시작
+            conversation = DialogueManager.Load(conversastionRef);
+            conversationUI = UIManager.OpenStretch<ConversationUI>(UIManager.RenderSpace.Overlay);
+            conversationUI.Play(conversation);
+            conversationUI.OnCompleted += conversationUI.Close;
         }
     }
 }

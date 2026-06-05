@@ -22,6 +22,8 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private Dictionary<Vector3Int, TileIndicator> tileIndicators = new();
 
+        [SerializeField, ReadOnly] private WorldCameraController worldCam = null;
+
 
         public static WorldManagerSettingsData Settings => settings;
 
@@ -39,6 +41,7 @@ namespace TRPG.Runtime
             tiles = new Dictionary<Vector3Int, TileController>();
             creatures = new Dictionary<int, CreatureController>();
             tileIndicators = new Dictionary<Vector3Int, TileIndicator>();
+            worldCam = Camera.main.GetComponent<WorldCameraController>();
         }
 
         /// <summary>
@@ -155,6 +158,14 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// 지정 CellPos에 NPC를 생성하고 월드 점유 목록에 등록합니다.
+        /// </summary>
+        public static void SpawnNPC(CreatureData npcData, Vector3Int cellPos)
+        {
+            GetInstance().SpawnNPCInternal(npcData, cellPos);
+        }
+
+        /// <summary>
         /// 지정 CellPos에 플레이어를 생성하고 월드 점유 목록에 등록합니다.
         /// </summary>
         public static void SpawnPlayer(Vector3Int cellPos)
@@ -168,15 +179,6 @@ namespace TRPG.Runtime
         public static void Despawn(int instanceId)
         {
             GetInstance().DespawnInternal(instanceId);
-        }
-
-        /// <summary>
-        /// cellPos에 해당하는 타일을 제거하고 월드 점유 목록에서 해제합니다.
-        /// </summary>
-        /// <param name="cellPos"></param>
-        public static void Despawn(Vector3Int cellPos)
-        {
-
         }
 
         /// <summary>

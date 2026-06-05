@@ -1,4 +1,4 @@
-Shader "TRPG/UI/DiagonalDitherWipe"
+Shader "Project/DiagonalDitherWipe"
 {
     Properties
     {

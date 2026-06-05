@@ -50,3 +50,15 @@ MonoBehaviour:
     m_SubObjectType: 
     m_SubObjectGUID: 
     m_EditorAssetChanged: 0
+  cheshireDataRef:
+    m_AssetGUID: 3daba66d337ebcb42801fae76c748eb9
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  conversastionRef:
+    m_AssetGUID: adc83df47d58f2948882b23fd547814d
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
