@@ -31,9 +31,13 @@ namespace TRPG.Runtime
 
         private void Update()
         {
-            if (Keyboard.current == null || !Keyboard.current.spaceKey.wasPressedThisFrame) return;
-
-            OnClick?.Invoke();
+            if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame ||
+                Mouse.current.leftButton.wasPressedThisFrame ||
+                Mouse.current.rightButton.wasPressedThisFrame ||
+                Mouse.current.middleButton.wasPressedThisFrame)
+            {
+                OnClick?.Invoke();
+            }
         }
 
         private void OnEnable()
