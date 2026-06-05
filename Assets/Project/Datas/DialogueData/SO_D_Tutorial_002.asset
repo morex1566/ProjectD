@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DialogueData
   Id: D_Tutorial_002
   Speaker: "\uCCB4\uC154"
-  Description: "\uD6C4\uD6D7. \uC5ED\uC2DC \uB0B4\uAC00 \uC18C\uD658\uD55C \uD328\uBC00\uB9AC\uC5B4\uC57C."
+  Description: "\uD5DB! \uBC8C\uC368 \uC5EC\uAE30\uAE4C\uC9C0 \uCAD2\uC544\uC654\uC5B4!!!\\n\uC774\uB807\uAC8C
+    \uB41C \uC774\uC0C1!\\n\uC2AC\uB77C\uC784! \uBB3C\uC5B4!\\n\u2026\\n\uD30C\u2026\uD30C\uC774\uD305?"
   NextDialogueId: null
   EventId: null

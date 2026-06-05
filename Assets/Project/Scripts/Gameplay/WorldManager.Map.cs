@@ -13,16 +13,22 @@ namespace TRPG.Runtime
             if (mapData == null) return;
 
             Transform root = EnsureMapRoot();
-            int topRowCellY = GetTopRowCellY(mapData.Tiles);
             foreach (MapTileData tileData in mapData.Tiles)
             {
                 if (tileData.TilePb == null) continue;
 
                 TileController tile = Instantiate(tileData.TilePb, CellPosToWorldPos(tileData.CellPos), Quaternion.identity, root);
 
-                ApplyTileOrderInLayer(tile, topRowCellY - tileData.CellPos.y);
                 tiles.Add(tileData.CellPos, tile);
                 tile.CellPos = tileData.CellPos;
+            }
+
+            int topRowCellY = GetTopRowCellY(tiles.Keys);
+            foreach (KeyValuePair<Vector3Int, TileController> pair in tiles)
+            {
+                if (pair.Value == null) continue;
+
+                ApplyTileOrderInLayer(pair.Value, topRowCellY - pair.Key.y);
             }
 
             OnMapLoaded?.Invoke();
@@ -239,17 +245,23 @@ namespace TRPG.Runtime
         /// <summary>
         /// 타일 밑 음영이 행 순서대로 가려지도록 최상단 행의 CellPos y를 찾습니다.
         /// </summary>
-        private static int GetTopRowCellY(IReadOnlyList<MapTileData> tileDataList)
+        private static int GetTopRowCellY(IEnumerable<Vector3Int> cellPosList)
         {
-            if (tileDataList.Count == 0) return 0;
-
-            int topRowCellY = tileDataList[0].CellPos.y;
-            foreach (MapTileData tileData in tileDataList)
+            bool hasCellPos = false;
+            int topRowCellY = 0;
+            foreach (Vector3Int cellPos in cellPosList)
             {
-                topRowCellY = Mathf.Max(topRowCellY, tileData.CellPos.y);
+                if (!hasCellPos)
+                {
+                    topRowCellY = cellPos.y;
+                    hasCellPos = true;
+                    continue;
+                }
+
+                topRowCellY = Mathf.Max(topRowCellY, cellPos.y);
             }
 
-            return topRowCellY;
+            return hasCellPos ? topRowCellY : 0;
         }
 
         /// <summary>

@@ -13,17 +13,23 @@ MonoBehaviour:
   m_Name: SO_Map_Tutorial_00
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MapData
   tiles:
+  - cellPos: {x: -2, y: -1, z: 0}
+    tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
   - cellPos: {x: -1, y: -1, z: 0}
     tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
   - cellPos: {x: 0, y: -1, z: 0}
     tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
   - cellPos: {x: 1, y: -1, z: 0}
     tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
+  - cellPos: {x: -2, y: 0, z: 0}
+    tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
   - cellPos: {x: -1, y: 0, z: 0}
     tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
   - cellPos: {x: 0, y: 0, z: 0}
     tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
   - cellPos: {x: 1, y: 0, z: 0}
+    tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
+  - cellPos: {x: -2, y: 1, z: 0}
     tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
   - cellPos: {x: -1, y: 1, z: 0}
     tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}

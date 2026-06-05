@@ -8,10 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Project/Scenes/SCN_NonCombat.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
+  - enabled: 0
     path: Assets/Project/Scenes/SCN_Main.unity
     guid: 4e10f31f2e387e0479f6a7b1ad760fed
-  - enabled: 0
+  - enabled: 1
     path: Assets/Project/Scenes/SCN_Title.unity
     guid: cb6e4f4cf60c632469c3ce246c447bca
   m_configObjects:

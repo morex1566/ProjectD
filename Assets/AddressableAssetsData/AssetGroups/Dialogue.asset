@@ -15,6 +15,12 @@ MonoBehaviour:
   m_GroupName: Dialogue
   m_GUID: 9c43bec601aae6c4d8f31b56a5284a38
   m_SerializeEntries:
+  - m_GUID: 14d706780e574a5499377bb6fe5b4c7c
+    m_Address: SO_D_Tutorial_002
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 891000c716e2c6f469c68c0f26419be5
     m_Address: SO_D_Tutorial_000
     m_ReadOnly: 0

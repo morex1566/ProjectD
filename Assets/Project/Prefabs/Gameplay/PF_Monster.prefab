@@ -422,7 +422,7 @@ MonoBehaviour:
   loopType: 0
   loops: 1
   id: 
-  isRelative: 0
+  isRelative: 1
   isFrom: 1
   isIndependentUpdate: 0
   autoKill: 1

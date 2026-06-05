@@ -177,7 +177,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 188c50bfc1daae54fba6a543eec5e18e, type: 3}
-  m_Color: {r: 0.39607844, g: 0.30980393, b: 0.46666667, a: 1}
+  m_Color: {r: 0.21968667, g: 0.25058883, b: 0.4566037, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -462,6 +462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b0fa93acebabc44ac7686e791cc0ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.TileController
+  spriter: {fileID: 0}
   moveAnim: {fileID: 2463093531532728559}
   fadeAnim: {fileID: 5233769098555134928}
   moveAnimFromOffsetRange:
@@ -470,3 +471,4 @@ MonoBehaviour:
   moveAnimDurationRange:
     Min: 0.6
     Max: 0.8
+  CellPos: {x: 0, y: 0, z: 0}

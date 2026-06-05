@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -7,6 +8,12 @@ namespace TRPG.Runtime
         [Header(nameof(WorldCameraController) + ".Runtime")]
 
         [SerializeField, ReadOnly] private Camera cam;
+
+        [SerializeField] private Ease cameraMoveEase = Ease.OutCubic;
+
+        [SerializeField] private float cameraMoveDuration = 0.8f;
+
+        private Tween cameraMoveTween;
 
         private void Awake()
         {
@@ -23,11 +30,6 @@ namespace TRPG.Runtime
             WorldManager.OnMapLoaded -= LookAt;
         }
 
-        private void Update()
-        {
-
-        }
-
         /// <summary>
         /// world manager에서 맵이 로드되면 카메라가 맵의 정중앙을 바라봅니다.
         /// </summary>
@@ -36,11 +38,21 @@ namespace TRPG.Runtime
             if (!WorldManager.TryGetMapCenterWorldPos(out Vector3 mapCenterWorldPos)) return;
 
             // 2D 카메라 깊이는 유지하고 맵 중심에 해당하는 x, y만 맞춥니다.
-            transform.position = new Vector3(mapCenterWorldPos.x, mapCenterWorldPos.y, transform.position.z);
+            Vector3 targetPos = new Vector3(mapCenterWorldPos.x, mapCenterWorldPos.y, transform.position.z);
+
+            cameraMoveTween = transform.DOMove(targetPos, cameraMoveDuration).SetEase(cameraMoveEase);
 
             // 화면에 맵 전체가 보이게 할 수 있도록
             int rowCount = WorldManager.GetMapRowCount();
             cam.orthographicSize = rowCount * 0.6f;
+        }
+
+        /// <summary>
+        /// 카메라가 지정된 위치를 정중앙으로 바라보게 합니다.
+        /// </summary>
+        public void LookAt(Vector3 targetPos)
+        {
+            cameraMoveTween = transform.DOMove(targetPos, cameraMoveDuration).SetEase(cameraMoveEase);
         }
     }
 }

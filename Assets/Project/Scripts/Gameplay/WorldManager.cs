@@ -33,6 +33,8 @@ namespace TRPG.Runtime
 
         public static Dictionary<int, CreatureController> Creatures => GetInstance().creatures;
 
+        public static WorldCameraController WorldCam => GetInstance().worldCam;
+
 
         private void Awake()
         {

@@ -13,26 +13,48 @@ MonoBehaviour:
   m_Name: SO_Map_Tutorial_01
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MapData
   tiles:
-  - cellPos: {x: -1, y: -1, z: 0}
-    tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
-  - cellPos: {x: 0, y: -1, z: 0}
+  - cellPos: {x: 2, y: -1, z: 0}
     tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
-  - cellPos: {x: 1, y: -1, z: 0}
+  - cellPos: {x: 2, y: 0, z: 0}
     tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
-  - cellPos: {x: -1, y: 0, z: 0}
+  - cellPos: {x: 2, y: 1, z: 0}
     tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
-  - cellPos: {x: 0, y: 0, z: 0}
+  - cellPos: {x: -2, y: 2, z: 0}
     tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
-  - cellPos: {x: 1, y: 0, z: 0}
+  - cellPos: {x: -1, y: 2, z: 0}
     tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
-  - cellPos: {x: -1, y: 1, z: 0}
+  - cellPos: {x: 0, y: 2, z: 0}
     tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
-  - cellPos: {x: 0, y: 1, z: 0}
+  - cellPos: {x: 1, y: 2, z: 0}
     tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
-  - cellPos: {x: 1, y: 1, z: 0}
+  - cellPos: {x: 2, y: 2, z: 0}
     tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
+  - cellPos: {x: -2, y: 3, z: 0}
+    tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
+  - cellPos: {x: -1, y: 3, z: 0}
+    tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
+  - cellPos: {x: 0, y: 3, z: 0}
+    tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
+  - cellPos: {x: 1, y: 3, z: 0}
+    tilePb: {fileID: 1360647725469799825, guid: faaa4d4efa1ca3f46b431a07f7569b41, type: 3}
+  - cellPos: {x: 2, y: 3, z: 0}
+    tilePb: {fileID: 4041199613205893792, guid: ea7d8e67efb1284439bd8729a21c8c2d, type: 3}
   monsterSpawns:
-  - cellPos: {x: 0, y: 1, z: 0}
+  - cellPos: {x: -2, y: 3, z: 0}
+    monsterDataReference:
+      m_AssetGUID: 61c8a7f252422fc4492ff29b4cb7034a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 0
+  - cellPos: {x: 0, y: 3, z: 0}
+    monsterDataReference:
+      m_AssetGUID: ede14b99412d78d45b614570112f1e7d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 1
+  - cellPos: {x: 2, y: 3, z: 0}
     monsterDataReference:
       m_AssetGUID: 61c8a7f252422fc4492ff29b4cb7034a
       m_SubObjectName: 

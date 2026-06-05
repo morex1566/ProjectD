@@ -44,8 +44,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 855163747e2970c46be5545d7f3cfd80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.TutorialEvent
-  tutorialMapDataRef:
+  tutorialMeetingMapDataRef:
     m_AssetGUID: 07845caf2f4c7c949a0e6cdf514ecd71
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  tutorialCombatMapDataRef:
+    m_AssetGUID: b037aa227efd46939d87a6e1e1facefc
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 
@@ -56,8 +62,14 @@ MonoBehaviour:
     m_SubObjectType: 
     m_SubObjectGUID: 
     m_EditorAssetChanged: 0
-  conversastionRef:
+  tutorialMeetCheshireRef:
     m_AssetGUID: adc83df47d58f2948882b23fd547814d
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  tutorialBeforeCombatStartRef:
+    m_AssetGUID: 14d706780e574a5499377bb6fe5b4c7c
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 
