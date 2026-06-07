@@ -19,6 +19,8 @@ namespace TRPG.Runtime
 
         public new MonsterModel Model => base.Model as MonsterModel;
 
+        public bool CanExecuteAIMove => !HasActionFlag(ActionFlag.Moving | ActionFlag.Attacking);
+
 
         private void Reset()
         {
@@ -54,6 +56,29 @@ namespace TRPG.Runtime
             moveAnim.endValueV3 = moveAnimFromOffsetRange.Random();
             moveAnim.duration = moveAnimDurationRange.Random();
             moveAnim.DORestart(true);
+        }
+
+        /// <summary>
+        /// MonsterAI가 결정한 한 수를 실제 월드 액션으로 실행합니다.
+        /// </summary>
+        public bool TryExecuteAIMove(AIMove move)
+        {
+            if (move.Actor != this) return false;
+
+            if (!CanExecuteAIMove) return false;
+
+            if (!WorldManager.TryGetMapWorldPos(move.To, out Vector3 targetWorldPos)) return false;
+
+            if (move.IsAttack)
+            {
+                Attack(targetWorldPos, move.To, move.Target);
+            }
+            else
+            {
+                Move(targetWorldPos, move.To);
+            }
+
+            return true;
         }
     }
 }

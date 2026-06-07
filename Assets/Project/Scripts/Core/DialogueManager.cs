@@ -45,6 +45,12 @@ namespace TRPG.Runtime
         public static Dialouge Load(AssetReferenceT<DialogueData> dialogueData)
         {
             DialogueData data = ResourceManager.GetResource<DialogueData>(dialogueData);
+            if (data == null)
+            {
+                object runtimeKey = dialogueData != null && dialogueData.RuntimeKeyIsValid() ? dialogueData.RuntimeKey : "Invalid";
+                Debug.LogError($"[{nameof(DialogueManager)}] DialogueData를 찾지 못했습니다. Addressables 선로드 상태를 확인하세요. RuntimeKey: {runtimeKey}");
+                return null;
+            }
 
             // "\n"은 다음 대화 페이지로 넘기고, "\b"는 같은 페이지 안의 실제 줄바꿈으로 변환합니다.
             string description = (data.Description ?? string.Empty).Replace(DialogueLineBreakMarker, Environment.NewLine);

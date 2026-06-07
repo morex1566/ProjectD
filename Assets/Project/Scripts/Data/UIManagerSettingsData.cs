@@ -25,6 +25,10 @@ namespace TRPG.Runtime
 
         [SerializeField] private ConversationUI conversationUIPf;
 
+        [SerializeField] private TurnUI turnUIPf;
+
+        [SerializeField] private TurnStateUI turnStateUIPf;
+
 
 
         private readonly Dictionary<Type, UIBase> uiPbs = new();

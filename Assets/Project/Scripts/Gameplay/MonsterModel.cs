@@ -8,7 +8,7 @@ namespace TRPG.Runtime
     [RequireComponent(typeof(MonsterController))]
     public class MonsterModel : CreatureModel
     {
-        public CreatureData Data => data as MonsterData;
+        public CreatureData Data => data;
 
         public override void Init(Vector3Int cellPos, CreatureData data)
         {

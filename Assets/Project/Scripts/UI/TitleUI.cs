@@ -3,6 +3,7 @@ using DG.Tweening;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 namespace TRPG.Runtime
 {
@@ -10,8 +11,15 @@ namespace TRPG.Runtime
     {
         [SerializeField] private DOTweenAnimation[] anims;
 
+        [SerializeField] private TMP_Text messageText = null;
 
         public event Action OnClick;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            Bind();
+        }
 
 
         private void Reset()
@@ -27,14 +35,12 @@ namespace TRPG.Runtime
         private void Bind()
         {
             anims = GetComponentsInChildren<DOTweenAnimation>(true);
+            messageText = GetComponentInChildren<TMP_Text>(true);
         }
 
         private void Update()
         {
-            if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame ||
-                Mouse.current.leftButton.wasPressedThisFrame ||
-                Mouse.current.rightButton.wasPressedThisFrame ||
-                Mouse.current.middleButton.wasPressedThisFrame)
+            if (HasStartInput())
             {
                 OnClick?.Invoke();
             }
@@ -61,6 +67,16 @@ namespace TRPG.Runtime
             await DOTweenAnimationEx.WaitForAnimationsAsync(anims);
 
             onCompleted?.Invoke();
+        }
+
+        /// <summary>
+        /// 타이틀 메시지를 외부 이벤트 문구로 교체합니다.
+        /// </summary>
+        public void SetMessage(string message)
+        {
+            if (messageText == null) return;
+
+            messageText.text = message;
         }
 
         /// <summary>
@@ -95,6 +111,24 @@ namespace TRPG.Runtime
             // 열기 애니메이션은 From 값에서 현재 프리팹 배치값으로 올라오며 나타납니다.
             anim.isFrom = true;
             anim.RewindThenRecreateTweenAndPlay();
+        }
+
+        private bool HasStartInput()
+        {
+            return (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame) ||
+                   HasPointerInput();
+        }
+
+        private bool HasPointerInput()
+        {
+            bool isMousePressed = Mouse.current != null &&
+                                  (Mouse.current.leftButton.wasPressedThisFrame ||
+                                   Mouse.current.rightButton.wasPressedThisFrame ||
+                                   Mouse.current.middleButton.wasPressedThisFrame);
+            bool isTouchPressed = Touchscreen.current != null &&
+                                  Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
+
+            return isMousePressed || isTouchPressed;
         }
 
     }

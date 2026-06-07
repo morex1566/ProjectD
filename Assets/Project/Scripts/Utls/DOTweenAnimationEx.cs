@@ -14,6 +14,30 @@ namespace TRPG.Runtime
             await WaitForAnimationsAsync(animation);
         }
 
+        public static async UniTask PlayReverseAsync(DOTweenAnimation animation)
+        {
+            PlayReverse(animation);
+
+            await WaitForAnimationsAsync(animation);
+        }
+
+        public static void PlayReverse(DOTweenAnimation animation)
+        {
+            if (animation == null) return;
+
+            bool originIsFrom = animation.isFrom;
+            animation.isFrom = !originIsFrom;
+
+            try
+            {
+                Restart(animation);
+            }
+            finally
+            {
+                animation.isFrom = originIsFrom;
+            }
+        }
+
         public static void Restart(DOTweenAnimation animation)
         {
             if (animation == null) return;

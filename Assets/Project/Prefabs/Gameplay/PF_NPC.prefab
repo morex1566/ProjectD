@@ -203,6 +203,7 @@ GameObject:
   - component: {fileID: 8661768994742792519}
   - component: {fileID: 5985348329069664683}
   - component: {fileID: 3246640225871140410}
+  - component: {fileID: 937022548237303321}
   m_Layer: 12
   m_Name: Sprite
   m_TagString: Untagged
@@ -306,6 +307,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &937022548237303321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8440747369837178155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40102d0802b943846a49b2f2fea8792d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureAnimEventHandler
+  owner: {fileID: 513064846884434864}
 --- !u!1 &8894267875024610711
 GameObject:
   m_ObjectHideFlags: 0

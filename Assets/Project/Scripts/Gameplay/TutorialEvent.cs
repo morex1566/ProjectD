@@ -31,6 +31,10 @@ namespace TRPG.Runtime
 
         private PanelUI panelUI;
 
+        private NPCController cheshire;
+
+        private PlayerController player;
+
         public override async UniTask ExecuteAsync()
         {
             eventCompletionSource = new UniTaskCompletionSource();
@@ -45,8 +49,28 @@ namespace TRPG.Runtime
             // 화면 원래대로?
             UIManager.SetBackgroundColor();
 
+            if (DialogueManager.settings == null)
+            {
+                DialogueManager.Init();
+            }
+
+            if (DialogueManager.settings == null)
+            {
+                Debug.LogError($"[{nameof(TutorialEvent)}] SO_DialogueManagerSettings를 찾지 못했습니다.");
+                panelUI.Close();
+                eventCompletionSource?.TrySetResult();
+                return;
+            }
+
             // 튜토리얼 다이얼로그 UI 오픈
             dialouge = DialogueManager.Load(DialogueManager.settings.TutorialRef);
+            if (dialouge == null)
+            {
+                panelUI.Close();
+                eventCompletionSource?.TrySetResult();
+                return;
+            }
+
             dialougeUI = UIManager.Open<DialougeUI>(UIManager.RenderSpace.Camera, Vector3.zero);
             dialougeUI.OnCompleted += StartMeetEvt;
             dialougeUI.OnCompleted += panelUI.Close;
@@ -74,8 +98,8 @@ namespace TRPG.Runtime
 
             // 플레이어랑 NPC 스폰
             var cheshireData = ResourceManager.GetResource<CreatureData>(cheshireDataRef);
-            WorldManager.SpawnPlayer(Vector3Int.zero);
-            WorldManager.SpawnNPC(cheshireData, new Vector3Int(-2, 0, 0));
+            player = WorldManager.SpawnPlayer(Vector3Int.zero);
+            cheshire = WorldManager.SpawnNPC(cheshireData, new Vector3Int(-2, 0, 0)) as NPCController;
 
             await UniTask.Delay(TimeSpan.FromSeconds(0.8f));
 
@@ -108,6 +132,8 @@ namespace TRPG.Runtime
             beforeCombatStartDialogueUI = UIManager.OpenStretch<ConversationUI>(UIManager.RenderSpace.Overlay);
             beforeCombatStartDialogueUI.Play(beforeCombatStartDialogue);
             beforeCombatStartDialogueUI.OnCompleted += beforeCombatStartDialogueUI.Close;
+            beforeCombatStartDialogueUI.OnCompleted += cheshire.PlayDespawnAnimEvt;
+            beforeCombatStartDialogueUI.OnCompleted += WorldManager.StartCombatTurns;
         }
     }
 }

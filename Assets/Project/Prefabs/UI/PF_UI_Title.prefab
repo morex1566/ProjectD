@@ -308,7 +308,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 280, y: 32}
+  m_SizeDelta: {x: 400, y: 32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &9114265981720905673
 MonoBehaviour:
@@ -323,6 +323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.TitleUI
   anims: []
+  messageText: {fileID: 3931017007083169524}
 --- !u!1001 &1740361613494703758
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -428,6 +429,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bddfc94eec0c68c41bf5a7c67026799c, type: 3}
+--- !u!114 &3931017007083169524 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3362718364842979450, guid: bddfc94eec0c68c41bf5a7c67026799c, type: 3}
+  m_PrefabInstance: {fileID: 1740361613494703758}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!224 &8690372907694605328 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6970844033371542174, guid: bddfc94eec0c68c41bf5a7c67026799c, type: 3}

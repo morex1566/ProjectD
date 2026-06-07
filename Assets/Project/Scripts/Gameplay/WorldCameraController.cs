@@ -15,6 +15,8 @@ namespace TRPG.Runtime
 
         private Tween cameraMoveTween;
 
+        private Tween cameraZoomTween;
+
         private void Awake()
         {
             cam = GetComponent<Camera>();
@@ -53,6 +55,17 @@ namespace TRPG.Runtime
         public void LookAt(Vector3 targetPos)
         {
             cameraMoveTween = transform.DOMove(targetPos, cameraMoveDuration).SetEase(cameraMoveEase);
+        }
+
+        /// <summary>
+        /// 2D 월드 카메라의 orthographic size를 지정 크기로 보간합니다.
+        /// </summary>
+        public void Zoom(float orthographicSize, float duration)
+        {
+            if (cam == null) return;
+
+            cameraZoomTween?.Kill();
+            cameraZoomTween = cam.DOOrthoSize(orthographicSize, duration).SetEase(cameraMoveEase);
         }
     }
 }

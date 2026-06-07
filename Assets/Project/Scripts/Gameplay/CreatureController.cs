@@ -32,9 +32,6 @@ namespace TRPG.Runtime
 
         [SerializeField] protected SpriteRenderer outliner = null;
 
-        [SerializeField] protected PixelBreaker breaker = null;
-
-
         [SerializeField] private Transform statsPivot;
 
         [SerializeField] private Color outlineColor = Color.green;
@@ -45,6 +42,14 @@ namespace TRPG.Runtime
         /// 목표 타일 위에 살짝 띄운 도착 위치 오프셋
         /// </summary>
         [SerializeField] private Vector3 preLandingOffset = new Vector3(0f, 0.5f, 0f);
+
+        [SerializeField] private float attackReadyDelay = 0.8f;
+
+        [SerializeField] private float playerDeathReadyDelay = 1.5f;
+
+        [SerializeField] private float playerDeathCameraSize = 2f;
+
+        [SerializeField] private float playerDeathCameraZoomDuration = 0.6f;
 
         [Header(nameof(CreatureController) + ".Runtime")]
 
@@ -69,6 +74,8 @@ namespace TRPG.Runtime
         public bool IsSelected { get; set; } = false;
 
         public CreatureModel Model => model;
+
+        public bool IsActing => HasActionFlag(ActionFlag.Moving | ActionFlag.Attacking);
 
         private CreatureMotionSettingsData BattleMotionSettings => Model != null ? Model.BattleMotionSettings : null;
 
@@ -123,6 +130,11 @@ namespace TRPG.Runtime
         public void SetSelected(bool isSelected)
         {
             IsSelected = isSelected;
+        }
+
+        public void Despawn()
+        {
+            WorldManager.Despawn(GetInstanceID());
         }
 
         /// <summary>
@@ -249,12 +261,14 @@ namespace TRPG.Runtime
             transform.rotation = targetWorldRot;
         }
 
-        public void Attack(Vector3 battleCellWorldPos, Vector3Int battleCellPos, MonsterController targetController)
+        public void Attack(Vector3 battleCellWorldPos, Vector3Int battleCellPos, CreatureController targetController)
         {
+            actionFlags |= ActionFlag.Attacking;
+
             // 타겟도 같은 전투 CellPos 기준으로 방어 이동을 시작합니다.
             targetController.Defend(battleCellWorldPos, battleCellPos, this);
 
-            StartCoroutine(AttackCo(battleCellWorldPos, battleCellPos, BattleMoveDelay, BattleStompDelay, CollideDelay));
+            StartCoroutine(AttackCo(battleCellWorldPos, battleCellPos, targetController, BattleMoveDelay, BattleStompDelay, CollideDelay));
             StartCoroutine(RotCo(Quaternion.identity));
         }
 
@@ -266,20 +280,43 @@ namespace TRPG.Runtime
         /// <summary>
         /// 공격/방어 공통 이동/충돌 연출
         /// </summary>
-        public IEnumerator AttackCo(Vector3 battleCellWorldPos, Vector3Int battleCellPos, float moveDelay, float stompDelay, float collideDelay)
+        public IEnumerator AttackCo(Vector3 battleCellWorldPos, Vector3Int battleCellPos, CreatureController targetController, float moveDelay, float stompDelay, float collideDelay)
         {
             // 공격자는 전투 CellPos의 한쪽으로 이동합니다.
             Vector3 battleStartCellWorldPos = battleCellWorldPos - WorldManager.TileSize / 2;
             Vector3 battleEndCellWorldPos = battleCellWorldPos;
+            bool isPlayerDeath = targetController is PlayerController;
 
             // 전투 준비 위치로 이동해 양쪽이 잠깐 벌어지는 구도를 만듭니다.
             yield return MoveDampDirectCo(battleStartCellWorldPos, battleCellPos, moveDelay, stompDelay);
 
-            // 대기
-            yield return new WaitForSeconds(collideDelay);
+            if (isPlayerDeath)
+            {
+                WorldManager.WorldCam?.Zoom(playerDeathCameraSize, playerDeathCameraZoomDuration);
+            }
+
+            // 내려찍기 직전 대기 시간을 길게 가져가 타격 모션을 읽을 수 있게 합니다.
+            float readyDelay = collideDelay + attackReadyDelay;
+            if (isPlayerDeath)
+            {
+                readyDelay += playerDeathReadyDelay;
+            }
+            yield return new WaitForSeconds(readyDelay);
 
             // 전투 시작, 양쪽에서 서로 부딪힘
-            yield return MoveAccelerateDirectCo(battleEndCellWorldPos, battleCellPos, moveDelay, stompDelay);
+            yield return MoveAccelerateDirectCo(battleEndCellWorldPos, battleCellPos, moveDelay, stompDelay * 1.5f);
+
+            if (targetController != null)
+            {
+                targetController.Despawn();
+            }
+
+            actionFlags &= ~ActionFlag.Attacking;
+
+            if (isPlayerDeath)
+            {
+                WorldManager.ShowGameOverRestartUI();
+            }
         }
 
         public IEnumerator DefendCo(Vector3 battleCellWorldPos, Vector3Int battleCellPos, float moveDelay, float stompDelay, float collideDelay)
@@ -287,8 +324,6 @@ namespace TRPG.Runtime
             // 방어자는 공격자와 반대 방향의 전투 CellPos 위치로 이동합니다.
             Vector3 battleStartCellWorldPos = battleCellWorldPos + WorldManager.TileSize / 2;
             Vector3 battleEndCellWorldPos = battleCellWorldPos;
-            Vector3 hitDirection = battleStartCellWorldPos - battleEndCellWorldPos;
-
             // 전투 준비 위치로 이동해 양쪽이 잠깐 벌어지는 구도를 만듭니다.
             yield return MoveDampDirectCo(battleStartCellWorldPos, battleCellPos, moveDelay, stompDelay);
 
@@ -296,9 +331,7 @@ namespace TRPG.Runtime
             yield return new WaitForSeconds(collideDelay);
 
             // 전투 시작, 양쪽에서 서로 부딪힘
-            yield return MoveAccelerateDirectCo(battleEndCellWorldPos, battleCellPos, moveDelay, stompDelay);
-
-            breaker.Break(hitDirection);
+            yield return MoveAccelerateDirectCo(battleEndCellWorldPos, battleCellPos, moveDelay, stompDelay * 1.5f);
         }
 
         protected bool HasActionFlag(ActionFlag flag)

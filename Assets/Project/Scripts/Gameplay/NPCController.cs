@@ -15,9 +15,14 @@ namespace TRPG.Runtime
         /// <summary>
         /// NPC 스폰 상태로 전환합니다.
         /// </summary>
-        private void PlaySpawnAnim()
+        public void PlaySpawnAnim()
         {
             animator.SetTrigger(UnityConstant.Animator.Parameters.AC_Gameplay_Creature.Trigger.OnSpawn);
+        }
+
+        public void PlayDespawnAnimEvt()
+        {
+            animator.SetTrigger(UnityConstant.Animator.Parameters.AC_Gameplay_Creature.Trigger.OnDespawn);
         }
     }
 }

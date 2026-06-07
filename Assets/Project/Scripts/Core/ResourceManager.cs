@@ -27,16 +27,27 @@ namespace TRPG.Runtime
         // 같은 label이 로드 중이면 기존 작업을 공유해 Addressables 중복 호출을 막습니다.
         private static readonly Dictionary<string, AsyncLazy<IList<Object>>> pendingLoadTasks = new();
 
+        private static AsyncLazy<AsyncUnit> initTask;
+
 
 
 
         /// <summary>
-        /// 리소스 매니저 인스턴스와 설정 데이터를 준비합니다.
+        /// 리소스 매니저 인스턴스와 설정 데이터, Core Addressables 리소스를 준비합니다.
         /// </summary>
-        public static void Init()
+        public static async UniTask Init()
+        {
+            initTask ??= new AsyncLazy<AsyncUnit>(InitAsync);
+            await initTask;
+        }
+
+        private static async UniTask<AsyncUnit> InitAsync()
         {
             GetInstance();
             settings = Resources.Load<ResourceManagerSettingsData>("SO_ResourceManagerSettings");
+            await LoadAsync(UnityConstant.Addressable.Label.Core);
+
+            return AsyncUnit.Default;
         }
 
         /// <summary>

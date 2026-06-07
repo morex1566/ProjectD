@@ -27,7 +27,6 @@ namespace TRPG.Runtime
                 return;
             }
 
-            loading.AddLoadingTask(LoadCoreResourceAsync);
             loading.onLoadingCompleted.AddListener(UIManager.SetBackgroundColor);
             loading.onLoadingExitAnimCompleted.AddListener(OpenTitleUI);
             loading.LoadAsync().Forget();
@@ -40,17 +39,6 @@ namespace TRPG.Runtime
             eventCompletionSource?.TrySetResult();
         }
 
-        private async UniTask LoadCoreResourceAsync()
-        {
-            try
-            {
-                await ResourceManager.LoadAsync(UnityConstant.Addressable.Label.Core);
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError(exception);
-            }
-        }
 
         private void OpenTitleUI()
         {

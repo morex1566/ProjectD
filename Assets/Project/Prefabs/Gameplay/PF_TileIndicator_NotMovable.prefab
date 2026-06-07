@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 3647147568370030848}
   - component: {fileID: 8341206448957022298}
   m_Layer: 0
-  m_Name: PF_Tile_NotMovable
+  m_Name: PF_TileIndicator_NotMovable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -35,9 +35,19 @@ namespace TRPG.Runtime
             return GetInstance().PlayInternal<T>();
         }
 
+        /// <summary>
+        /// 넘겨받은 이벤트 인스턴스를 복제하고 실행합니다.
+        /// </summary>
+        public static UniTask Trigger<T>(T evt) where T : Event
+        {
+            return GetInstance().PlayInternal<T>(evt);
+        }
+
         public static void Close(int instanceId)
         {
-            Destroy(eventInsts[instanceId]);
+            if (!eventInsts.TryGetValue(instanceId, out Event eventInst)) return;
+
+            Destroy(eventInst.gameObject);
             eventInsts.Remove(instanceId);
         }
 
@@ -75,6 +85,35 @@ namespace TRPG.Runtime
             {
                 Debug.LogError(exception);
                 Close(eventObj.GetInstanceID());
+            }
+        }
+
+        private async UniTask PlayInternal<T>(T evt) where T : Event
+        {
+            if (evt == null)
+            {
+                Debug.LogError($"[{nameof(EventManager)}] 실행할 이벤트 인스턴스가 없습니다.");
+                return;
+            }
+
+            T eventInst = Instantiate<T>(evt, transform);
+            if (eventInst == null)
+            {
+                Debug.LogError($"[{nameof(EventManager)}] {typeof(T).Name} 이벤트 인스턴스 생성에 실패했습니다.");
+                return;
+            }
+
+            int instanceId = eventInst.gameObject.GetInstanceID();
+            eventInsts.Add(instanceId, eventInst);
+
+            try
+            {
+                await eventInst.ExecuteAsync();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(exception);
+                Close(instanceId);
             }
         }
     }

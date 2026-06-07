@@ -15,17 +15,17 @@ namespace TRPG.Runtime
 
         [SerializeField] private CreatureController playerPb = null;
 
-        [SerializeField] private TileIndicator allyTileIndicatorPb = null;
+        [SerializeField] private TileIndicatorController allyTileIndicatorPb = null;
 
-        [SerializeField] private TileIndicator enemyTileIndicatorPb = null;
+        [SerializeField] private TileIndicatorController enemyTileIndicatorPb = null;
 
         public CreatureController MonsterPb => monsterPb;
 
-        public CreatureController PlayerPb => playerPb;
+        public CreatureController PlayerPf => playerPb;
 
-        public TileIndicator AllyTileIndicatorPb => allyTileIndicatorPb;
+        public TileIndicatorController AllyTileIndicatorPb => allyTileIndicatorPb;
 
-        public TileIndicator EnemyTileIndicatorPb => enemyTileIndicatorPb;
+        public TileIndicatorController EnemyTileIndicatorPb => enemyTileIndicatorPb;
     }
 
 #if UNITY_EDITOR

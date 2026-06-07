@@ -20,9 +20,11 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private Dictionary<int, CreatureController> creatures = new();
 
-        [SerializeField, ReadOnly] private Dictionary<Vector3Int, TileIndicator> tileIndicators = new();
+        [SerializeField, ReadOnly] private Dictionary<Vector3Int, TileIndicatorController> tileIndicators = new();
 
         [SerializeField, ReadOnly] private WorldCameraController worldCam = null;
+
+        private readonly MonsterAI monsterAI = new();
 
 
         public static WorldManagerSettingsData Settings => settings;
@@ -42,7 +44,7 @@ namespace TRPG.Runtime
 
             tiles = new Dictionary<Vector3Int, TileController>();
             creatures = new Dictionary<int, CreatureController>();
-            tileIndicators = new Dictionary<Vector3Int, TileIndicator>();
+            tileIndicators = new Dictionary<Vector3Int, TileIndicatorController>();
             worldCam = Camera.main.GetComponent<WorldCameraController>();
         }
 
@@ -152,6 +154,52 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// 현재 월드 상태에서 몬스터 AI가 실행할 한 수를 계산합니다.
+        /// </summary>
+        public static bool TryGetMonsterAIMove(out AIMove move)
+        {
+            return GetInstance().monsterAI.TryGetBestMove(Creatures, out move);
+        }
+
+        /// <summary>
+        /// 지정 몬스터가 현재 월드 상태에서 실행할 한 수를 계산합니다.
+        /// </summary>
+        public static bool TryGetMonsterAIMove(MonsterController monster, out AIMove move)
+        {
+            return GetInstance().monsterAI.TryGetBestMove(monster, Creatures, out move);
+        }
+
+        /// <summary>
+        /// 현재 월드 상태에서 몬스터 AI 한 턴을 실행합니다.
+        /// </summary>
+        public static bool TryExecuteMonsterAITurn()
+        {
+            return TryExecuteMonsterAITurn(out _);
+        }
+
+        /// <summary>
+        /// 현재 월드 상태에서 몬스터 AI 한 턴을 실행하고, 실행된 수를 반환합니다.
+        /// </summary>
+        public static bool TryExecuteMonsterAITurn(out AIMove move)
+        {
+            if (!TryGetMonsterAIMove(out move)) return false;
+
+            if (move.Actor is not MonsterController monster) return false;
+
+            return monster.TryExecuteAIMove(move);
+        }
+
+        /// <summary>
+        /// 지정 몬스터의 AI 한 수를 실행하고, 실행된 수를 반환합니다.
+        /// </summary>
+        public static bool TryExecuteMonsterAITurn(MonsterController monster, out AIMove move)
+        {
+            if (!TryGetMonsterAIMove(monster, out move)) return false;
+
+            return monster.TryExecuteAIMove(move);
+        }
+
+        /// <summary>
         /// 지정 CellPos에 몬스터를 생성하고 월드 점유 목록에 등록합니다.
         /// </summary>
         public static void SpawnMonster(CreatureData monsterData, Vector3Int cellPos)
@@ -162,17 +210,17 @@ namespace TRPG.Runtime
         /// <summary>
         /// 지정 CellPos에 NPC를 생성하고 월드 점유 목록에 등록합니다.
         /// </summary>
-        public static void SpawnNPC(CreatureData npcData, Vector3Int cellPos)
+        public static CreatureController SpawnNPC(CreatureData npcData, Vector3Int cellPos)
         {
-            GetInstance().SpawnNPCInternal(npcData, cellPos);
+            return GetInstance().SpawnNPCInternal(npcData, cellPos);
         }
 
         /// <summary>
         /// 지정 CellPos에 플레이어를 생성하고 월드 점유 목록에 등록합니다.
         /// </summary>
-        public static void SpawnPlayer(Vector3Int cellPos)
+        public static PlayerController SpawnPlayer(Vector3Int cellPos)
         {
-            GetInstance().SpawnPlayerInternal(cellPos);
+            return GetInstance().SpawnPlayerInternal(cellPos);
         }
 
         /// <summary>
@@ -197,6 +245,30 @@ namespace TRPG.Runtime
         public static void AddEnemyTileIndicator(List<Vector3Int> cellPosList, CreatureController owner)
         {
             GetInstance().AddEnemyTileIndicatorInternal(cellPosList, owner);
+        }
+
+        /// <summary>
+        /// owner의 기존 인디케이터를 지우고 이동/공격 가능 범위 인디케이터를 함께 표시합니다.
+        /// </summary>
+        public static void AddTileIndicators(List<Vector3Int> allyCellPosList, List<Vector3Int> enemyCellPosList, CreatureController owner)
+        {
+            GetInstance().AddTileIndicatorsInternal(allyCellPosList, enemyCellPosList, owner);
+        }
+
+        /// <summary>
+        /// owner가 소유한 인디케이터 중 지정 CellPos만 hover 상태로 표시합니다.
+        /// </summary>
+        public static void SetTileIndicatorHover(CreatureController owner, Vector3Int cellPos)
+        {
+            GetInstance().SetTileIndicatorHoverInternal(owner, cellPos);
+        }
+
+        /// <summary>
+        /// owner가 소유한 모든 인디케이터를 기본 상태로 되돌립니다.
+        /// </summary>
+        public static void ClearTileIndicatorHover(CreatureController owner)
+        {
+            GetInstance().ClearTileIndicatorHoverInternal(owner);
         }
 
         /// <summary>

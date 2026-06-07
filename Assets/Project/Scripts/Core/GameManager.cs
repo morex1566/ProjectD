@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,18 +20,36 @@ namespace TRPG.Runtime
     public class GameManager : MonoBehaviourSingleton<GameManager>
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-        private static void OnBeforeSplashSceneLoaded()
+        private static async void OnBeforeSplashSceneLoaded()
         {
             Init();
 
             DOTween.Init();
             InputManager.Init();
-            ResourceManager.Init();
+
+            try
+            {
+                await ResourceManager.Init();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(exception);
+            }
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void OnAfterSceneLoaded()
+        private static async void OnAfterSceneLoaded()
         {
+            try
+            {
+                await ResourceManager.Init();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(exception);
+                return;
+            }
+
             UIManager.Init();
             WorldManager.Init();
             DialogueManager.Init();

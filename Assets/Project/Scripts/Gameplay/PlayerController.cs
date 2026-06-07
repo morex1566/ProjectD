@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,6 +11,8 @@ namespace TRPG.Runtime
     /// </summary>
     public partial class PlayerController : CreatureController
     {
+        [SerializeField] private ObjectSelector2D selector;
+
         public new PlayerModel Model => base.Model as PlayerModel;
 
         protected override void Awake()
@@ -31,6 +34,12 @@ namespace TRPG.Runtime
             InputManager.InputMappingContext.Player.LeftClick.performed -= OnClickPerformed;
             InputManager.InputMappingContext.Player.LeftClick.canceled -= OnClickCanceled;
             InputManager.InputMappingContext.Player.Point.performed -= OnPointPerformed;
+        }
+
+
+        public void SetActiveSelector(bool active)
+        {
+            selector.gameObject.SetActive(active);
         }
 
         /// <summary>
@@ -82,6 +91,39 @@ namespace TRPG.Runtime
 
             return isMovable;
         }
+
+        /// <summary>
+        /// 체스 말처럼 적이 점유한 이동 가능 칸을 공격 가능 칸으로 분리합니다.
+        /// </summary>
+        private List<Vector3Int> GetAttackableCellPosList()
+        {
+            var movableCellPosList = WorldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, true);
+            List<Vector3Int> attackableCellPosList = new();
+
+            foreach (Vector3Int cellPos in movableCellPosList)
+            {
+                if (!WorldManager.HasMonsterInCellPos(cellPos, out _)) continue;
+
+                attackableCellPosList.Add(cellPos);
+            }
+
+            return attackableCellPosList;
+        }
+
+        /// <summary>
+        /// 드래그 중 마우스가 가리키는 이동/공격 인디케이터를 hover 상태로 갱신합니다.
+        /// </summary>
+        private void RequestTileIndicatorHover(Vector3 mouseWorldPos)
+        {
+            if (WorldManager.TryGetMapCellPos(mouseWorldPos, out Vector3Int mouseCellPos) &&
+                WorldManager.HasIndicatorInCellPos(mouseCellPos, this))
+            {
+                WorldManager.SetTileIndicatorHover(this, mouseCellPos);
+                return;
+            }
+
+            WorldManager.ClearTileIndicatorHover(this);
+        }
     }
 
     /// <summary>
@@ -96,10 +138,19 @@ namespace TRPG.Runtime
             // 플레이어 이동중?
             if (HasActionFlag(ActionFlag.Moving)) return;
 
+            if (!WorldManager.CanPlayerAct) return;
+
+            if (dragger.gameObject.activeSelf)
+            {
+                RequestTileIndicatorHover(mouseWorldPos);
+                return;
+            }
+
             // 드래깅 중이지 않고
             // 플레이어 호버링하면 외곽선 쉐이딩
-            bool isOutlineEnable = !dragger.gameObject.activeSelf && Contains(mouseWorldPos);
+            bool isOutlineEnable = Contains(mouseWorldPos);
 
+            // 현재 대상에 대상 외곽선 쉐이딩
             SetOutline(isOutlineEnable);
         }
 
@@ -107,9 +158,12 @@ namespace TRPG.Runtime
         {
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
             var indicatorCellPosList = WorldManager.GetMovableCellPosList(Model.CellPos, Model.Directions, Model.IsMoveRepeatable, false);
+            var attackableCellPosList = GetAttackableCellPosList();
 
             // 플레이어 이동중?
             if (HasActionFlag(ActionFlag.Moving)) return;
+
+            if (!WorldManager.CanPlayerAct) return;
 
             // 플레이어를 클릭하면 아군 이동 가능 타일을 표시합니다.
             if (!Contains(mouseWorldPos)) return;
@@ -120,7 +174,7 @@ namespace TRPG.Runtime
             // 드래깅 시작
             // 이동 범위 요청
             // 이동 범위에 있는 크리쳐에게 외곽선 효과 요청
-            WorldManager.AddAllyTileIndicator(indicatorCellPosList, this);
+            WorldManager.AddTileIndicators(indicatorCellPosList, attackableCellPosList, this);
             dragger.gameObject.SetActive(true);
             SetOutline(false);
             RequestShowOutline(true);
@@ -133,28 +187,30 @@ namespace TRPG.Runtime
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(Camera.main);
             bool isAttackable = IsAttackable(mouseWorldPos, out MonsterController monsterController);
             bool isMovable = IsMovable(mouseWorldPos, out Vector3 mouseCellWorldPos, out Vector3Int mouseCellPos);
+            bool isTurnAction = isAttackable || isMovable;
 
             // 플레이어 이동중?
             if (HasActionFlag(ActionFlag.Moving)) return;
 
+            if (!WorldManager.CanPlayerAct) return;
+
             // 드래깅 중임?
             if (!dragger.gameObject.activeSelf) return;
 
-            // 공격 가능함?
+            // 공격 가능함? -> 해당 타일로 이동 + 공격
             if (isAttackable)
             {
                 Attack(mouseCellWorldPos, mouseCellPos, monsterController);
             }
             else
-            // 이동 가능함?
+            // 이동 가능함? -> 해당 타일로 이동
             if (isMovable)
             {
-                // 마우스 커서가 있는 Ground 타일로 이동
                 Move(mouseCellWorldPos, mouseCellPos);
             }
+            // 공격도, 이동도 못함? -> 원래 타일로
             else
             {
-                // 원래 타일로 이동
                 Move(Model.CellWorldPos, Model.CellPos);
             }
 
@@ -166,6 +222,23 @@ namespace TRPG.Runtime
             WorldManager.RemoveTileIndicators(this);
 
             PlayDrop();
+
+            if (isTurnAction)
+            {
+                StartCoroutine(EndPlayerTurnWhenActionCompletedCoroutine());
+            }
+        }
+
+        private IEnumerator EndPlayerTurnWhenActionCompletedCoroutine()
+        {
+            yield return null;
+
+            while (IsActing)
+            {
+                yield return null;
+            }
+
+            WorldManager.EndPlayerTurn();
         }
     }
 

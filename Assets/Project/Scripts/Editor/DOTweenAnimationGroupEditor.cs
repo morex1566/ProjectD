@@ -19,9 +19,9 @@ namespace TRPG.Editor
 
             DOTweenAnimationGroup group = (DOTweenAnimationGroup)target;
 
-            if (GUILayout.Button("Refresh Animations"))
+            if (GUILayout.Button("Refresh Anims"))
             {
-                Undo.RecordObject(group, "Refresh DOTween Animations");
+                Undo.RecordObject(group, "Refresh DOTween Anims");
                 group.Refresh();
                 EditorUtility.SetDirty(group);
             }
@@ -43,7 +43,7 @@ namespace TRPG.Editor
         {
             if (Application.isPlaying)
             {
-                group.Play();
+                group.PlayAnim();
                 return;
             }
 
@@ -54,7 +54,7 @@ namespace TRPG.Editor
             RegisterPreviewCleanup();
 
             bool createdTween = false;
-            foreach (DOTweenAnimation animation in group.Animations)
+            foreach (DOTweenAnimation animation in group.Anims)
             {
                 if (animation == null || !animation.isActive) continue;
 
@@ -83,7 +83,7 @@ namespace TRPG.Editor
             DOTweenEditorPreview.Stop(true, true);
             isPreviewing = false;
 
-            foreach (DOTweenAnimation animation in group.Animations)
+            foreach (DOTweenAnimation animation in group.Anims)
             {
                 if (animation == null) continue;
 

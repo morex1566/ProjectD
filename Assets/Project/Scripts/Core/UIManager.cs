@@ -66,7 +66,15 @@ namespace TRPG.Runtime
         /// </summary>
         public static T Open<T>(RenderSpace renderSpace) where T : UIBase
         {
-            return GetInstance().OpenInternal<T>(renderSpace, null, null);
+            return GetInstance().OpenInternal<T>(renderSpace, null, null, true);
+        }
+
+        /// <summary>
+        /// 지정한 UI 타입의 인스턴스를 프리팹 위치로 생성하고 형제 순서를 지정합니다.
+        /// </summary>
+        public static T Open<T>(RenderSpace renderSpace, int? siblingIndex) where T : UIBase
+        {
+            return GetInstance().OpenInternal<T>(renderSpace, null, siblingIndex, true);
         }
 
         /// <summary>
@@ -90,7 +98,7 @@ namespace TRPG.Runtime
         /// </summary>
         public static T OpenStretch<T>(RenderSpace renderSpace, Vector2 offsetMin, Vector2 offsetMax, int? siblingIndex = null) where T : UIBase
         {
-            return GetInstance().OpenInternal<T>(renderSpace, null, siblingIndex, true, offsetMin, offsetMax);
+            return GetInstance().OpenInternal<T>(renderSpace, null, siblingIndex, false, true, offsetMin, offsetMax);
         }
 
         /// <summary>
@@ -98,7 +106,7 @@ namespace TRPG.Runtime
         /// </summary>
         public static T OpenAnchored<T>(RenderSpace renderSpace, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta, int? siblingIndex = null) where T : UIBase
         {
-            return GetInstance().OpenInternal<T>(renderSpace, null, siblingIndex, false, default, default, true, anchorMin, anchorMax, anchoredPosition, sizeDelta);
+            return GetInstance().OpenInternal<T>(renderSpace, null, siblingIndex, false, false, default, default, true, anchorMin, anchorMax, anchoredPosition, sizeDelta);
         }
 
         public static void SetBackgroundColor()
@@ -160,13 +168,18 @@ namespace TRPG.Runtime
         /// <summary>
         /// 지정한 UI 타입의 인스턴스를 가져오거나 생성합니다.
         /// </summary>
-        private T OpenInternal<T>(RenderSpace renderSpace, Vector3? openPos, int? siblingIndex, bool stretchCanvas = false, Vector2 offsetMin = default, Vector2 offsetMax = default, bool applyAnchor = false, Vector2 anchorMin = default, Vector2 anchorMax = default, Vector2 anchoredPosition = default, Vector2 sizeDelta = default) where T : UIBase
+        private T OpenInternal<T>(RenderSpace renderSpace, Vector3? openPos, int? siblingIndex, bool usePrefabOpenPos = false, bool stretchCanvas = false, Vector2 offsetMin = default, Vector2 offsetMax = default, bool applyAnchor = false, Vector2 anchorMin = default, Vector2 anchorMax = default, Vector2 anchoredPosition = default, Vector2 sizeDelta = default) where T : UIBase
         {
             T pb = settings.Get<T>();
 
             if (pb == null)
             {
                 return null;
+            }
+
+            if (usePrefabOpenPos && !openPos.HasValue)
+            {
+                openPos = GetPrefabOpenPos(pb, renderSpace);
             }
 
             T inst = null;
@@ -195,6 +208,25 @@ namespace TRPG.Runtime
             uiInsts.Add(inst.GetInstanceID(), inst);
 
             return inst;
+        }
+
+        /// <summary>
+        /// 명시 좌표가 없을 때 프리팹 에셋에 저장된 기본 위치를 사용합니다.
+        /// </summary>
+        private static Vector3 GetPrefabOpenPos(UIBase prefab, RenderSpace renderSpace)
+        {
+            if (renderSpace == RenderSpace.World)
+            {
+                return prefab.transform.position;
+            }
+
+            RectTransform rectTransform = prefab.transform as RectTransform;
+            if (rectTransform != null)
+            {
+                return rectTransform.anchoredPosition3D;
+            }
+
+            return prefab.transform.localPosition;
         }
 
         /// <summary>
