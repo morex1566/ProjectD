@@ -1,160 +1,113 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
     /// <summary>
     /// InputManager의 포인터 입력을 받아 클릭 선택, 드래그 선택, 선택 대상 이동 명령을 처리합니다.
     /// </summary>
-    public class ObjectSelector : MonoBehaviourSingleton<ObjectSelector>
+    public class ObjectSelector : MonoBehaviour
     {
-        [SerializeField] private Camera worldCamera;
+        /// <summary>
+        /// 드래깅이 너무 작으면 개별 클릭으로 전환되는데 그 기준 길이
+        /// </summary>
         [SerializeField] private float dragThreshold = 8f;
 
-        private readonly List<ISelectable> dragResults = new();
+        /// <summary>
+        /// 드래그 대상
+        /// </summary>
+        private readonly List<ISelectable> selectedInsts = new();
 
-        private Vector2 pointerDownPosition;
+        /// <summary>
+        /// 드래그 시작지점 캐싱
+        /// </summary>
+        private Vector2 startPointerDownScreenPos;
+
+        /// <summary>
+        /// 선택중?
+        /// </summary>
         private bool isPointerDown;
-        private bool isBlockedByUI;
 
-        private void Awake()
-        {
-            worldCamera ??= Camera.main;
-        }
 
         private void OnEnable()
         {
-            InputManager.LeftClickStarted += OnLeftClickStarted;
-            InputManager.LeftClickCanceled += OnLeftClickCanceled;
-            InputManager.RightClickStarted += OnRightClickStarted;
+            InputManager.InputMappingContext.Player.LeftClick.performed += OnLeftClickStarted;
+            InputManager.InputMappingContext.Player.LeftClick.canceled += OnLeftClickCanceled;
         }
 
         private void OnDisable()
         {
-            InputManager.LeftClickStarted -= OnLeftClickStarted;
-            InputManager.LeftClickCanceled -= OnLeftClickCanceled;
-            InputManager.RightClickStarted -= OnRightClickStarted;
+            InputManager.InputMappingContext.Player.LeftClick.performed -= OnLeftClickStarted;
+            InputManager.InputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;
         }
 
-        private void OnLeftClickStarted(Vector2 screenPosition)
+        private void OnLeftClickStarted(InputAction.CallbackContext context)
         {
-            pointerDownPosition = screenPosition;
+            // 드래그 시작지점이 UI 위치임?
+            if (IsPointerOverUI()) return;
+
+            startPointerDownScreenPos = Pointer.current.position.ReadValue();
             isPointerDown = true;
-            isBlockedByUI = IsPointerOverUI();
         }
 
-        private void OnLeftClickCanceled(Vector2 screenPosition)
+        private void OnLeftClickCanceled(InputAction.CallbackContext context)
         {
-            if (!isPointerDown)
-            {
-                return;
-            }
+            // 이전 제약조건에 의해 드래깅 취소 된거였음?
+            if (!isPointerDown) return;
 
             isPointerDown = false;
 
-            if (isBlockedByUI || IsPointerOverUI())
-            {
-                isBlockedByUI = false;
-                return;
-            }
+            // 드래그 종료지점이 UI 위치임?
+            if (IsPointerOverUI()) return;
 
-            float dragSqrDistance = (screenPosition - pointerDownPosition).sqrMagnitude;
+            Vector2 endPointerDownScreenPos = Pointer.current.position.ReadValue();
+            Vector2 endPointerDownWorldPos = MouseEx.GetMouseWorldPos(WorldManager.CamController.Cam);
+
+            float dragSqrDistance = (endPointerDownScreenPos - startPointerDownScreenPos).sqrMagnitude;
             if (dragSqrDistance >= dragThreshold * dragThreshold)
             {
-                SelectInScreenRect(pointerDownPosition, screenPosition);
+                Selects(startPointerDownScreenPos, endPointerDownScreenPos);
             }
             else
             {
-                SelectAtPointerPosition();
+                Select(endPointerDownWorldPos);
             }
         }
 
-        private void OnRightClickStarted(Vector2 screenPosition)
+        private static bool IsPointerOverUI()
         {
-            if (IsPointerOverUI()) return;
-            if (!MouseEx.TryGetMouseWorldPos(GetWorldCamera(), out Vector3 worldPosition)) return;
-
-            SelectionManager.GetInstance().MoveSelectedCreatures(worldPosition);
+            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         }
 
-        private void SelectAtPointerPosition()
+        private void Selects(Vector2 startPos, Vector2 endPos)
         {
-            if (!MouseEx.TryGetMouseWorldPos(GetWorldCamera(), out Vector3 worldPosition)) return;
-
-            ISelectable selectable = FindSelectable(worldPosition);
-            SelectionManager selectionManager = SelectionManager.GetInstance();
-
-            if (selectable == null)
-            {
-                selectionManager.ClearSelection();
-                return;
-            }
-
-            selectionManager.SelectSingle(selectable);
-        }
-
-        private void SelectInScreenRect(Vector2 startPosition, Vector2 endPosition)
-        {
-            Rect selectionRect = CreateScreenRect(startPosition, endPosition);
+            Rect selectionRect = CreateScreenRect(startPos, endPos);
             MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            Camera camera = GetWorldCamera();
+            Camera cam = WorldManager.CamController.Cam;
 
-            dragResults.Clear();
+            selectedInsts.Clear();
 
             for (int i = 0; i < behaviours.Length; i++)
             {
+                // MonoBehaviour 중에서 ISelectable을 구현한 것만 통과.
                 if (behaviours[i] is not ISelectable selectable) continue;
+
+                // 선택 가능한 상태인지?
                 if (!selectable.CanSelect) continue;
-                if (!IsBoundsInScreenRect(camera, selectable.SelectionBounds, selectionRect)) continue;
 
-                dragResults.Add(selectable);
+                // 드래깅 범위에 있음?
+                if (!IsBoundsInScreenRect(cam, selectable.SelectionBounds, selectionRect)) continue;
+
+                selectedInsts.Add(selectable);
             }
-
-            dragResults.Sort(CompareSelectableInstanceId);
-            SelectionManager.GetInstance().SelectMany(dragResults);
         }
 
-        private ISelectable FindSelectable(Vector3 worldPosition)
+        private static Rect CreateScreenRect(Vector2 startPos, Vector2 endPos)
         {
-            MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            Camera camera = GetWorldCamera();
-            ISelectable bestSelectable = null;
-            float bestSqrDistance = float.MaxValue;
-            int bestInstanceId = int.MaxValue;
-
-            for (int i = 0; i < behaviours.Length; i++)
-            {
-                if (behaviours[i] is not ISelectable selectable) continue;
-                if (!selectable.CanSelect) continue;
-                if (!selectable.Contains(worldPosition)) continue;
-
-                float sqrDistance = camera != null
-                    ? Vector3.SqrMagnitude(camera.transform.position - selectable.SelectionBounds.center)
-                    : 0f;
-                int instanceId = behaviours[i].GetInstanceID();
-
-                if (sqrDistance < bestSqrDistance || (Mathf.Approximately(sqrDistance, bestSqrDistance) && instanceId < bestInstanceId))
-                {
-                    bestSelectable = selectable;
-                    bestSqrDistance = sqrDistance;
-                    bestInstanceId = instanceId;
-                }
-            }
-
-            return bestSelectable;
-        }
-
-        private Camera GetWorldCamera()
-        {
-            worldCamera ??= Camera.main;
-            return worldCamera;
-        }
-
-        private static Rect CreateScreenRect(Vector2 startPosition, Vector2 endPosition)
-        {
-            Vector2 min = Vector2.Min(startPosition, endPosition);
-            Vector2 max = Vector2.Max(startPosition, endPosition);
+            Vector2 min = Vector2.Min(startPos, endPos);
+            Vector2 max = Vector2.Max(startPos, endPos);
 
             return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
         }
@@ -173,17 +126,41 @@ namespace TRPG.Runtime
             return screenRect.Overlaps(boundsRect) || screenRect.Contains(camera.WorldToScreenPoint(bounds.center));
         }
 
-        private static bool IsPointerOverUI()
+        private void Select(Vector2 mouseWorldPos)
         {
-            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
-        }
+            selectedInsts.Clear();
 
-        private static int CompareSelectableInstanceId(ISelectable lhs, ISelectable rhs)
-        {
-            if (lhs is not MonoBehaviour lhsBehaviour) return 1;
-            if (rhs is not MonoBehaviour rhsBehaviour) return -1;
+            MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+            Camera cam = WorldManager.CamController.Cam;
+            ISelectable bestSelectable = null;
+            float bestSqrDistance = float.MaxValue;
+            int bestInstanceId = int.MaxValue;
 
-            return lhsBehaviour.GetInstanceID().CompareTo(rhsBehaviour.GetInstanceID());
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                // MonoBehaviour 중에서 ISelectable을 구현한 것만 통과.
+                if (behaviours[i] is not ISelectable selectable) continue;
+
+                // 선택 가능한 상태인지?
+                if (!selectable.CanSelect) continue;
+
+                // 대상이 클릭 가능한 위치였음?
+                if (!selectable.Contains(mouseWorldPos)) continue;
+
+                // 선택
+                // 1. 가장 가까운 대상
+                // 2. 인스턴스ID가 가장 작은 대상
+                float sqrDistance = Vector3.SqrMagnitude(cam.transform.position - selectable.SelectionBounds.center);
+                int instanceId = behaviours[i].GetInstanceID();
+                if (sqrDistance < bestSqrDistance || (Mathf.Approximately(sqrDistance, bestSqrDistance) && instanceId < bestInstanceId))
+                {
+                    bestSelectable = selectable;
+                    bestSqrDistance = sqrDistance;
+                    bestInstanceId = instanceId;
+                }
+            }
+
+            if (bestSelectable is not null) selectedInsts.Add(bestSelectable);
         }
     }
 }

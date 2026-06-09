@@ -4,52 +4,37 @@ namespace TRPG.Runtime
 {
     public class CreatureController : MonoBehaviour, ISelectable
     {
-        [SerializeField] private Sprite creatureSprite;
-        [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private Collider2D selectionCollider;
+        [SerializeField] private Sprite sprite;
+
+        [SerializeField] private SpriteRenderer spriter;
+
         [SerializeField] private Color selectedColor = Color.cyan;
+
         [SerializeField] private float moveSpeed = 5f;
+
         [SerializeField] private float stopDistance = 0.01f;
 
         private Vector3 targetPosition;
+
         private bool hasTarget;
+
         private Color defaultColor = Color.white;
 
         public bool CanSelect { get; set; } = true;
 
         public bool IsSelected { get; set; }
 
-        public Bounds SelectionBounds
-        {
-            get
-            {
-                if (spriteRenderer != null)
-                {
-                    return spriteRenderer.bounds;
-                }
-
-                if (selectionCollider != null)
-                {
-                    return selectionCollider.bounds;
-                }
-
-                return new Bounds(transform.position, Vector3.zero);
-            }
-        }
+        public Bounds SelectionBounds => sprite.bounds;
 
         private void Awake()
         {
             targetPosition = transform.position;
-            spriteRenderer ??= GetComponentInChildren<SpriteRenderer>();
-            selectionCollider ??= GetComponentInChildren<Collider2D>();
+            spriter ??= GetComponentInChildren<SpriteRenderer>();
 
-            if (spriteRenderer != null)
+            if (spriter != null)
             {
-                defaultColor = spriteRenderer.color;
-                if (creatureSprite != null)
-                {
-                    spriteRenderer.sprite = creatureSprite;
-                }
+                defaultColor = spriter.color;
+                spriter.sprite = sprite;
             }
         }
 
@@ -60,11 +45,6 @@ namespace TRPG.Runtime
 
         public bool Contains(Vector3 worldPosition)
         {
-            if (selectionCollider != null)
-            {
-                return selectionCollider.OverlapPoint(worldPosition);
-            }
-
             return SelectionBounds.Contains(worldPosition);
         }
 
@@ -72,9 +52,9 @@ namespace TRPG.Runtime
         {
             IsSelected = isSelected;
 
-            if (spriteRenderer != null)
+            if (spriter != null)
             {
-                spriteRenderer.color = isSelected ? selectedColor : defaultColor;
+                spriter.color = isSelected ? selectedColor : defaultColor;
             }
         }
 
@@ -96,6 +76,7 @@ namespace TRPG.Runtime
 
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
+            // 목표에 근접하면 이동 종료
             if (Vector3.Distance(transform.position, targetPosition) <= stopDistance)
             {
                 transform.position = targetPosition;

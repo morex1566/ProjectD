@@ -12,13 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70df97e9aae845a9a9a0179375846461, type: 3}
   m_Name: SO_WorldManagerSettings
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldManagerSettingsData
-  monsterPb: {fileID: 5623844873239391356, guid: 669db6c883a1c0d48a770e4b3b66cae3, type: 3}
-  playerPb: {fileID: 2188207816268681392, guid: fe859d1a378664047919604f767dbe0f, type: 3}
-  allyTileIndicatorPb: {fileID: 8005795874296381529, guid: bd61225f71852ad4e8add82101bac98f, type: 3}
-  enemyTileIndicatorPb: {fileID: 8341206448957022298, guid: a403a12c171cc85448e8fb1dbbb1c15b, type: 3}
-  testMapData:
-    m_AssetGUID: b037aa227efd46939d87a6e1e1facefc
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
+  Selector: {fileID: 7379261557961419522, guid: 123a10618a299144eb73806cba138cf4, type: 3}
+  CamController: {fileID: 8413876597104047414, guid: 51b16e32e965af64eb843d470cac3165, type: 3}

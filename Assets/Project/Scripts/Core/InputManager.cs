@@ -41,12 +41,6 @@ namespace TRPG.Runtime
     {
         public static InputMappingContext InputMappingContext;
 
-        public static event Action<Vector2> LeftClickStarted;
-
-        public static event Action<Vector2> LeftClickCanceled;
-
-        public static event Action<Vector2> RightClickStarted;
-
         /// <summary>
         /// 입력 매핑 컨텍스트를 생성하고 활성화합니다.
         /// </summary>
@@ -54,97 +48,8 @@ namespace TRPG.Runtime
         {
             GetInstance();
 
-            if (InputMappingContext != null) return;
-
-            {
-                InputMappingContext = new InputMappingContext();
-                InputMappingContext.Enable();
-            }
-        }
-
-        private void Update()
-        {
-            if (!TryGetPointerScreenPosition(out Vector2 screenPosition)) return;
-
-            if (IsLeftClickPressedThisFrame())
-            {
-                LeftClickStarted?.Invoke(screenPosition);
-            }
-
-            if (IsLeftClickReleasedThisFrame())
-            {
-                LeftClickCanceled?.Invoke(screenPosition);
-            }
-
-            if (IsRightClickPressedThisFrame())
-            {
-                RightClickStarted?.Invoke(screenPosition);
-            }
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-
-            if (InputMappingContext != null)
-            {
-                InputMappingContext.Dispose();
-                InputMappingContext = null;
-            }
-
-            LeftClickStarted = null;
-            LeftClickCanceled = null;
-            RightClickStarted = null;
-        }
-
-        private static bool IsLeftClickPressedThisFrame()
-        {
-            if (InputMappingContext != null)
-            {
-                return InputMappingContext.Player.LeftClick.WasPressedThisFrame();
-            }
-
-            return Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
-        }
-
-        private static bool IsLeftClickReleasedThisFrame()
-        {
-            if (InputMappingContext != null)
-            {
-                return InputMappingContext.Player.LeftClick.WasReleasedThisFrame();
-            }
-
-            return Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame;
-        }
-
-        private static bool IsRightClickPressedThisFrame()
-        {
-            if (InputMappingContext != null)
-            {
-                return InputMappingContext.Player.RightClick.WasPressedThisFrame();
-            }
-
-            return Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame;
-        }
-
-        private static bool TryGetPointerScreenPosition(out Vector2 screenPosition)
-        {
-            screenPosition = default;
-
-            if (Pointer.current == null) return false;
-
-            screenPosition = Pointer.current.position.ReadValue();
-            return IsFinite(screenPosition);
-        }
-
-        private static bool IsFinite(Vector2 value)
-        {
-            return IsFinite(value.x) && IsFinite(value.y);
-        }
-
-        private static bool IsFinite(float value)
-        {
-            return !float.IsNaN(value) && !float.IsInfinity(value);
+            InputMappingContext = new InputMappingContext();
+            InputMappingContext.Enable();
         }
     }
 }
