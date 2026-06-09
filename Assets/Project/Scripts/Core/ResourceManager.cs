@@ -27,27 +27,16 @@ namespace TRPG.Runtime
         // 같은 label이 로드 중이면 기존 작업을 공유해 Addressables 중복 호출을 막습니다.
         private static readonly Dictionary<string, AsyncLazy<IList<Object>>> pendingLoadTasks = new();
 
-        private static AsyncLazy<AsyncUnit> initTask;
-
-
 
 
         /// <summary>
         /// 리소스 매니저 인스턴스와 설정 데이터, Core Addressables 리소스를 준비합니다.
+        /// CAUTION : GameManager에서 한번만 사용됨
         /// </summary>
-        public static async UniTask Init()
+        public static async UniTask InitAsync()
         {
-            initTask ??= new AsyncLazy<AsyncUnit>(InitAsync);
-            await initTask;
-        }
-
-        private static async UniTask<AsyncUnit> InitAsync()
-        {
-            GetInstance();
             settings = Resources.Load<ResourceManagerSettingsData>("SO_ResourceManagerSettings");
-            await LoadAsync(UnityConstant.Addressable.Label.Core);
-
-            return AsyncUnit.Default;
+            await new AsyncLazy<AsyncUnit>(InitInternalAsync);
         }
 
         /// <summary>
@@ -122,45 +111,39 @@ namespace TRPG.Runtime
 
 
 
-        /// <summary>
-        /// Addressables에서 location과 asset을 실제로 로드하고 캐시에 등록합니다.
-        /// </summary>
+        private static async UniTask<AsyncUnit> InitInternalAsync()
+        {
+            GetInstance();
+            settings = Resources.Load<ResourceManagerSettingsData>("SO_ResourceManagerSettings");
+            await LoadAsync(UnityConstant.Addressable.Label.Core);
+
+            return AsyncUnit.Default;
+        }
+
         private async UniTask<IList<Object>> LoadInternalAsync(string label)
         {
-            AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(Object));
+            AsyncOperationHandle<IList<IResourceLocation>> locationsHandle =
+                Addressables.LoadResourceLocationsAsync(label, typeof(Object));
 
             try
             {
                 IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
-                List<string> primaryKeys = new();
-                List<Object> assets = new();
 
-                // 로드 중 실패해도 catch에서 같은 언로드 경로로 정리할 수 있게 먼저 등록합니다.
-                cachedLabelPrimaryKeys[label] = primaryKeys;
+                List<string> loadedPrimaryKeys = new();
+                List<Object> loadedAssets = new();
+
+                // 중간 실패 시 UnloadInternalAsync(label)로 정리할 수 있도록 먼저 등록합니다.
+                cachedLabelPrimaryKeys[label] = loadedPrimaryKeys;
 
                 foreach (IResourceLocation location in locations)
                 {
-                    // 실제 리소스 해제는 이 handle을 기준으로 처리합니다.
-                    AsyncOperationHandle<Object> assetHandle = Addressables.LoadAssetAsync<Object>(location);
-                    Object asset = await assetHandle.ToUniTask();
-                    if (asset == null)
+                    if (!await TryLoadAndCacheAssetAsync(location, loadedPrimaryKeys, loadedAssets))
                     {
-                        if (assetHandle.IsValid())
-                        {
-                            Addressables.Release(assetHandle);
-                        }
-
                         continue;
                     }
-
-                    // 선로드 캐시는 Addressables location의 PrimaryKey를 기준으로 통일합니다.
-                    cachedResources[location.PrimaryKey] = asset;
-                    cachedHandles[location.PrimaryKey] = assetHandle;
-                    primaryKeys.Add(location.PrimaryKey);
-                    assets.Add(asset);
                 }
 
-                return assets;
+                return loadedAssets;
             }
             catch
             {
@@ -171,32 +154,56 @@ namespace TRPG.Runtime
             }
             finally
             {
-                if (locationsHandle.IsValid())
-                {
-                    Addressables.Release(locationsHandle);
-                }
+                ReleaseIfValid(locationsHandle);
             }
         }
 
-        /// <summary>
-        /// label에 연결된 primary key 목록을 기준으로 캐시와 handle을 정리합니다.
-        /// </summary>
+        private static async UniTask<bool> TryLoadAndCacheAssetAsync(IResourceLocation location, List<string> loadedPrimaryKeys, List<Object> loadedAssets)
+        {
+            AsyncOperationHandle<Object> assetHandle = Addressables.LoadAssetAsync<Object>(location);
+
+            Object asset = await assetHandle.ToUniTask();
+
+            if (asset == null)
+            {
+                ReleaseIfValid(assetHandle);
+                return false;
+            }
+
+            CacheLoadedAsset(location.PrimaryKey, asset, assetHandle);
+
+            loadedPrimaryKeys.Add(location.PrimaryKey);
+            loadedAssets.Add(asset);
+
+            return true;
+        }
+
+        private static void CacheLoadedAsset(string primaryKey, Object asset, AsyncOperationHandle<Object> assetHandle)
+        {
+            cachedResources[primaryKey] = asset;
+            cachedHandles[primaryKey] = assetHandle;
+        }
+
+        private static void ReleaseIfValid<T>(AsyncOperationHandle<T> handle)
+        {
+            if (handle.IsValid())
+            {
+                Addressables.Release(handle);
+            }
+        }
+
         private UniTask UnloadInternalAsync(string label)
         {
-            // 로드된 적 없는 label은 언로드할 리소스가 없습니다.
-            if (!cachedLabelPrimaryKeys.TryGetValue(label, out List<string> primaryKeys))
+            if (!cachedLabelPrimaryKeys.Remove(label, out List<string> primaryKeys))
             {
                 return UniTask.CompletedTask;
             }
 
-            cachedLabelPrimaryKeys.Remove(label);
-
             foreach (string primaryKey in primaryKeys)
             {
-                // Addressables 로드 참조는 로드 때 받은 handle로 해제합니다.
-                if (cachedHandles.TryGetValue(primaryKey, out AsyncOperationHandle<Object> handle) && handle.IsValid())
+                if (cachedHandles.TryGetValue(primaryKey, out AsyncOperationHandle<Object> handle))
                 {
-                    Addressables.Release(handle);
+                    ReleaseIfValid(handle);
                 }
 
                 cachedHandles.Remove(primaryKey);
@@ -206,9 +213,6 @@ namespace TRPG.Runtime
             return UniTask.CompletedTask;
         }
 
-        /// <summary>
-        /// primary key 목록에 대응하는 유효한 캐시 리소스만 모아서 반환합니다.
-        /// </summary>
         private static List<Object> GetCachedAssets(List<string> primaryKeys)
         {
             List<Object> assets = new();
@@ -224,9 +228,6 @@ namespace TRPG.Runtime
             return assets;
         }
 
-        /// <summary>
-        /// Addressables locator에서 runtime key와 타입에 맞는 primary key를 찾습니다.
-        /// </summary>
         private static bool TryGetPrimaryKey(object runtimeKey, System.Type type, out string primaryKey)
         {
             foreach (IResourceLocator locator in Addressables.ResourceLocators)

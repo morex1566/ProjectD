@@ -14,7 +14,7 @@ namespace TRPG.Runtime
 
         public void Close()
         {
-            UIManager.Close(GetInstanceID());
+            
         }
     }
 }

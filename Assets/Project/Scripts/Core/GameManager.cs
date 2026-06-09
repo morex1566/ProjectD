@@ -1,10 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -23,37 +19,16 @@ namespace TRPG.Runtime
         private static async void OnBeforeSplashSceneLoaded()
         {
             Init();
-
             DOTween.Init();
             InputManager.Init();
-
-            try
-            {
-                await ResourceManager.Init();
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError(exception);
-            }
+            await ResourceManager.InitAsync();
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static async void OnAfterSceneLoaded()
+        private static void OnAfterSceneLoaded()
         {
-            try
-            {
-                await ResourceManager.Init();
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError(exception);
-                return;
-            }
-
             UIManager.Init();
             WorldManager.Init();
-            DialogueManager.Init();
-            EventManager.Init();
         }
 
         private static void Init()

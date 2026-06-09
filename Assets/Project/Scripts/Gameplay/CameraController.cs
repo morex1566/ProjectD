@@ -1,8 +1,9 @@
 using UnityEngine;
 
+
 namespace TRPG.Runtime
 {
-    public class TileController : MonoBehaviour
+    public class CameraController : MonoBehaviour
     {
         
     }
