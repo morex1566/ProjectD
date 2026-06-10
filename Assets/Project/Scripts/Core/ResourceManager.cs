@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
@@ -9,7 +8,7 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// 런타임 리소스와 게임 데이터 로딩 작업을 순차 처리합니다.
+    /// 런타임 리소스와 게임 데이터 로딩 작업을 처리합니다.
     /// </summary>
     public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
     {
@@ -24,25 +23,23 @@ namespace TRPG.Runtime
         // Addressables.Release는 로드 때 받은 handle 기준으로 처리합니다.
         private static readonly Dictionary<string, AsyncOperationHandle<Object>> cachedHandles = new();
 
-        // 같은 label이 로드 중이면 기존 작업을 공유해 Addressables 중복 호출을 막습니다.
-        private static readonly Dictionary<string, AsyncLazy<IList<Object>>> pendingLoadTasks = new();
-
 
 
         /// <summary>
-        /// 리소스 매니저 인스턴스와 설정 데이터, Core Addressables 리소스를 준비합니다.
+        /// 리소스 매니저 인스턴스와 설정 데이터, Core Addressables 리소스를 동기적으로 준비합니다.
         /// CAUTION : GameManager에서 한번만 사용됨
         /// </summary>
-        public static async UniTask InitAsync()
+        public static void Init()
         {
+            GetInstance();
             settings = Resources.Load<ResourceManagerSettingsData>("SO_ResourceManagerSettings");
-            await new AsyncLazy<AsyncUnit>(InitInternalAsync);
+            Load(UnityConstant.Addressable.Label.Core);
         }
 
         /// <summary>
-        /// 지정한 Addressables label의 리소스를 로드하고, 로드 중인 같은 label 요청은 기존 작업을 공유합니다.
+        /// 지정한 Addressables label의 리소스를 동기 로드합니다.
         /// </summary>
-        public static async UniTask<IList<Object>> LoadAsync(string label)
+        public static IList<Object> Load(string label)
         {
             ResourceManager inst = GetInstance();
 
@@ -51,22 +48,7 @@ namespace TRPG.Runtime
                 return GetCachedAssets(cachedPrimaryKeys);
             }
 
-            if (pendingLoadTasks.TryGetValue(label, out AsyncLazy<IList<Object>> pendingLoadTask))
-            {
-                return await pendingLoadTask;
-            }
-
-            AsyncLazy<IList<Object>> loadTask = new AsyncLazy<IList<Object>>(() => inst.LoadInternalAsync(label));
-            pendingLoadTasks[label] = loadTask;
-
-            try
-            {
-                return await loadTask;
-            }
-            finally
-            {
-                pendingLoadTasks.Remove(label);
-            }
+            return inst.LoadInternal(label);
         }
 
         /// <summary>
@@ -96,48 +78,31 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 지정한 label의 로드가 진행 중이면 완료를 기다린 뒤 캐시와 Addressables handle을 해제합니다.
+        /// 지정한 label의 캐시와 Addressables handle을 해제합니다.
         /// </summary>
-        public static async UniTask UnloadAsync(string label)
+        public static void Unload(string label)
         {
-            if (pendingLoadTasks.TryGetValue(label, out AsyncLazy<IList<Object>> pendingLoadTask))
-            {
-                await pendingLoadTask;
-            }
-
-            await GetInstance().UnloadInternalAsync(label);
+            GetInstance().UnloadInternal(label);
         }
 
-
-
-
-        private static async UniTask<AsyncUnit> InitInternalAsync()
-        {
-            GetInstance();
-            settings = Resources.Load<ResourceManagerSettingsData>("SO_ResourceManagerSettings");
-            await LoadAsync(UnityConstant.Addressable.Label.Core);
-
-            return AsyncUnit.Default;
-        }
-
-        private async UniTask<IList<Object>> LoadInternalAsync(string label)
+        private IList<Object> LoadInternal(string label)
         {
             AsyncOperationHandle<IList<IResourceLocation>> locationsHandle =
                 Addressables.LoadResourceLocationsAsync(label, typeof(Object));
 
             try
             {
-                IList<IResourceLocation> locations = await locationsHandle.ToUniTask();
+                IList<IResourceLocation> locations = locationsHandle.WaitForCompletion();
 
                 List<string> loadedPrimaryKeys = new();
                 List<Object> loadedAssets = new();
 
-                // 중간 실패 시 UnloadInternalAsync(label)로 정리할 수 있도록 먼저 등록합니다.
+                // 중간 실패 시 UnloadInternal(label)로 정리할 수 있도록 먼저 등록합니다.
                 cachedLabelPrimaryKeys[label] = loadedPrimaryKeys;
 
                 foreach (IResourceLocation location in locations)
                 {
-                    if (!await TryLoadAndCacheAssetAsync(location, loadedPrimaryKeys, loadedAssets))
+                    if (!TryLoadAndCacheAsset(location, loadedPrimaryKeys, loadedAssets))
                     {
                         continue;
                     }
@@ -147,7 +112,7 @@ namespace TRPG.Runtime
             }
             catch
             {
-                await UnloadInternalAsync(label);
+                UnloadInternal(label);
 
                 Debug.LogError($"Load Error: {label}");
                 throw;
@@ -158,11 +123,11 @@ namespace TRPG.Runtime
             }
         }
 
-        private static async UniTask<bool> TryLoadAndCacheAssetAsync(IResourceLocation location, List<string> loadedPrimaryKeys, List<Object> loadedAssets)
+        private static bool TryLoadAndCacheAsset(IResourceLocation location, List<string> loadedPrimaryKeys, List<Object> loadedAssets)
         {
             AsyncOperationHandle<Object> assetHandle = Addressables.LoadAssetAsync<Object>(location);
 
-            Object asset = await assetHandle.ToUniTask();
+            Object asset = assetHandle.WaitForCompletion();
 
             if (asset == null)
             {
@@ -192,11 +157,11 @@ namespace TRPG.Runtime
             }
         }
 
-        private UniTask UnloadInternalAsync(string label)
+        private void UnloadInternal(string label)
         {
             if (!cachedLabelPrimaryKeys.Remove(label, out List<string> primaryKeys))
             {
-                return UniTask.CompletedTask;
+                return;
             }
 
             foreach (string primaryKey in primaryKeys)
@@ -209,8 +174,6 @@ namespace TRPG.Runtime
                 cachedHandles.Remove(primaryKey);
                 cachedResources.Remove(primaryKey);
             }
-
-            return UniTask.CompletedTask;
         }
 
         private static List<Object> GetCachedAssets(List<string> primaryKeys)

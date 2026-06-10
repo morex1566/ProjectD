@@ -11,6 +11,8 @@ namespace TRPG.Runtime
     [CreateAssetMenu(fileName = "SO_WorldManagerSettings", menuName = "Scriptable Objects/Settings/WorldManager")]
     public partial class WorldManagerSettingsData : ScriptableObject
     {
+        public AssetReferenceT<CreatureDataSheet> CreatureDataSheetRef;
+
         public ObjectSelector Selector;
 
         public WorldCameraController CamController;

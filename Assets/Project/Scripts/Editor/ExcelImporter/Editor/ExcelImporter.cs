@@ -1,16 +1,20 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using NPOI.HSSF.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
+using TRPG.Runtime;
 
 public class ExcelImporter : AssetPostprocessor
 {
+	const string ScriptableObjectAssetPrefix = "SO_";
+
 	class ExcelAssetInfo
 	{
 		public Type AssetType { get; set; }
@@ -83,12 +87,44 @@ public class ExcelImporter : AssetPostprocessor
 
 		if (asset == null)
 		{
-			asset = ScriptableObject.CreateInstance(assetType.Name);
+			string legacyAssetPath = GetLegacyAssetPath(assetPath, assetType);
+			asset = AssetDatabase.LoadAssetAtPath(legacyAssetPath, assetType);
+
+			if (asset != null)
+			{
+				string error = AssetDatabase.RenameAsset(legacyAssetPath, Path.GetFileNameWithoutExtension(assetPath));
+
+				if (!string.IsNullOrEmpty(error))
+				{
+					Debug.LogError(error);
+				}
+
+				asset = AssetDatabase.LoadAssetAtPath(assetPath, assetType);
+			}
+		}
+
+		if (asset == null)
+		{
+			asset = ScriptableObject.CreateInstance(assetType);
 			AssetDatabase.CreateAsset((ScriptableObject)asset, assetPath);
 			asset.hideFlags = HideFlags.NotEditable;
 		}
 
+		string assetName = Path.GetFileNameWithoutExtension(assetPath);
+
+		if (asset.name != assetName)
+		{
+			asset.name = assetName;
+			EditorUtility.SetDirty(asset);
+		}
+
 		return asset;
+	}
+
+	static string GetLegacyAssetPath(string assetPath, Type assetType)
+	{
+		string directoryPath = Path.GetDirectoryName(assetPath);
+		return Path.Combine(directoryPath, assetType.Name + ".asset");
 	}
 
 	static IWorkbook LoadBook(string excelPath)
@@ -98,6 +134,14 @@ public class ExcelImporter : AssetPostprocessor
 			if (Path.GetExtension(excelPath) == ".xls") return new HSSFWorkbook(stream);
 			else return new XSSFWorkbook(stream);
 		}
+	}
+
+	static ISheet GetSheetByFieldName(IWorkbook book, string fieldName)
+	{
+		ISheet sheet = book.GetSheet(fieldName);
+		if (sheet != null) return sheet;
+
+		return book.GetSheet(ToLowerCamelName(fieldName));
 	}
 
 	static List<string> GetFieldNamesFromSheetHeader(ISheet sheet)
@@ -112,6 +156,60 @@ public class ExcelImporter : AssetPostprocessor
 			fieldNames.Add(cell.StringCellValue);
 		}
 		return fieldNames;
+	}
+
+	static FieldInfo GetSerializableField(Type entityType, string columnName)
+	{
+		FieldInfo entityField = entityType.GetField(
+			columnName,
+			BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+		);
+
+		if (entityField != null) return entityField;
+
+		// Excel/data keys use lower camel while Unity fields use PascalCase.
+		string unityFieldName = ToPascalCaseName(columnName);
+		if (unityFieldName == columnName) return null;
+
+		return entityType.GetField(
+			unityFieldName,
+			BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+		);
+	}
+
+	static string ToPascalCaseName(string value)
+	{
+		if (string.IsNullOrWhiteSpace(value)) return value;
+
+		string trimmedValue = value.Trim();
+		StringBuilder builder = new StringBuilder(trimmedValue.Length);
+		bool upperNext = true;
+		bool hasSeparator = false;
+
+		foreach (char ch in trimmedValue)
+		{
+			if (ch == '_' || ch == '-' || ch == ' ' || ch == '.')
+			{
+				upperNext = true;
+				hasSeparator = true;
+				continue;
+			}
+
+			builder.Append(upperNext ? char.ToUpperInvariant(ch) : ch);
+			upperNext = false;
+		}
+
+		if (hasSeparator) return builder.ToString();
+
+		return char.ToUpperInvariant(trimmedValue[0]) + trimmedValue.Substring(1);
+	}
+
+	static string ToLowerCamelName(string value)
+	{
+		if (string.IsNullOrWhiteSpace(value)) return value;
+
+		string trimmedValue = value.Trim();
+		return char.ToLowerInvariant(trimmedValue[0]) + trimmedValue.Substring(1);
 	}
 
 	static object CellToFieldObject(ICell cell, FieldInfo fieldInfo, bool isFormulaEvalute = false)
@@ -145,10 +243,7 @@ public class ExcelImporter : AssetPostprocessor
 
 		for (int i = 0; i < columnNames.Count; i++)
 		{
-			FieldInfo entityField = entityType.GetField(
-				columnNames[i],
-				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic 
-			);
+			FieldInfo entityField = GetSerializableField(entityType, columnNames[i]);
 			if (entityField == null) continue;
 			if (!entityField.IsPublic && entityField.GetCustomAttributes(typeof(SerializeField), false).Length == 0) continue;
 
@@ -197,7 +292,7 @@ public class ExcelImporter : AssetPostprocessor
 	static void ImportExcel(string excelPath, ExcelAssetInfo info)
 	{
 		string assetPath = "";
-		string assetName = info.AssetType.Name + ".asset";
+		string assetName = ScriptableObjectAssetPrefix + info.AssetType.Name + ".asset";
 
 		if(string.IsNullOrEmpty(info.Attribute.AssetPath))
 		{
@@ -216,7 +311,7 @@ public class ExcelImporter : AssetPostprocessor
 
 		foreach (var assetField in assetFields)
 		{
-			ISheet sheet =  book.GetSheet(assetField.Name);
+			ISheet sheet =  GetSheetByFieldName(book, assetField.Name);
 			if(sheet == null) continue;
 
 			Type fieldType = assetField.FieldType;

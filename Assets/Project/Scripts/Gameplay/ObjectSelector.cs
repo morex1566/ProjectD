@@ -30,6 +30,26 @@ namespace TRPG.Runtime
         /// </summary>
         private bool isPointerDown;
 
+        /// <summary>
+        /// InputAction 콜백에서 받은 클릭 시작 처리 예약
+        /// </summary>
+        private bool hasPendingLeftClickStarted;
+
+        /// <summary>
+        /// InputAction 콜백에서 받은 클릭 종료 처리 예약
+        /// </summary>
+        private bool hasPendingLeftClickCanceled;
+
+        /// <summary>
+        /// 클릭 시작 화면 좌표 예약값
+        /// </summary>
+        private Vector2 pendingStartPointerDownScreenPos;
+
+        /// <summary>
+        /// 클릭 종료 화면 좌표 예약값
+        /// </summary>
+        private Vector2 pendingEndPointerDownScreenPos;
+
 
         private void OnEnable()
         {
@@ -43,16 +63,47 @@ namespace TRPG.Runtime
             InputManager.InputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;
         }
 
+        private void Update()
+        {
+            if (hasPendingLeftClickStarted)
+            {
+                hasPendingLeftClickStarted = false;
+                TryStartSelect(pendingStartPointerDownScreenPos);
+            }
+
+            if (hasPendingLeftClickCanceled)
+            {
+                hasPendingLeftClickCanceled = false;
+                TryEndSelect(pendingEndPointerDownScreenPos);
+            }
+        }
+
         private void OnLeftClickStarted(InputAction.CallbackContext context)
         {
-            // 드래그 시작지점이 UI 위치임?
-            if (IsPointerOverUI()) return;
+            if (Pointer.current == null) return;
 
-            startPointerDownScreenPos = Pointer.current.position.ReadValue();
-            isPointerDown = true;
+            pendingStartPointerDownScreenPos = Pointer.current.position.ReadValue();
+            hasPendingLeftClickStarted = true;
         }
 
         private void OnLeftClickCanceled(InputAction.CallbackContext context)
+        {
+            if (Pointer.current == null) return;
+
+            pendingEndPointerDownScreenPos = Pointer.current.position.ReadValue();
+            hasPendingLeftClickCanceled = true;
+        }
+
+        private void TryStartSelect(Vector2 pointerScreenPos)
+        {
+            // 드래그 시작지점이 UI 위치임?
+            if (IsPointerOverUI(pointerScreenPos)) return;
+
+            startPointerDownScreenPos = pointerScreenPos;
+            isPointerDown = true;
+        }
+
+        private void TryEndSelect(Vector2 pointerScreenPos)
         {
             // 이전 제약조건에 의해 드래깅 취소 된거였음?
             if (!isPointerDown) return;
@@ -60,15 +111,14 @@ namespace TRPG.Runtime
             isPointerDown = false;
 
             // 드래그 종료지점이 UI 위치임?
-            if (IsPointerOverUI()) return;
+            if (IsPointerOverUI(pointerScreenPos)) return;
 
-            Vector2 endPointerDownScreenPos = Pointer.current.position.ReadValue();
             Vector2 endPointerDownWorldPos = MouseEx.GetMouseWorldPos(WorldManager.CamController.Cam);
 
-            float dragSqrDistance = (endPointerDownScreenPos - startPointerDownScreenPos).sqrMagnitude;
+            float dragSqrDistance = (pointerScreenPos - startPointerDownScreenPos).sqrMagnitude;
             if (dragSqrDistance >= dragThreshold * dragThreshold)
             {
-                Selects(startPointerDownScreenPos, endPointerDownScreenPos);
+                Selects(startPointerDownScreenPos, pointerScreenPos);
             }
             else
             {
@@ -76,9 +126,20 @@ namespace TRPG.Runtime
             }
         }
 
-        private static bool IsPointerOverUI()
+        private static bool IsPointerOverUI(Vector2 pointerScreenPos)
         {
-            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null) return false;
+
+            // InputAction 콜백 안에서 IsPointerOverGameObject를 호출하면 Unity가 이전 프레임 UI 상태를 사용합니다.
+            PointerEventData pointerEventData = new PointerEventData(eventSystem)
+            {
+                position = pointerScreenPos
+            };
+            List<RaycastResult> raycastResults = new();
+            eventSystem.RaycastAll(pointerEventData, raycastResults);
+
+            return raycastResults.Count > 0;
         }
 
         private void Selects(Vector2 startPos, Vector2 endPos)

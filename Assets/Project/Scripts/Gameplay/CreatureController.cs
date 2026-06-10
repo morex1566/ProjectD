@@ -1,46 +1,34 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace TRPG.Runtime
 {
-    public class CreatureController : MonoBehaviour, ISelectable
+    public class CreatureController : MonoBehaviour, ISelectable, IWorldObject
     {
-        [SerializeField] private Sprite sprite;
+        [SerializeField] private CreatureData data;
 
         [SerializeField] private SpriteRenderer spriter;
 
-        [SerializeField] private Color selectedColor = Color.cyan;
 
-        [SerializeField] private float moveSpeed = 5f;
-
-        [SerializeField] private float stopDistance = 0.01f;
-
-        private Vector3 targetPosition;
-
-        private bool hasTarget;
-
-        private Color defaultColor = Color.white;
 
         public bool CanSelect { get; set; } = true;
 
-        public bool IsSelected { get; set; }
+        public bool IsSelected { get; set; } = false;
 
-        public Bounds SelectionBounds => sprite.bounds;
+        public Bounds SelectionBounds => spriter.bounds;
 
-        private void Awake()
+        public string DataId => data.DataId;
+
+        public int InstanceId => GetInstanceID();
+
+
+
+        public void Init(CreatureData creatureData)
         {
-            targetPosition = transform.position;
-            spriter ??= GetComponentInChildren<SpriteRenderer>();
+            data = creatureData;
 
-            if (spriter != null)
-            {
-                defaultColor = spriter.color;
-                spriter.sprite = sprite;
-            }
-        }
-
-        private void Update()
-        {
-            MoveToTarget();
+            ClearSpritePf();
+            ComposeSpritePf();
         }
 
         public bool Contains(Vector3 worldPosition)
@@ -51,37 +39,47 @@ namespace TRPG.Runtime
         public void SetSelected(bool isSelected)
         {
             IsSelected = isSelected;
+        }
 
+        private void ClearSpritePf()
+        {
+            if (spriter == null) return;
+
+            if (spriter.gameObject == gameObject) return;
+
+            Destroy(spriter.gameObject);
+            spriter = null;
+        }
+
+        private void ComposeSpritePf()
+        {
+            GameObject spriteObj = Instantiate(data.SpritePf, transform);
+            spriteObj.transform.localPosition = Vector3.zero;
+            spriteObj.transform.localRotation = Quaternion.identity;
+            spriteObj.transform.localScale = Vector3.one;
+
+            spriter = spriteObj.GetComponentInChildren<SpriteRenderer>();
+        }
+
+
+        /// <summary>
+        /// 인스턴스 아이디 표기
+        /// </summary>
+        private void OnDrawGizmos()
+        {
+            // 선택 범위 박스
             if (spriter != null)
             {
-                spriter.color = isSelected ? selectedColor : defaultColor;
+                Gizmos.color = IsSelected ? Color.green : Color.yellow;
+                Gizmos.DrawWireCube(SelectionBounds.center, SelectionBounds.size);
             }
-        }
 
-        /// <summary>
-        /// 외부 입력 처리자가 전달한 월드 좌표를 이동 목표로 설정합니다.
-        /// </summary>
-        public void MoveTo(Vector3 worldPosition)
-        {
-            targetPosition = new Vector3(worldPosition.x, worldPosition.y, transform.position.z);
-            hasTarget = true;
-        }
-
-        /// <summary>
-        /// 현재 위치에서 목표 지점까지 일정 속도로 이동합니다.
-        /// </summary>
-        private void MoveToTarget()
-        {
-            if (!hasTarget) return;
-
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-            // 목표에 근접하면 이동 종료
-            if (Vector3.Distance(transform.position, targetPosition) <= stopDistance)
-            {
-                transform.position = targetPosition;
-                hasTarget = false;
-            }
+#if UNITY_EDITOR
+            // Scene View에 텍스트 표시
+            Vector3 labelPos = transform.position + Vector3.up * 0.75f;
+            string label = $"InstanceId: {InstanceId}\n" + $"DataId: {DataId}";
+            Handles.Label(labelPos, label);
+#endif
         }
     }
 }

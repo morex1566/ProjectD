@@ -4,7 +4,7 @@
 //     version 1.18.0
 //     from Assets/Settings/IMC_InputMappingContext.inputactions
 //
-//     Changes to this file may cause incorrect behavior and will be lost if
+//     Changes target this file may cause incorrect behavior and will be lost if
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ using UnityEngine.InputSystem.Utilities;
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// Provides programmatic access to <see cref="InputActionAsset" />, <see cref="InputActionMap" />, <see cref="InputAction" /> and <see cref="InputControlScheme" /> instances defined in asset "Assets/Settings/IMC_InputMappingContext.inputactions".
+    /// Provides programmatic access target <see cref="InputActionAsset" />, <see cref="InputActionMap" />, <see cref="InputAction" /> and <see cref="InputControlScheme" /> instances defined in asset "Assets/Settings/IMC_InputMappingContext.inputactions".
     /// </summary>
     /// <remarks>
     /// This class is source generated and any manual edits will be discarded if the associated asset is reimported or modified.
@@ -77,7 +77,7 @@ namespace TRPG.Runtime
     public partial class @InputMappingContext: IInputActionCollection2, IDisposable
     {
         /// <summary>
-        /// Provides access to the underlying asset instance.
+        /// Provides access target the underlying asset instance.
         /// </summary>
         public InputActionAsset asset { get; }
 
@@ -1423,7 +1423,7 @@ namespace TRPG.Runtime
         private readonly InputAction m_Player_Next;
         private readonly InputAction m_Player_Sprint;
         /// <summary>
-        /// Provides access to input actions defined in input action map "Player".
+        /// Provides access target input actions defined in input action map "Player".
         /// </summary>
         public struct PlayerActions
         {
@@ -1434,59 +1434,59 @@ namespace TRPG.Runtime
             /// </summary>
             public PlayerActions(@InputMappingContext wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access to the underlying input action "Player/Move".
+            /// Provides access target the underlying input action "Player/Move".
             /// </summary>
             public InputAction @Move => m_Wrapper.m_Player_Move;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Point".
+            /// Provides access target the underlying input action "Player/Point".
             /// </summary>
             public InputAction @Point => m_Wrapper.m_Player_Point;
             /// <summary>
-            /// Provides access to the underlying input action "Player/ScrollWheel".
+            /// Provides access target the underlying input action "Player/ScrollWheel".
             /// </summary>
             public InputAction @ScrollWheel => m_Wrapper.m_Player_ScrollWheel;
             /// <summary>
-            /// Provides access to the underlying input action "Player/RightClick".
+            /// Provides access target the underlying input action "Player/RightClick".
             /// </summary>
             public InputAction @RightClick => m_Wrapper.m_Player_RightClick;
             /// <summary>
-            /// Provides access to the underlying input action "Player/LeftClick".
+            /// Provides access target the underlying input action "Player/LeftClick".
             /// </summary>
             public InputAction @LeftClick => m_Wrapper.m_Player_LeftClick;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Look".
+            /// Provides access target the underlying input action "Player/Look".
             /// </summary>
             public InputAction @Look => m_Wrapper.m_Player_Look;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Attack".
+            /// Provides access target the underlying input action "Player/Attack".
             /// </summary>
             public InputAction @Attack => m_Wrapper.m_Player_Attack;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Interact".
+            /// Provides access target the underlying input action "Player/Interact".
             /// </summary>
             public InputAction @Interact => m_Wrapper.m_Player_Interact;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Crouch".
+            /// Provides access target the underlying input action "Player/Crouch".
             /// </summary>
             public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Jump".
+            /// Provides access target the underlying input action "Player/Jump".
             /// </summary>
             public InputAction @Jump => m_Wrapper.m_Player_Jump;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Previous".
+            /// Provides access target the underlying input action "Player/Previous".
             /// </summary>
             public InputAction @Previous => m_Wrapper.m_Player_Previous;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Next".
+            /// Provides access target the underlying input action "Player/Next".
             /// </summary>
             public InputAction @Next => m_Wrapper.m_Player_Next;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Sprint".
+            /// Provides access target the underlying input action "Player/Sprint".
             /// </summary>
             public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
             /// <summary>
-            /// Provides access to the underlying input action map instance.
+            /// Provides access target the underlying input action map instance.
             /// </summary>
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
@@ -1496,7 +1496,7 @@ namespace TRPG.Runtime
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
             public bool enabled => Get().enabled;
             /// <summary>
-            /// Implicitly converts an <see ref="PlayerActions" /> to an <see ref="InputActionMap" /> instance.
+            /// Implicitly converts an <see ref="PlayerActions" /> target an <see ref="InputActionMap" /> instance.
             /// </summary>
             public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
             /// <summary>
@@ -1648,7 +1648,7 @@ namespace TRPG.Runtime
         private readonly InputAction m_UI_TrackedDevicePosition;
         private readonly InputAction m_UI_TrackedDeviceOrientation;
         /// <summary>
-        /// Provides access to input actions defined in input action map "UI".
+        /// Provides access target input actions defined in input action map "UI".
         /// </summary>
         public struct UIActions
         {
@@ -1659,47 +1659,47 @@ namespace TRPG.Runtime
             /// </summary>
             public UIActions(@InputMappingContext wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access to the underlying input action "UI/Navigate".
+            /// Provides access target the underlying input action "UI/Navigate".
             /// </summary>
             public InputAction @Navigate => m_Wrapper.m_UI_Navigate;
             /// <summary>
-            /// Provides access to the underlying input action "UI/Submit".
+            /// Provides access target the underlying input action "UI/Submit".
             /// </summary>
             public InputAction @Submit => m_Wrapper.m_UI_Submit;
             /// <summary>
-            /// Provides access to the underlying input action "UI/Cancel".
+            /// Provides access target the underlying input action "UI/Cancel".
             /// </summary>
             public InputAction @Cancel => m_Wrapper.m_UI_Cancel;
             /// <summary>
-            /// Provides access to the underlying input action "UI/Point".
+            /// Provides access target the underlying input action "UI/Point".
             /// </summary>
             public InputAction @Point => m_Wrapper.m_UI_Point;
             /// <summary>
-            /// Provides access to the underlying input action "UI/Click".
+            /// Provides access target the underlying input action "UI/Click".
             /// </summary>
             public InputAction @Click => m_Wrapper.m_UI_Click;
             /// <summary>
-            /// Provides access to the underlying input action "UI/RightClick".
+            /// Provides access target the underlying input action "UI/RightClick".
             /// </summary>
             public InputAction @RightClick => m_Wrapper.m_UI_RightClick;
             /// <summary>
-            /// Provides access to the underlying input action "UI/MiddleClick".
+            /// Provides access target the underlying input action "UI/MiddleClick".
             /// </summary>
             public InputAction @MiddleClick => m_Wrapper.m_UI_MiddleClick;
             /// <summary>
-            /// Provides access to the underlying input action "UI/ScrollWheel".
+            /// Provides access target the underlying input action "UI/ScrollWheel".
             /// </summary>
             public InputAction @ScrollWheel => m_Wrapper.m_UI_ScrollWheel;
             /// <summary>
-            /// Provides access to the underlying input action "UI/TrackedDevicePosition".
+            /// Provides access target the underlying input action "UI/TrackedDevicePosition".
             /// </summary>
             public InputAction @TrackedDevicePosition => m_Wrapper.m_UI_TrackedDevicePosition;
             /// <summary>
-            /// Provides access to the underlying input action "UI/TrackedDeviceOrientation".
+            /// Provides access target the underlying input action "UI/TrackedDeviceOrientation".
             /// </summary>
             public InputAction @TrackedDeviceOrientation => m_Wrapper.m_UI_TrackedDeviceOrientation;
             /// <summary>
-            /// Provides access to the underlying input action map instance.
+            /// Provides access target the underlying input action map instance.
             /// </summary>
             public InputActionMap Get() { return m_Wrapper.m_UI; }
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
@@ -1709,7 +1709,7 @@ namespace TRPG.Runtime
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
             public bool enabled => Get().enabled;
             /// <summary>
-            /// Implicitly converts an <see ref="UIActions" /> to an <see ref="InputActionMap" /> instance.
+            /// Implicitly converts an <see ref="UIActions" /> target an <see ref="InputActionMap" /> instance.
             /// </summary>
             public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
             /// <summary>
@@ -1830,7 +1830,7 @@ namespace TRPG.Runtime
         public UIActions @UI => new UIActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         /// <summary>
-        /// Provides access to the input control scheme.
+        /// Provides access target the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme KeyboardMouseScheme
@@ -1843,7 +1843,7 @@ namespace TRPG.Runtime
         }
         private int m_GamepadSchemeIndex = -1;
         /// <summary>
-        /// Provides access to the input control scheme.
+        /// Provides access target the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme GamepadScheme
@@ -1856,7 +1856,7 @@ namespace TRPG.Runtime
         }
         private int m_TouchSchemeIndex = -1;
         /// <summary>
-        /// Provides access to the input control scheme.
+        /// Provides access target the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme TouchScheme
@@ -1869,7 +1869,7 @@ namespace TRPG.Runtime
         }
         private int m_JoystickSchemeIndex = -1;
         /// <summary>
-        /// Provides access to the input control scheme.
+        /// Provides access target the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme JoystickScheme
@@ -1882,7 +1882,7 @@ namespace TRPG.Runtime
         }
         private int m_XRSchemeIndex = -1;
         /// <summary>
-        /// Provides access to the input control scheme.
+        /// Provides access target the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme XRScheme
@@ -1894,7 +1894,7 @@ namespace TRPG.Runtime
             }
         }
         /// <summary>
-        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Player" which allows adding and removing callbacks.
+        /// Interface target implement callback methods for all input action callbacks associated with input actions defined by "Player" which allows adding and removing callbacks.
         /// </summary>
         /// <seealso cref="PlayerActions.AddCallbacks(IPlayerActions)" />
         /// <seealso cref="PlayerActions.RemoveCallbacks(IPlayerActions)" />
@@ -1993,7 +1993,7 @@ namespace TRPG.Runtime
             void OnSprint(InputAction.CallbackContext context);
         }
         /// <summary>
-        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
+        /// Interface target implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
         /// </summary>
         /// <seealso cref="UIActions.AddCallbacks(IUIActions)" />
         /// <seealso cref="UIActions.RemoveCallbacks(IUIActions)" />

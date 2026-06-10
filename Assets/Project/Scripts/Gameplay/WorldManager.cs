@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,13 +10,16 @@ namespace TRPG.Runtime
     {
         private static WorldManagerSettingsData settings = null;
 
-        private static readonly Dictionary<int, GameObject> worldInsts = new();
+        private static readonly Dictionary<int, IWorldObject> worldInsts = new();
 
         private static GameObject worldRoot = null;
 
         public static ObjectSelector Selector = null;
 
         public static WorldCameraController CamController = null;
+
+        public static CreatureDataSheet creatureDataSheet = null;
+
 
 
         /// <summary>
@@ -35,6 +37,39 @@ namespace TRPG.Runtime
             worldRoot = new GameObject("World");
             Selector = Instantiate(settings.Selector);
             CamController = Instantiate(settings.CamController);
+            creatureDataSheet = ResourceManager.GetResource(settings.CreatureDataSheetRef);
+        }
+
+        public static IWorldObject Spawn(IdKeyData idKeyData, Vector3 position)
+        {
+            CreatureData creatureData = creatureDataSheet.GetCreatureData(idKeyData.Id);
+            GameObject instObj = Instantiate(creatureData.CreaturePf, position, Quaternion.identity, worldRoot.transform);
+            instObj.name = creatureData.DataId;
+
+            CreatureController creatureController = instObj.GetComponent<CreatureController>();
+            creatureController.Init(creatureData);
+
+            Register(creatureController);
+
+            return creatureController;
+        }
+
+        public static bool Despawn(int instanceId)
+        {
+            IWorldObject worldObject = worldInsts[instanceId];
+            worldInsts.Remove(instanceId);
+
+            if (worldObject is Component component)
+            {
+                Destroy(component.gameObject);
+            }
+
+            return true;
+        }
+
+        private static void Register(IWorldObject worldObject)
+        {
+            worldInsts.Add(worldObject.InstanceId, worldObject);
         }
     }
 }
