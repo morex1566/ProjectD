@@ -2,18 +2,28 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
-    public class CreatureJob : MonoBehaviour
+    public abstract class CreatureJob
     {
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
+        public int Priority;
+
+        public bool IsDone;
+
+        protected CreatureController owner;
+
+        protected CreatureJobQueue queue;
+
+        protected CreatureJob(CreatureController owner, CreatureJobQueue queue, int priority)
         {
-        
+            this.owner = owner;
+            this.queue = queue;
+            Priority = priority;
         }
 
-        // Update is called once per frame
-        void Update()
+        public virtual void Execute()
         {
-        
+            IsDone = EvaluteIsDone();
         }
+
+        public abstract bool EvaluteIsDone();
     }
 }

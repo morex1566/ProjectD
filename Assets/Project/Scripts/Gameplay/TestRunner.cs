@@ -6,10 +6,12 @@ namespace TRPG.Runtime
     {
         [SerializeField] private IdKeyData idKeyData;
 
-        [ContextMenu("TestSpawn")]
-        public void TestSpawn()
+        [ContextMenu("TestSpawnAlly")]
+        public void TestSpawnAlly()
         {
-            WorldManager.Spawn(idKeyData, Vector2.zero);
+            var creature = WorldManager.Spawn(idKeyData, Vector2.zero);
+            var creatureController = creature as CreatureController;
+            creatureController?.SetOwner(PlayerManager.GetInstance().gameObject);
         }
     }
 }

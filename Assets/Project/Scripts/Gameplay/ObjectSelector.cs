@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace TRPG.Runtime
 {
@@ -14,6 +15,11 @@ namespace TRPG.Runtime
         /// 드래깅이 너무 작으면 개별 클릭으로 전환되는데 그 기준 길이
         /// </summary>
         [SerializeField] private float dragThreshold = 8f;
+
+        /// <summary>
+        /// 드래그 선택 영역을 표시할 UI 프리팹입니다.
+        /// </summary>
+        [SerializeField] private RectTransform selectionBoxPf = null;
 
         /// <summary>
         /// 드래그 대상
@@ -30,26 +36,19 @@ namespace TRPG.Runtime
         /// </summary>
         private bool isPointerDown;
 
-        /// <summary>
-        /// InputAction 콜백에서 받은 클릭 시작 처리 예약
-        /// </summary>
-        private bool hasPendingLeftClickStarted;
+        private RectTransform selectionBoxCanvasRect;
 
-        /// <summary>
-        /// InputAction 콜백에서 받은 클릭 종료 처리 예약
-        /// </summary>
-        private bool hasPendingLeftClickCanceled;
+        private RectTransform selectionBox;
 
-        /// <summary>
-        /// 클릭 시작 화면 좌표 예약값
-        /// </summary>
-        private Vector2 pendingStartPointerDownScreenPos;
 
-        /// <summary>
-        /// 클릭 종료 화면 좌표 예약값
-        /// </summary>
-        private Vector2 pendingEndPointerDownScreenPos;
+        public IReadOnlyList<ISelectable> SelectedInsts => selectedInsts;
 
+
+        private void Awake()
+        {
+            CreateSelectionBox();
+            HideSelectionBox();
+        }
 
         private void OnEnable()
         {
@@ -61,54 +60,62 @@ namespace TRPG.Runtime
         {
             InputManager.InputMappingContext.Player.LeftClick.performed -= OnLeftClickStarted;
             InputManager.InputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;
+            HideSelectionBox();
         }
 
         private void Update()
         {
-            if (hasPendingLeftClickStarted)
+            if (!isPointerDown) return;
+            if (Pointer.current == null) return;
+
+            Vector2 pointerScreenPos = Pointer.current.position.ReadValue();
+            float dragSqrDistance = (pointerScreenPos - startPointerDownScreenPos).sqrMagnitude;
+            if (dragSqrDistance < dragThreshold * dragThreshold)
             {
-                hasPendingLeftClickStarted = false;
-                TryStartSelect(pendingStartPointerDownScreenPos);
+                HideSelectionBox();
+                return;
             }
 
-            if (hasPendingLeftClickCanceled)
-            {
-                hasPendingLeftClickCanceled = false;
-                TryEndSelect(pendingEndPointerDownScreenPos);
-            }
+            ShowSelectionBox(startPointerDownScreenPos, pointerScreenPos);
         }
 
         private void OnLeftClickStarted(InputAction.CallbackContext context)
         {
             if (Pointer.current == null) return;
 
-            pendingStartPointerDownScreenPos = Pointer.current.position.ReadValue();
-            hasPendingLeftClickStarted = true;
+            Vector2 pointerScreenPos = Pointer.current.position.ReadValue();
+            StartSelect(pointerScreenPos);
         }
 
         private void OnLeftClickCanceled(InputAction.CallbackContext context)
         {
             if (Pointer.current == null) return;
 
-            pendingEndPointerDownScreenPos = Pointer.current.position.ReadValue();
-            hasPendingLeftClickCanceled = true;
+            Vector2 pointerScreenPos = Pointer.current.position.ReadValue();
+            EndSelect(pointerScreenPos);
         }
 
-        private void TryStartSelect(Vector2 pointerScreenPos)
+        private void StartSelect(Vector2 pointerScreenPos)
         {
             // 드래그 시작지점이 UI 위치임?
             if (IsPointerOverUI(pointerScreenPos)) return;
 
             startPointerDownScreenPos = pointerScreenPos;
             isPointerDown = true;
+            HideSelectionBox();
         }
 
-        private void TryEndSelect(Vector2 pointerScreenPos)
+        private void EndSelect(Vector2 pointerScreenPos)
         {
             // 이전 제약조건에 의해 드래깅 취소 된거였음?
-            if (!isPointerDown) return;
+            if (!isPointerDown)
+            {
+                HideSelectionBox();
+                return;
+            }
 
             isPointerDown = false;
+            HideSelectionBox();
 
             // 드래그 종료지점이 UI 위치임?
             if (IsPointerOverUI(pointerScreenPos)) return;
@@ -144,11 +151,11 @@ namespace TRPG.Runtime
 
         private void Selects(Vector2 startPos, Vector2 endPos)
         {
+            ClearSelection();
+
             Rect selectionRect = CreateScreenRect(startPos, endPos);
             MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             Camera cam = WorldManager.CamController.Cam;
-
-            selectedInsts.Clear();
 
             for (int i = 0; i < behaviours.Length; i++)
             {
@@ -161,7 +168,7 @@ namespace TRPG.Runtime
                 // 드래깅 범위에 있음?
                 if (!IsBoundsInScreenRect(cam, selectable.SelectionBounds, selectionRect)) continue;
 
-                selectedInsts.Add(selectable);
+                AddSelection(selectable);
             }
         }
 
@@ -189,7 +196,7 @@ namespace TRPG.Runtime
 
         private void Select(Vector2 mouseWorldPos)
         {
-            selectedInsts.Clear();
+            ClearSelection();
 
             MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             Camera cam = WorldManager.CamController.Cam;
@@ -221,7 +228,70 @@ namespace TRPG.Runtime
                 }
             }
 
-            if (bestSelectable is not null) selectedInsts.Add(bestSelectable);
+            if (bestSelectable is not null) AddSelection(bestSelectable);
+        }
+
+        private void ClearSelection()
+        {
+            for (int i = 0; i < selectedInsts.Count; i++)
+            {
+                // 선택 리스트를 비울 때 실제 선택 상태도 함께 해제합니다.
+                selectedInsts[i].SetSelected(false);
+            }
+
+            selectedInsts.Clear();
+        }
+
+        private void AddSelection(ISelectable selectable)
+        {
+            selectedInsts.Add(selectable);
+            selectable.SetSelected(true);
+        }
+
+        private void CreateSelectionBox()
+        {
+            if (selectionBox != null) return;
+            if (selectionBoxPf == null) return;
+
+            GameObject canvasObj = new GameObject("SelectionBoxCanvas", typeof(RectTransform), typeof(Canvas));
+            canvasObj.transform.SetParent(transform, false);
+
+            Canvas canvas = canvasObj.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 1000;
+
+            selectionBoxCanvasRect = canvasObj.GetComponent<RectTransform>();
+            selectionBox = Instantiate(selectionBoxPf, selectionBoxCanvasRect);
+            selectionBox.anchorMin = new Vector2(0.5f, 0.5f);
+            selectionBox.anchorMax = new Vector2(0.5f, 0.5f);
+            selectionBox.pivot = new Vector2(0.5f, 0.5f);
+
+            // 선택 박스 UI가 드래그 종료 지점의 UI 판정을 막지 않게 합니다.
+            Graphic selectionBoxGraphic = selectionBox.GetComponent<Graphic>();
+            if (selectionBoxGraphic != null) selectionBoxGraphic.raycastTarget = false;
+        }
+
+        private void ShowSelectionBox(Vector2 startScreenPos, Vector2 endScreenPos)
+        {
+            if (selectionBox == null) return;
+            if (selectionBoxCanvasRect == null) return;
+
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(selectionBoxCanvasRect, startScreenPos, null, out Vector2 localStart)) return;
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(selectionBoxCanvasRect, endScreenPos, null, out Vector2 localEnd)) return;
+
+            Vector2 min = Vector2.Min(localStart, localEnd);
+            Vector2 max = Vector2.Max(localStart, localEnd);
+
+            selectionBox.gameObject.SetActive(true);
+            selectionBox.anchoredPosition = (min + max) * 0.5f;
+            selectionBox.sizeDelta = max - min;
+        }
+
+        private void HideSelectionBox()
+        {
+            if (selectionBox == null) return;
+
+            selectionBox.gameObject.SetActive(false);
         }
     }
 }

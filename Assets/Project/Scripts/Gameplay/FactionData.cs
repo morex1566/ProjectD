@@ -7,20 +7,20 @@ namespace TRPG.Runtime
     [CreateAssetMenu(fileName = "SO_Faction", menuName = "Scriptable Objects/Faction/Default")]
     public class FactionData : ScriptableObject
     {
-        [SerializeField] private FactionType type;
+        [SerializeField] public FactionType Type;
 
-        [SerializeField] private List<Relation> entries = new();
+        [SerializeField] public List<Relation> Entries = new();
 
 #if UNITY_EDITOR
         private void Reset()
         {
-            entries = new List<Relation>();
+            Entries = new List<Relation>();
 
             foreach (FactionType factionType in Enum.GetValues(typeof(FactionType)))
             {
                 if (factionType == FactionType.None) continue;
 
-                entries.Add(new Relation(factionType, 0));
+                Entries.Add(new Relation(factionType, 0));
             }
         }
 #endif

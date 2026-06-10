@@ -28,6 +28,7 @@ namespace TRPG.Runtime
         {
             UIManager.Init();
             WorldManager.Init();
+            PlayerManager.Init();
         }
 
         private static void Init()

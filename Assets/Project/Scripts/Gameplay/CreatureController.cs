@@ -1,15 +1,25 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
+    
+
     public class CreatureController : MonoBehaviour, ISelectable, IWorldObject
     {
-        [SerializeField] private CreatureData data;
+        [SerializeField] private CreatureData data = null;
 
-        [SerializeField] private SpriteRenderer spriter;
+        [SerializeField] private SpriteRenderer spriter = null;
 
+        [SerializeField] private GameObject selectionIndicator = null;
 
+        private CreatureJobQueue jobQueue = new();
+
+        /// <summary>
+        /// 현재 이 생명체가 조종받는 대상
+        /// </summary>
+        public GameObject Owner { get; private set; } = null;
 
         public bool CanSelect { get; set; } = true;
 
@@ -28,7 +38,12 @@ namespace TRPG.Runtime
             data = creatureData;
 
             ClearSpritePf();
-            ComposeSpritePf();
+            SetSpritePf();
+        }
+
+        private void Update()
+        {
+            jobQueue.Execute();
         }
 
         public bool Contains(Vector3 worldPosition)
@@ -39,6 +54,15 @@ namespace TRPG.Runtime
         public void SetSelected(bool isSelected)
         {
             IsSelected = isSelected;
+            selectionIndicator.SetActive(isSelected);
+        }
+
+        /// <summary>
+        /// 사용자가 조작하는 상태인지?
+        /// </summary>
+        public void SetOwner(GameObject owner)
+        {
+            this.Owner = owner;
         }
 
         private void ClearSpritePf()
@@ -51,7 +75,7 @@ namespace TRPG.Runtime
             spriter = null;
         }
 
-        private void ComposeSpritePf()
+        private void SetSpritePf()
         {
             GameObject spriteObj = Instantiate(data.SpritePf, transform);
             spriteObj.transform.localPosition = Vector3.zero;
@@ -59,6 +83,11 @@ namespace TRPG.Runtime
             spriteObj.transform.localScale = Vector3.one;
 
             spriter = spriteObj.GetComponentInChildren<SpriteRenderer>();
+        }
+
+        public void EnqueueMove(Vector3 targetPos)
+        {
+            jobQueue.Enqueue(new CreatureMoveJob(targetPos, 5.0f, this, jobQueue, 1));
         }
 
 

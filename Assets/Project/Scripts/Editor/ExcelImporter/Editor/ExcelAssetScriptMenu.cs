@@ -12,7 +12,7 @@ using NPOI.SS.UserModel;
 public class ExcelAssetScriptMenu
 {
 	const string ScriptTemplateName = "ExcelAssetScriptTemplete.cs.txt";
-	const string FieldTemplete = "\t//public List<EntityType> #FIELDNAME#; // Replace 'EntityType' to an actual type that is serializable.";
+	const string FieldTemplete = "\t//public List<EntityType> #FIELDNAME#; // Replace 'EntityType' to an actual Type that is serializable.";
 
 	[MenuItem("Assets/Create/ExcelAssetScript", false)]
 	static void CreateScript()

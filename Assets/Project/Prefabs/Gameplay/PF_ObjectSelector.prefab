@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.ObjectSelector
   dragThreshold: 8
+  selectionBoxPf: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
