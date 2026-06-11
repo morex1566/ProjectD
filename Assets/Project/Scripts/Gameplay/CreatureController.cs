@@ -1,11 +1,10 @@
+using DG.Tweening;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
-    
-
     public class CreatureController : MonoBehaviour, ISelectable, IWorldObject
     {
         [SerializeField] private CreatureData data = null;
@@ -14,7 +13,17 @@ namespace TRPG.Runtime
 
         [SerializeField] private GameObject selectionIndicator = null;
 
-        private CreatureJobQueue jobQueue = new();
+        public DOTweenAnimation AttackAnim = null;
+
+        public DOTweenAnimation HitAnim = null;
+
+        public CreatureJobMachine JobMachine = null;
+
+        public CreatureStatus Status = null;
+
+        public CreatureDetector Detector = null;
+
+
 
         /// <summary>
         /// 현재 이 생명체가 조종받는 대상
@@ -31,11 +40,16 @@ namespace TRPG.Runtime
 
         public int InstanceId => GetInstanceID();
 
+        public SpriteRenderer Spriter => spriter;
+
 
 
         public void Init(CreatureData creatureData)
         {
             data = creatureData;
+            JobMachine = new CreatureJobMachine();
+            Status = data.Create();
+            Detector = new CreatureDetector(this, Status);
 
             ClearSpritePf();
             SetSpritePf();
@@ -43,7 +57,7 @@ namespace TRPG.Runtime
 
         private void Update()
         {
-            jobQueue.Execute();
+            JobMachine.Execute();
         }
 
         public bool Contains(Vector3 worldPosition)
@@ -85,11 +99,30 @@ namespace TRPG.Runtime
             spriter = spriteObj.GetComponentInChildren<SpriteRenderer>();
         }
 
-        public void EnqueueMove(Vector3 targetPos)
+        public void EnqueueMove(Vector3 targetPos, CommandQueueMode mode)
         {
-            jobQueue.Enqueue(new CreatureMoveJob(targetPos, 5.0f, this, jobQueue, 1));
+            if (mode == CommandQueueMode.Replace)
+            {
+                JobMachine.Clear();
+            }
+
+            JobMachine.Enqueue(new CreatureMoveJob(targetPos, Status.MoveSpeed, this, JobMachine, 1));
         }
 
+        public void EnqueueAttack(CreatureController target, CommandQueueMode mode)
+        {
+            if (mode == CommandQueueMode.Replace)
+            {
+                JobMachine.Clear();
+            }
+
+            JobMachine.Enqueue(new CreatureAttackJob(target, this, JobMachine, 1));
+        }
+
+        public void TakeDamage()
+        {
+
+        }
 
         /// <summary>
         /// 인스턴스 아이디 표기

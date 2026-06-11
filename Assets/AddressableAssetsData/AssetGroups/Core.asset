@@ -15,6 +15,12 @@ MonoBehaviour:
   m_GroupName: Core
   m_GUID: 4bcec18cbf956b3498a87dcbcb54eeeb
   m_SerializeEntries:
+  - m_GUID: 10f2f2627919644409e113872128325e
+    m_Address: SO_AshedSnow
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9224db4d178973f4b8e1c994f2fac449
     m_Address: SO_CreatureDataSheet
     m_ReadOnly: 0

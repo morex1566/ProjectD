@@ -30,13 +30,10 @@ namespace TRPG.Runtime
             GetInstance();
 
             settings = Resources.Load<WorldManagerSettingsData>("SO_WorldManagerSettings");
-        }
 
-        public void Start()
-        {
             worldRoot = new GameObject("World");
             Selector = Instantiate(settings.Selector);
-            CamController = Instantiate(settings.CamController);
+            CamController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
             creatureDataSheet = ResourceManager.GetResource(settings.CreatureDataSheetRef);
         }
 

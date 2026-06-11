@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aeb6d45f277d62c4194150d1a81d9c70, type: 3}
+  m_Name: SO_AshedSnow
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.BckgData
+  BckgSprites:
+  - {fileID: 5877392767103905950, guid: 3ac82897179ab2e46afaff116d973fea, type: 3}
+  - {fileID: -4098223667789411807, guid: 0ebdfbcd88b4baf47ab658092a7ab029, type: 3}
+  - {fileID: -5339643788687104136, guid: bc4318491e9ade549a3e26118bc7e8c9, type: 3}
+  - {fileID: -3216904329794513945, guid: e65bffad4e7c56044b0df0fcfbe494f0, type: 3}
+  baseMoveSpeedPerSec: 0.2
+  speedMultiplier: 1.25
+  cameraHeightRatio: 0.5
+  baseSortingOrder: -100

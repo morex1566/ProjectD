@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1809254756998236648}
   - component: {fileID: 5108346331041859384}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: PF_Creature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,6 +52,7 @@ MonoBehaviour:
     Faction: 
     Hp: 0
     Atk: 0
+    DetectRange: 0
     FactionData: {fileID: 0}
     SpritePf: {fileID: 0}
     CreaturePf: {fileID: 0}
@@ -67,7 +68,7 @@ GameObject:
   m_Component:
   - component: {fileID: 34097733405933765}
   - component: {fileID: 7481076587661530369}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Selection
   m_TagString: Untagged
   m_Icon: {fileID: 0}

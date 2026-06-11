@@ -4,6 +4,12 @@ using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
+    public enum CommandQueueMode
+    {
+        Replace,
+        Append
+    }
+
     /// <summary>
     /// 플레이어 입력에 따른 명령을 중개
     /// </summary>
@@ -33,11 +39,10 @@ namespace TRPG.Runtime
         private void OnRightClickPerformed(InputAction.CallbackContext context)
         {
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(WorldManager.CamController.Cam);
-
-            CommandMoveCreatures(mouseWorldPos);
+            CommandMove(mouseWorldPos, CommandQueueMode.Replace);
         }
 
-        private void CommandMoveCreatures(Vector3 destWorldPos)
+        private void CommandMove(Vector3 destWorldPos, CommandQueueMode mode)
         {
             IReadOnlyList<ISelectable> selectedInsts = WorldManager.Selector.SelectedInsts;
 
@@ -47,7 +52,7 @@ namespace TRPG.Runtime
 
                 if (creature.Owner != gameObject) continue;
 
-                creature.EnqueueMove(destWorldPos);
+                creature.EnqueueMove(destWorldPos, mode);
             }
         }
     }

@@ -4,9 +4,16 @@ namespace TRPG.Runtime
 {
     public class CreatureAttackJob : CreatureJob
     {
+        public static float MaxAttackGauge = 100f;
+
         private CreatureController target;
 
-        public CreatureAttackJob(CreatureController target, CreatureController owner, CreatureJobQueue queue, int priority) : base(owner, queue, priority)
+        private Vector3 direction;
+
+        // 100을 넘으면 공격할 수 있습니다!
+        private float attackGauge = 90f;
+
+        public CreatureAttackJob(CreatureController target, CreatureController owner, CreatureJobMachine queue, int priority) : base(owner, queue, priority)
         {
             this.target = target;
         }
@@ -21,16 +28,34 @@ namespace TRPG.Runtime
             base.Execute();
 
             Attack();
-
-            IsDone = true;
         }
 
         private void Attack()
         {
-            Debug.Log($"{owner.name} attacked {target.name}");
+            // 일단 공격 가능한 범위까지 이동
+            if (!owner.Detector.Detect(target))
+            {
+                Vector3 currentPos = owner.transform.position;
+                Vector3 nextPos = Vector3.MoveTowards(currentPos, target.transform.position, owner.Status.MoveSpeed * Time.deltaTime);
 
-            // TODO: 나중에 CreatureController에 체력/데미지 붙으면 여기서 처리
-            // target.TakeDamage(owner.AttackPower);
+                direction = nextPos - currentPos;
+                owner.transform.position = nextPos;
+
+                return;
+            }
+
+            // 공격 게이지를 채움
+            if (attackGauge <= MaxAttackGauge)
+            {
+                attackGauge += owner.Status.AttackSpeed * Time.deltaTime * 100f;
+            }
+            // 공격 게이지가 꽉 차면 공격
+            else
+            {
+                owner.AttackAnim.DORestart();
+                attackGauge = 0f;
+                // TODO : 공격
+            }
         }
     }
 }

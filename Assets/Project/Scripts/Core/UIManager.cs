@@ -1,8 +1,5 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace TRPG.Runtime
 {
@@ -19,6 +16,8 @@ namespace TRPG.Runtime
         }
 
         private static UIManagerSettingsData settings;
+
+        public static Action OnResolutionChange;
 
         /// <summary>
         /// UI 매니저 초기화 진입점입니다.

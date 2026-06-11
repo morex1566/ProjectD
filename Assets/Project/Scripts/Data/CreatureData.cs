@@ -12,9 +12,21 @@ namespace TRPG.Runtime
         public string Faction;
         public float Hp;
         public float Atk;
+        public float DetectRange;
+        public float AttackRange;
+        public float AttackSpeed;
+        public float MoveSpeed;
 
         public FactionData FactionData;
         public GameObject SpritePf;
         public GameObject CreaturePf;
+
+        /// <summary>
+        /// 셋업 데이터를 기준으로 독립적인 런타임 상태를 생성합니다.
+        /// </summary>
+        public CreatureStatus Create()
+        {
+            return new CreatureStatus(this);
+        }
     }
 }

@@ -10,9 +10,9 @@ namespace TRPG.Runtime
 
         protected CreatureController owner;
 
-        protected CreatureJobQueue queue;
+        protected CreatureJobMachine queue;
 
-        protected CreatureJob(CreatureController owner, CreatureJobQueue queue, int priority)
+        protected CreatureJob(CreatureController owner, CreatureJobMachine queue, int priority)
         {
             this.owner = owner;
             this.queue = queue;
@@ -25,5 +25,10 @@ namespace TRPG.Runtime
         }
 
         public abstract bool EvaluteIsDone();
+
+        private void ResetAnim()
+        {
+
+        }
     }
 }
