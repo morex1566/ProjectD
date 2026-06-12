@@ -32,12 +32,12 @@ namespace TRPG.Runtime
     /// public class Example : MonoBehaviour, MyActions.IPlayerActions
     /// {
     ///     private MyActions_Actions m_Actions;                  // Source code representation of asset.
-    ///     private MyActions_Actions.PlayerActions m_Player;     // Source code representation of action map.
+    ///     private MyActions_Actions.PlayerActions m_Player;     // Source code representation of action cachedMap.
     ///
     ///     void Awake()
     ///     {
     ///         m_Actions = new MyActions_Actions();              // Create asset object.
-    ///         m_Player = m_Actions.Player;                      // Extract action map object.
+    ///         m_Player = m_Actions.Player;                      // Extract action cachedMap object.
     ///         m_Player.AddCallbacks(this);                      // Register callback interface IPlayerActions.
     ///     }
     ///
@@ -48,12 +48,12 @@ namespace TRPG.Runtime
     ///
     ///     void OnEnable()
     ///     {
-    ///         m_Player.Enable();                                // Enable all jobs within map.
+    ///         m_Player.Enable();                                // Enable all jobs within cachedMap.
     ///     }
     ///
     ///     void OnDisable()
     ///     {
-    ///         m_Player.Disable();                               // Disable all jobs within map.
+    ///         m_Player.Disable();                               // Disable all jobs within cachedMap.
     ///     }
     ///
     ///     #region Interface implementation of MyActions.IPlayerActions
@@ -1423,14 +1423,14 @@ namespace TRPG.Runtime
         private readonly InputAction m_Player_Next;
         private readonly InputAction m_Player_Sprint;
         /// <summary>
-        /// Provides access target input jobs defined in input action map "Player".
+        /// Provides access target input jobs defined in input action cachedMap "Player".
         /// </summary>
         public struct PlayerActions
         {
             private @InputMappingContext m_Wrapper;
 
             /// <summary>
-            /// Construct a new instance of the input action map wrapper class.
+            /// Construct a new instance of the input action cachedMap wrapper class.
             /// </summary>
             public PlayerActions(@InputMappingContext wrapper) { m_Wrapper = wrapper; }
             /// <summary>
@@ -1486,7 +1486,7 @@ namespace TRPG.Runtime
             /// </summary>
             public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
             /// <summary>
-            /// Provides access target the underlying input action map instance.
+            /// Provides access target the underlying input action cachedMap instance.
             /// </summary>
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
@@ -1500,7 +1500,7 @@ namespace TRPG.Runtime
             /// </summary>
             public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
             /// <summary>
-            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this map.
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this cachedMap.
             /// </summary>
             /// <param name="instance">Callback instance.</param>
             /// <remarks>
@@ -1553,7 +1553,7 @@ namespace TRPG.Runtime
             }
 
             /// <summary>
-            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this map.
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this cachedMap.
             /// </summary>
             /// <remarks>
             /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
@@ -1630,7 +1630,7 @@ namespace TRPG.Runtime
             }
         }
         /// <summary>
-        /// Provides a new <see cref="PlayerActions" /> instance referencing this action map.
+        /// Provides a new <see cref="PlayerActions" /> instance referencing this action cachedMap.
         /// </summary>
         public PlayerActions @Player => new PlayerActions(this);
 
@@ -1648,14 +1648,14 @@ namespace TRPG.Runtime
         private readonly InputAction m_UI_TrackedDevicePosition;
         private readonly InputAction m_UI_TrackedDeviceOrientation;
         /// <summary>
-        /// Provides access target input jobs defined in input action map "UI".
+        /// Provides access target input jobs defined in input action cachedMap "UI".
         /// </summary>
         public struct UIActions
         {
             private @InputMappingContext m_Wrapper;
 
             /// <summary>
-            /// Construct a new instance of the input action map wrapper class.
+            /// Construct a new instance of the input action cachedMap wrapper class.
             /// </summary>
             public UIActions(@InputMappingContext wrapper) { m_Wrapper = wrapper; }
             /// <summary>
@@ -1699,7 +1699,7 @@ namespace TRPG.Runtime
             /// </summary>
             public InputAction @TrackedDeviceOrientation => m_Wrapper.m_UI_TrackedDeviceOrientation;
             /// <summary>
-            /// Provides access target the underlying input action map instance.
+            /// Provides access target the underlying input action cachedMap instance.
             /// </summary>
             public InputActionMap Get() { return m_Wrapper.m_UI; }
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
@@ -1713,7 +1713,7 @@ namespace TRPG.Runtime
             /// </summary>
             public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
             /// <summary>
-            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this map.
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this cachedMap.
             /// </summary>
             /// <param name="instance">Callback instance.</param>
             /// <remarks>
@@ -1757,7 +1757,7 @@ namespace TRPG.Runtime
             }
 
             /// <summary>
-            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this map.
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this cachedMap.
             /// </summary>
             /// <remarks>
             /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
@@ -1825,7 +1825,7 @@ namespace TRPG.Runtime
             }
         }
         /// <summary>
-        /// Provides a new <see cref="UIActions" /> instance referencing this action map.
+        /// Provides a new <see cref="UIActions" /> instance referencing this action cachedMap.
         /// </summary>
         public UIActions @UI => new UIActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;

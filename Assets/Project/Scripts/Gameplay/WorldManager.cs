@@ -64,6 +64,18 @@ namespace TRPG.Runtime
             return true;
         }
 
+        public static Vector2Int GetVisibleTileCount(float tileWorldSize = 1)
+        {
+
+            float worldHeight = CamController.Cam.orthographicSize * 2f;
+            float worldWidth = worldHeight * CamController.Cam.aspect;
+
+            int tileCountX = Mathf.CeilToInt(worldWidth / tileWorldSize);
+            int tileCountY = Mathf.CeilToInt(worldHeight / tileWorldSize);
+
+            return new Vector2Int(tileCountX, tileCountY);
+        }
+
         private static void Register(IWorldObject worldObject)
         {
             worldInsts.Add(worldObject.InstanceId, worldObject);
