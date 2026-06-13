@@ -14,10 +14,6 @@ namespace TRPG.Runtime
         [Header("Output")]
         [SerializeField] private RawImage previewMap;
 
-        [Header("Map Size")]
-        [SerializeField] private int width = 256;
-        [SerializeField] private int height = 256;
-
         [Header("FastNoiseLite")]
         [SerializeField] private int seed = 4;
         [SerializeField] private FastNoiseLite.NoiseType noiseType = FastNoiseLite.NoiseType.OpenSimplex2;
@@ -37,76 +33,67 @@ namespace TRPG.Runtime
         [SerializeField, Range(0f, 2f)] private float falloffStrength = 1f;
         [SerializeField, Range(0.1f, 5f)] private float falloffPower = 3f;
 
-        [Header("Chunk")]
-
-        /// <summary>
-        /// MapTexture를 가로/세로 몇 개의 청크로 나눌 것인지.
-        /// 예: 16이면 전체 맵은 16 x 16 청크.
-        /// </summary>
-        [SerializeField] private int chunkSize = 16;
-
-        /// <summary>
-        /// 청크 하나에 들어가는 총 타일 개수.
-        /// 예: 256이면 1청크는 16 x 16 타일.
-        /// </summary>
-        [SerializeField] private int tileCountPerChunk = 256;
-
         [Header("Map Setting")]
         [SerializeField, Range(0f, 1f)] private float seaLevel = 0.2f;
 
+        [SerializeField] private int maskLength = 256;
+
+        [SerializeField, Min(1)] private int maskUpscale = 2;
+
+        [SerializeField, Min(1)] private int chunkLength = 128;
+
+
         [Header("Preview")]
         [SerializeField] private PreviewMode previewMode = PreviewMode.Land;
-
-        [SerializeField] private bool autoUpdate = true;
 
 
         private Map cachedMap = null;
 
 
-        public int ChunkTileSize => Mathf.RoundToInt(Mathf.Sqrt(tileCountPerChunk));
-
-        public int MapWidth => chunkSize * ChunkTileSize;
-
-        public int MapHeight => chunkSize * ChunkTileSize;
-
-
-
+        /// <summary>
+        /// 인스펙터 값이 변경될 때 맵 크기와 청크 크기를 보정합니다.
+        /// </summary>
         private void OnValidate()
         {
-            chunkSize = Mathf.Max(1, chunkSize);
-            tileCountPerChunk = Mathf.Max(1, tileCountPerChunk);
-            frequency = Mathf.Max(0.001f, frequency);
-            octaves = Mathf.Max(1, octaves);
-            lacunarity = Mathf.Max(1f, lacunarity);
-
-            if (autoUpdate) GenerateMap();
+            NormalizeSettings();
         }
 
-        [ContextMenu("GenerateMap")]
-        public Map GenerateMap()
+        private void NormalizeSettings()
         {
-            cachedMap = new()
-            { 
-                heights = GenerateHeightMap()
-            };
+            maskLength = Mathf.Max(1, maskLength);
+            maskUpscale = Mathf.Max(1, maskUpscale);
+            chunkLength = Mathf.Max(1, chunkLength);
+
+            int mapLength = maskLength * maskUpscale;
+
+            // 최종 맵 길이가 청크 길이로 나누어떨어지지 않으면 기본 청크 길이로 되돌립니다.
+            if (mapLength % chunkLength != 0)
+            {
+                chunkLength = 128;
+            }
+        }
+
+        [ContextMenu("Generate")]
+        public Map Generate()
+        {
+            NormalizeSettings();
+
+            int mapLength = maskLength * maskUpscale;
+
+            cachedMap = new Map(mapLength, chunkLength);
+            GenerateHeightMap(cachedMap);
+            GenerateTiles(cachedMap, mapLength);
+            GenerateChunks(cachedMap, mapLength);
+
+#if UNITY_EDITOR
+            GeneratePreviewMap(previewMode, cachedMap, mapLength);
+#endif
 
             return cachedMap;
         }
 
-        [ContextMenu("GeneratePreviewMap")]
-        public Texture GeneratePreviewMap()
+        private void GenerateHeightMap(Map map)
         {
-            if (previewMap == null) return null;
-
-            previewMap.texture = GeneratePreviewMap(previewMode, cachedMap);
-
-            return previewMap.texture;
-        }
-
-        private float[,] GenerateHeightMap()
-        {
-            float[,] heightMap = new float[width, height];
-
             FastNoiseLite noise = new FastNoiseLite(seed);
             noise.SetNoiseType(noiseType);
             noise.SetFrequency(frequency);
@@ -116,16 +103,26 @@ namespace TRPG.Runtime
             noise.SetFractalGain(gain);
             noise.SetFractalLacunarity(lacunarity);
 
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < maskLength; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < maskLength; x++)
                 {
                     float heightValue = SampleHeight(noise, x, y);
-                    heightMap[x, y] = heightValue;
+                    int startX = x * maskUpscale;
+                    int startY = y * maskUpscale;
+
+                    // 원본 height 값을 보간하지 않고 같은 값으로 복제해 Map.Heights에 저장합니다.
+                    for (int upscaleY = 0; upscaleY < maskUpscale; upscaleY++)
+                    {
+                        for (int upscaleX = 0; upscaleX < maskUpscale; upscaleX++)
+                        {
+                            int mapX = startX + upscaleX;
+                            int mapY = startY + upscaleY;
+                            map.Heights[map.ToIndex(mapX, mapY)] = heightValue;
+                        }
+                    }
                 }
             }
-
-            return heightMap;
         }
 
         private float SampleHeight(FastNoiseLite noise, int x, int y)
@@ -149,8 +146,8 @@ namespace TRPG.Runtime
 
         private float GetIslandFalloff(int x, int y)
         {
-            float nx = x / (float)(width - 1) * 2f - 1f;
-            float ny = y / (float)(height - 1) * 2f - 1f;
+            float nx = x / (float)(maskLength - 1) * 2f - 1f;
+            float ny = y / (float)(maskLength - 1) * 2f - 1f;
 
             float distance = Mathf.Sqrt(nx * nx + ny * ny);
             distance = Mathf.Clamp01(distance);
@@ -158,19 +155,20 @@ namespace TRPG.Runtime
             return Mathf.Pow(distance, falloffPower);
         }
 
-        private Texture GeneratePreviewMap(PreviewMode mode, Map map)
+        private Texture GeneratePreviewMap(PreviewMode mode, Map map, int mapLength)
         {
-            Texture2D texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            Texture2D texture = new Texture2D(mapLength, mapLength, TextureFormat.RGBA32, false);
             texture.filterMode = FilterMode.Point;
             texture.wrapMode = TextureWrapMode.Clamp;
 
-            Color[] pixels = new Color[width * height];
+            Color[] pixels = new Color[mapLength * mapLength];
 
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < mapLength; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < mapLength; x++)
                 {
-                    float heightValue = map.heights[x, y];
+                    int index = map.ToIndex(x, y);
+                    float heightValue = map.Heights[index];
                     Color color;
 
                     switch (mode)
@@ -188,12 +186,17 @@ namespace TRPG.Runtime
                             break;
                     }
 
-                    pixels[y * width + x] = color;
+                    pixels[index] = color;
                 }
             }
 
             texture.SetPixels(pixels);
             texture.Apply();
+
+            if (previewMap != null)
+            {
+                previewMap.texture = texture;
+            }
 
             return texture;
         }
@@ -210,41 +213,61 @@ namespace TRPG.Runtime
             return Color.white;
         }
 
-
-
-        public MapTileType[,] GenerateTileMap(float[,] heightMap)
+        private void GenerateTiles(Map map, int mapLength)
         {
-            MapTileType[,] tileMap = new MapTileType[MapWidth, MapHeight];
+            float halfLength = mapLength * 0.5f;
 
-            for (int y = 0; y < MapHeight; y++)
+            for (int y = 0; y < mapLength; y++)
             {
-                for (int x = 0; x < MapWidth; x++)
+                for (int x = 0; x < mapLength; x++)
                 {
-                    // seaLevel보다 낮으면 바다, 높으면 땅으로 판정한다.
-                    tileMap[x, y] = heightMap[x, y] < seaLevel
-                        ? MapTileType.Sea
-                        : MapTileType.Land;
+                    int index = map.ToIndex(x, y);
+                    float heightValue = map.Heights[index];
+
+                    map.Tiles[index] = new MapTile
+                    {
+                        worldPos = new Vector2(x - halfLength, y - halfLength),
+                        type = heightValue < seaLevel ? MapTileType.Sea : MapTileType.Land
+                    };
                 }
             }
-
-            return tileMap;
         }
 
-        public void GenerateChunk(MapTileType[,] tileMap, int chunkX, int chunkY)
+        private void GenerateChunks(Map map, int mapLength)
         {
-            int startX = chunkX * ChunkTileSize;
-            int startY = chunkY * ChunkTileSize;
+            int chunkCountPerAxis = mapLength / chunkLength;
+            int tileCountPerChunk = chunkLength * chunkLength;
 
-            for (int localY = 0; localY < ChunkTileSize; localY++)
+            for (int chunkRow = 0; chunkRow < chunkCountPerAxis; chunkRow++)
             {
-                for (int localX = 0; localX < ChunkTileSize; localX++)
+                for (int chunkX = 0; chunkX < chunkCountPerAxis; chunkX++)
                 {
-                    int tileX = startX + localX;
-                    int tileY = startY + localY;
+                    int chunkIndex = chunkX + chunkRow * chunkCountPerAxis;
+                    int chunkYFromBottom = chunkCountPerAxis - 1 - chunkRow;
+                    Chunk chunk = new Chunk
+                    {
+                        Tiles = new System.Collections.Generic.List<MapTile>(tileCountPerChunk)
+                    };
 
-                    MapTileType tileType = tileMap[tileX, tileY];
+                    FillChunkTiles(map, chunk, chunkX, chunkYFromBottom);
+                    map.Chunks[chunkIndex] = chunk;
+                }
+            }
+        }
 
-                    // 다음 단계에서 여기서 실제 타일을 생성하거나 Tilemap에 배치한다.
+        private void FillChunkTiles(Map map, Chunk chunk, int chunkX, int chunkY)
+        {
+            int startX = chunkX * chunkLength;
+            int startY = chunkY * chunkLength;
+
+            for (int y = chunkLength - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < chunkLength; x++)
+                {
+                    int mapX = startX + x;
+                    int mapY = startY + y;
+
+                    chunk.Tiles.Add(map.Tiles[map.ToIndex(mapX, mapY)]);
                 }
             }
         }

@@ -9,7 +9,7 @@ namespace TRPG.Editor
 {
     public class CreatureIdKeyDataGenerator : AssetPostprocessor
     {
-        private const string MenuPath = "Tools/TRPG/Data/GenerateMap Creature Id Keys";
+        private const string MenuPath = "Tools/TRPG/Data/Generate Creature Id Keys";
         private const string CreatureSheetFilter = "t:CreatureDataSheet";
         private const string OutputFolder = "Assets/Project/Datas/Gen";
         private const string AssetNamePrefix = "SO_IdKey_";
