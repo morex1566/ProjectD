@@ -27,5 +27,7 @@ namespace TRPG.Runtime
             GetInstance();
             settings = Resources.Load<UIManagerSettingsData>("SO_UIManagerSettings");
         }
+
+        
     }
 }

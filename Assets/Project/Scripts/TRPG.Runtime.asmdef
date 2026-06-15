@@ -13,7 +13,9 @@
         "UniTask.DOTween",
         "UniTask.Linq",
         "UniTask.TextMeshPro",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.Collections",
+        "Unity.Burst"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

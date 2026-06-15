@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d272424de64c508d07eaac04f0e9a4, type: 3}
   m_Name: SO_PlayerManagerSettings
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.PlayerManagerSettingsData
+  Selector: {fileID: 7379261557961419522, guid: 123a10618a299144eb73806cba138cf4, type: 3}

@@ -9,6 +9,6 @@ namespace TRPG.Runtime
     [CreateAssetMenu(fileName = "SO_PlayerManagerSettings", menuName = "Scriptable Objects/Settings/PlayerManager")]
     public class PlayerManagerSettingsData : ScriptableObject
     {
-
+        [SerializeField] public Selector Selector;
     }
 }

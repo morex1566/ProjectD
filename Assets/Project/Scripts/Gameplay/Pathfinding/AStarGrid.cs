@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -11,6 +12,8 @@ namespace TRPG.Runtime
         public int Width { get; }
 
         public int Height { get; }
+
+        public int NodeCount => Width * Height;
 
         public AStarGrid(int width, int height)
         {
@@ -53,6 +56,30 @@ namespace TRPG.Runtime
         public AStarNode GetNode(int x, int y)
         {
             return nodes[x, y];
+        }
+
+        /// <summary>
+        /// 2차원 배열을 1차원 배열로
+        /// </summary>
+        public int ToIndex(int x, int y)
+        {
+            return x + y * Width;
+        }
+
+        /// <summary>
+        ///  1차원을 다시 2차원으로
+        /// </summary>
+        public int ToX(int index)
+        {
+            return index % Width;
+        }
+
+        /// <summary>
+        ///  1차원을 다시 2차원으로
+        /// </summary>
+        public int ToY(int index)
+        {
+            return index / Width;
         }
 
         /// <summary>
@@ -143,6 +170,9 @@ namespace TRPG.Runtime
             return null;
         }
 
+        /// <summary>
+        /// 길찾기 로직중에 현재 노드의 주변 노드를 탐색
+        /// </summary>
         public List<AStarNode> GetNeighbors(AStarNode node)
         {
             List<AStarNode> neighbors = new List<AStarNode>();
@@ -153,6 +183,46 @@ namespace TRPG.Runtime
             AddNeighbor(neighbors, node.X, node.Y - 1);
 
             return neighbors;
+        }
+
+        /// <summary>
+        /// byte는 지나갈 수 있는지 아닌지를 말함 JobSystem용 함수
+        /// </summary>
+        public void CopyWalkableTo(NativeArray<byte> destination)
+        {
+            if (destination.Length < NodeCount)
+            {
+                throw new ArgumentException("Walkable 상태를 복사할 NativeArray 길이가 부족합니다.", nameof(destination));
+            }
+
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    // 2차원 노드 좌표를 Job에서 사용할 1차원 index로 변환합니다.
+                    int index = ToIndex(x, y);
+                    destination[index] = nodes[x, y].IsWalkable ? (byte)1 : (byte)0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// A*는 탐색 중 노드에 상태를 저장함
+        /// 다음 탐색 전에 이전 상태를 지워야 함
+        /// </summary>
+        public void ResetNodes()
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    AStarNode node = nodes[x, y];
+
+                    node.GCost = int.MaxValue;
+                    node.HCost = 0;
+                    node.Parent = null;
+                }
+            }
         }
 
         private void AddNeighbor(List<AStarNode> neighbors, int x, int y)
@@ -179,25 +249,6 @@ namespace TRPG.Runtime
         private int CalculateMoveCost(AStarNode from, AStarNode to)
         {
             return 1;
-        }
-
-        /// <summary>
-        /// A*는 탐색 중 노드에 상태를 저장함
-        /// 다음 탐색 전에 이전 상태를 지워야 함
-        /// </summary>
-        public void ResetNodes()
-        {
-            for (int x = 0; x < Width; x++)
-            {
-                for (int y = 0; y < Height; y++)
-                {
-                    AStarNode node = nodes[x, y];
-
-                    node.GCost = int.MaxValue;
-                    node.HCost = 0;
-                    node.Parent = null;
-                }
-            }
         }
 
         /// <summary>

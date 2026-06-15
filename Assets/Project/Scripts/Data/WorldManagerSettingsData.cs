@@ -12,9 +12,5 @@ namespace TRPG.Runtime
     public partial class WorldManagerSettingsData : ScriptableObject
     {
         public AssetReferenceT<CreatureDataSheet> CreatureDataSheetRef;
-
-        public ObjectSelector Selector;
-
-        public WorldCameraController CamController;
     }
 }

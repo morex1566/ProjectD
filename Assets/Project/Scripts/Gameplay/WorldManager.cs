@@ -14,9 +14,7 @@ namespace TRPG.Runtime
 
         private static GameObject worldRoot = null;
 
-        public static MapGenerator MapGenerator = null;
-
-        public static ObjectSelector Selector = null;
+        public static Map MapGenerator = null;
 
         public static WorldCameraController CamController = null;
 
@@ -34,8 +32,7 @@ namespace TRPG.Runtime
             settings = Resources.Load<WorldManagerSettingsData>("SO_WorldManagerSettings");
 
             worldRoot = new GameObject("World");
-            Selector = Instantiate(settings.Selector);
-            MapGenerator = GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<MapGenerator>();
+            MapGenerator = GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<Map>();
             CamController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
             creatureDataSheet = ResourceManager.GetResource(settings.CreatureDataSheetRef);
         }
@@ -65,18 +62,6 @@ namespace TRPG.Runtime
             }
 
             return true;
-        }
-
-        public static Vector2Int GetVisibleTileCount(float tileWorldSize = 1)
-        {
-
-            float worldHeight = CamController.Cam.orthographicSize * 2f;
-            float worldWidth = worldHeight * CamController.Cam.aspect;
-
-            int tileCountX = Mathf.CeilToInt(worldWidth / tileWorldSize);
-            int tileCountY = Mathf.CeilToInt(worldHeight / tileWorldSize);
-
-            return new Vector2Int(tileCountX, tileCountY);
         }
 
         private static void Register(IWorldObject worldObject)
