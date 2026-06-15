@@ -11,13 +11,12 @@ namespace TRPG.Runtime
         public string DescKey;
         public string Faction;
         public float Hp;
-        public float Atk;
+        public float Damage;
         public float DetectRange;
         public float AttackRange;
         public float AttackSpeed;
         public float MoveSpeed;
 
-        public FactionData FactionData;
         public GameObject SpritePf;
         public GameObject CreaturePf;
 

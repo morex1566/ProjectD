@@ -14,5 +14,15 @@ namespace TRPG.Runtime
         {
             Cam = GetComponent<Camera>();
         }
+
+        private void OnEnable()
+        {
+
+        }
+
+        private void OnDisable()
+        {
+            
+        }
     }
 }

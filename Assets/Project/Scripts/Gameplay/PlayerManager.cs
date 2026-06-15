@@ -42,7 +42,7 @@ namespace TRPG.Runtime
             CommandMove(mouseWorldPos, CommandQueueMode.Replace);
         }
 
-        private void CommandMove(Vector3 destWorldPos, CommandQueueMode mode)
+        private void CommandMove(Vector3 targetPos, CommandQueueMode mode)
         {
             IReadOnlyList<ISelectable> selectedInsts = WorldManager.Selector.SelectedInsts;
 
@@ -52,7 +52,7 @@ namespace TRPG.Runtime
 
                 if (creature.Owner != gameObject) continue;
 
-                creature.EnqueueMove(destWorldPos, mode);
+                creature.EnqueueMove(targetPos, mode);
             }
         }
     }

@@ -18,12 +18,11 @@ MonoBehaviour:
     DescKey: creature_human_001_desc
     Faction: Human
     Hp: 10
-    Atk: 0
+    Damage: 2
     DetectRange: 2
     AttackRange: 1
     AttackSpeed: 2
     MoveSpeed: 3
-    FactionData: {fileID: 0}
     SpritePf: {fileID: 4025121471085608295, guid: adccd25d1d293f641bc90e0eb57ed6c3, type: 3}
     CreaturePf: {fileID: 1142311668006381792, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
   - DataId: creature_walker_001
@@ -31,11 +30,10 @@ MonoBehaviour:
     DescKey: creature_walker_001_desc
     Faction: Undead
     Hp: 10
-    Atk: 0
+    Damage: 1
     DetectRange: 2
     AttackRange: 1
     AttackSpeed: 1
     MoveSpeed: 2.5
-    FactionData: {fileID: 0}
     SpritePf: {fileID: 1933297630562758217, guid: 91eec441324a56f48bf626071c9cf8a0, type: 3}
     CreaturePf: {fileID: 1142311668006381792, guid: b1c400a67cf75644e85722de29e5e748, type: 3}

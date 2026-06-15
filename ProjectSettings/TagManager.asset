@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Creature
   - WorldCamera
+  - Map
   layers:
   - Default
   - TransparentFX

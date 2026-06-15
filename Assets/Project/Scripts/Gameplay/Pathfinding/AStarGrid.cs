@@ -1,0 +1,245 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace TRPG.Runtime
+{
+    public class AStarGrid
+    {
+        private AStarNode[,] nodes;
+
+        public int Width { get; }
+
+        public int Height { get; }
+
+        public AStarGrid(int width, int height)
+        {
+            Width = width;
+            Height = height;
+            nodes = new AStarNode[width, height];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    nodes[x, y] = new AStarNode(x, y, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// IsInside인지?
+        /// Walkable인지?
+        /// </summary>
+        public bool TryGetNode(int x, int y, out AStarNode node)
+        {
+            // 좌표가 그리드 좌표인지?
+            node = null;
+            if (!IsInside(x, y))
+            {
+                return false;
+            }
+
+            // 이동가능한 노드?
+            node = GetNode(x, y);
+            if (!node.IsWalkable)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public AStarNode GetNode(int x, int y)
+        {
+            return nodes[x, y];
+        }
+
+        /// <summary>
+        /// 좌표가 그리드 안 좌표임?
+        /// </summary>
+        public bool IsInside(int x, int y)
+        {
+            return x >= 0 && x < Width && y >= 0 && y < Height;
+        }
+
+        public void SetWalkable(int x, int y, bool isWalkable)
+        {
+            if (!IsInside(x, y))
+            {
+                return;
+            }
+
+            nodes[x, y].IsWalkable = isWalkable;
+        }
+
+        /// <summary>
+        /// 길찾기 시작
+        /// </summary>
+        public List<AStarNode> FindPath(AStarNode startNode, AStarNode targetNode)
+        {
+            // 이전 탐색에서 남은 G/H/Parent 값을 초기화한다.
+            ResetNodes();
+
+            // Open: 앞으로 검사할 후보 노드들
+            // Closed: 이미 검사가 끝난 노드들
+            List<AStarNode> openList = new List<AStarNode>();
+            HashSet<AStarNode> closedSet = new HashSet<AStarNode>();
+
+            // 시작 노드의 비용을 설정하고 탐색 후보에 넣는다.
+            startNode.GCost = 0;
+            startNode.HCost = CalculateHeuristic(startNode, targetNode);
+            startNode.Parent = null;
+            openList.Add(startNode);
+
+            // 더 이상 검사할 후보가 없을 때까지 반복한다.
+            while (openList.Count > 0)
+            {
+                // 후보 중 FCost가 가장 낮은 노드를 현재 노드로 선택한다.
+                AStarNode currentNode = GetLowestCostNode(openList);
+
+                // 목표 노드에 도착했다면 Parent를 따라가며 최종 경로를 만든다.
+                if (currentNode == targetNode)
+                {
+                    return BuildPath(targetNode);
+                }
+
+                // 현재 노드는 검사가 끝났으므로 Open에서 제거하고 Closed에 넣는다.
+                openList.Remove(currentNode);
+                closedSet.Add(currentNode);
+
+                // 현재 노드에서 이동 가능한 주변 노드를 확인한다.
+                foreach (AStarNode neighbor in GetNeighbors(currentNode))
+                {
+                    // 이미 검사 완료된 노드는 다시 검사하지 않는다.
+                    if (closedSet.Contains(neighbor))
+                    {
+                        continue;
+                    }
+
+                    // 현재 노드를 거쳐 이웃 노드로 가는 새 비용을 계산한다.
+                    int newGCost = currentNode.GCost + CalculateMoveCost(currentNode, neighbor);
+
+                    // 기존 경로가 더 싸거나 같으면 갱신하지 않는다.
+                    if (newGCost >= neighbor.GCost)
+                    {
+                        continue;
+                    }
+
+                    // 더 좋은 경로를 찾았으므로 비용과 이전 노드를 갱신한다.
+                    neighbor.GCost = newGCost;
+                    neighbor.HCost = CalculateHeuristic(neighbor, targetNode);
+                    neighbor.Parent = currentNode;
+
+                    // 아직 후보 목록에 없다면 추가한다.
+                    if (!openList.Contains(neighbor))
+                    {
+                        openList.Add(neighbor);
+                    }
+                }
+            }
+
+            // Open이 비었다는 것은 목표까지 갈 수 있는 경로가 없다는 뜻이다.
+            return null;
+        }
+
+        public List<AStarNode> GetNeighbors(AStarNode node)
+        {
+            List<AStarNode> neighbors = new List<AStarNode>();
+
+            AddNeighbor(neighbors, node.X + 1, node.Y);
+            AddNeighbor(neighbors, node.X - 1, node.Y);
+            AddNeighbor(neighbors, node.X, node.Y + 1);
+            AddNeighbor(neighbors, node.X, node.Y - 1);
+
+            return neighbors;
+        }
+
+        private void AddNeighbor(List<AStarNode> neighbors, int x, int y)
+        {
+            if (!TryGetNode(x, y, out AStarNode node))
+            {
+                return;
+            }
+
+            neighbors.Add(node);
+        }
+
+        private int CalculateHeuristic(AStarNode current, AStarNode target)
+        {
+            int distanceX = Math.Abs(current.X - target.X);
+            int distanceY = Math.Abs(current.Y - target.Y);
+
+            return distanceX + distanceY;
+        }
+
+        /// <summary>
+        /// 만약에 대각선 이동을 넣으면 상하좌우 : 10, 대각선 14 이렇게 할 수 있음.
+        /// </summary>
+        private int CalculateMoveCost(AStarNode from, AStarNode to)
+        {
+            return 1;
+        }
+
+        /// <summary>
+        /// A*는 탐색 중 노드에 상태를 저장함
+        /// 다음 탐색 전에 이전 상태를 지워야 함
+        /// </summary>
+        public void ResetNodes()
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    AStarNode node = nodes[x, y];
+
+                    node.GCost = int.MaxValue;
+                    node.HCost = 0;
+                    node.Parent = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// openList 안에서 FCost가 가장 낮은 노드를 찾습니다.
+        /// 동점이면 HCost가 낮은 쪽을 고릅니다.
+        /// </summary>
+        private AStarNode GetLowestCostNode(List<AStarNode> openList)
+        {
+            AStarNode bestNode = openList[0];
+
+            for (int i = 1; i < openList.Count; i++)
+            {
+                AStarNode candidate = openList[i];
+
+                if (candidate.FCost < bestNode.FCost ||
+                    candidate.FCost == bestNode.FCost && candidate.HCost < bestNode.HCost)
+                {
+                    bestNode = candidate;
+                }
+            }
+
+            return bestNode;
+        }
+
+        /// <summary>
+        /// 뒤집어진 경로를 백트래이싱
+        /// </summary>
+        private List<AStarNode> BuildPath(AStarNode targetNode)
+        {
+            List<AStarNode> path = new List<AStarNode>();
+
+            AStarNode currentNode = targetNode;
+
+            while (currentNode != null)
+            {
+                path.Add(currentNode);
+                currentNode = currentNode.Parent;
+            }
+
+            path.Reverse();
+
+            return path;
+        }
+    }
+}

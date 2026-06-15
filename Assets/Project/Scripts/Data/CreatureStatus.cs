@@ -26,7 +26,7 @@ namespace TRPG.Runtime
         {
             // CreatureData의 전투 수치를 런타임 상태로 복사합니다.
             CurrentHp = data.Hp;
-            Atk = data.Atk;
+            Atk = data.Damage;
             DetectRange = data.DetectRange;
             AttackRange = data.AttackRange;
             AttackSpeed = data.AttackSpeed;

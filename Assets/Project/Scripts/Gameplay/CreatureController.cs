@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,10 +13,6 @@ namespace TRPG.Runtime
         [SerializeField] private SpriteRenderer spriter = null;
 
         [SerializeField] private GameObject selectionIndicator = null;
-
-        public DOTweenAnimation AttackAnim = null;
-
-        public DOTweenAnimation HitAnim = null;
 
         public CreatureJobMachine JobMachine = null;
 

@@ -64,13 +64,6 @@ namespace TRPG.Runtime
             }
         }
 
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            Init();
-        }
-#endif
-
         private void OnEnable()
         {
             Init();

@@ -14,7 +14,6 @@ namespace TRPG.Editor
         private const string PrefabSearchFolder = "Assets/Project/Prefabs/Gameplay";
         private const string FactionSearchFolder = "Assets/Project/Datas/Gameplay";
         private const string PrefabNamePrefix = "PF_";
-        private const string FactionNamePrefix = "SO_";
         private const string CreaturePrefabPath = "Assets/Project/Prefabs/Gameplay/PF_Creature.prefab";
 
         private static bool isMappingScheduled;
@@ -80,7 +79,6 @@ namespace TRPG.Editor
         private static void MapAllCreatureSheets(bool logResult)
         {
             Dictionary<string, GameObject> prefabByDataId = BuildPrefabLookup();
-            Dictionary<string, FactionData> factionByName = BuildFactionLookup();
             GameObject creaturePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(CreaturePrefabPath);
             string[] sheetGuids = AssetDatabase.FindAssets(CreatureSheetFilter);
 
@@ -117,23 +115,6 @@ namespace TRPG.Editor
                     creatureData.SpritePf = spritePrefab;
                     changed = true;
                     mappedSpriteCount++;
-                }
-
-                foreach (CreatureData creatureData in sheet.Entities)
-                {
-                    if (creatureData == null || string.IsNullOrWhiteSpace(creatureData.Faction)) continue;
-
-                    if (!factionByName.TryGetValue(GetFactionLookupKey(creatureData.Faction), out FactionData factionData))
-                    {
-                        missingFactionCount++;
-                        continue;
-                    }
-
-                    if (creatureData.FactionData == factionData) continue;
-
-                    creatureData.FactionData = factionData;
-                    changed = true;
-                    mappedFactionCount++;
                 }
 
                 foreach (CreatureData creatureData in sheet.Entities)
@@ -194,43 +175,6 @@ namespace TRPG.Editor
             }
 
             return prefabByDataId;
-        }
-
-        private static Dictionary<string, FactionData> BuildFactionLookup()
-        {
-            Dictionary<string, FactionData> factionByName = new(StringComparer.OrdinalIgnoreCase);
-            string[] factionGuids = AssetDatabase.FindAssets("t:FactionData", new[] { FactionSearchFolder });
-
-            foreach (string factionGuid in factionGuids)
-            {
-                string factionPath = AssetDatabase.GUIDToAssetPath(factionGuid);
-                string factionName = Path.GetFileNameWithoutExtension(factionPath);
-                FactionData factionData = AssetDatabase.LoadAssetAtPath<FactionData>(factionPath);
-
-                if (factionData == null) continue;
-
-                // 엑셀에는 Human 또는 SO_Human 중 어느 쪽으로 적어도 같은 SO로 매핑합니다.
-                AddFactionLookup(factionByName, factionName, factionData);
-                if (factionName.StartsWith(FactionNamePrefix, StringComparison.Ordinal))
-                {
-                    AddFactionLookup(factionByName, factionName.Substring(FactionNamePrefix.Length), factionData);
-                }
-            }
-
-            return factionByName;
-        }
-
-        private static void AddFactionLookup(Dictionary<string, FactionData> factionByName, string factionName, FactionData factionData)
-        {
-            string factionKey = GetFactionLookupKey(factionName);
-            if (string.IsNullOrEmpty(factionKey) || factionByName.ContainsKey(factionKey)) return;
-
-            factionByName.Add(factionKey, factionData);
-        }
-
-        private static string GetFactionLookupKey(string factionName)
-        {
-            return string.IsNullOrWhiteSpace(factionName) ? string.Empty : factionName.Trim();
         }
 
         private static string GetResourceLookupKey(string resourceName)

@@ -52,7 +52,6 @@ namespace TRPG.Runtime
             // 공격 게이지가 꽉 차면 공격
             else
             {
-                owner.AttackAnim.DORestart();
                 attackGauge = 0f;
                 // TODO : 공격
             }
