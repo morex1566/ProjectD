@@ -9,7 +9,7 @@ namespace TRPG.Runtime
         [ContextMenu("TestSpawnAlly")]
         public void TestSpawnAlly()
         {
-            var worldPos = WorldManager.MapGenerator.Center;
+            var worldPos = WorldManager.Map.Center;
             var creature = WorldManager.Spawn(allyIdData, (Vector2)worldPos);
             var creatureController = creature as CreatureController;
             creatureController?.SetOwner(PlayerManager.GetInstance().gameObject);

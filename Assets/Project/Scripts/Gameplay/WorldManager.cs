@@ -14,7 +14,7 @@ namespace TRPG.Runtime
 
         private static GameObject worldRoot = null;
 
-        public static Map MapGenerator = null;
+        public static Map Map = null;
 
         public static WorldCameraController CamController = null;
 
@@ -32,7 +32,7 @@ namespace TRPG.Runtime
             settings = Resources.Load<WorldManagerSettingsData>("SO_WorldManagerSettings");
 
             worldRoot = new GameObject("World");
-            MapGenerator = GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<Map>();
+            Map = GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<Map>();
             CamController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
             creatureDataSheet = ResourceManager.GetResource(settings.CreatureDataSheetRef);
         }

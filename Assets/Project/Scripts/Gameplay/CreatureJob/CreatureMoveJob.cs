@@ -46,8 +46,8 @@ namespace TRPG.Runtime
             this.moveSpeed = moveSpeed;
 
             // worldpos를 tilemap의 cellpos로 전환
-            var startPos = WorldManager.MapGenerator.Ground.WorldToCell(owner.transform.position);
-            var targetPosInt = WorldManager.MapGenerator.Ground.WorldToCell(targetPos);
+            var startPos = WorldManager.Map.Ground.WorldToCell(owner.transform.position);
+            var targetPosInt = WorldManager.Map.Ground.WorldToCell(targetPos);
             path = AStarPathfinder.FindPath(startPos, targetPosInt);
         }
 

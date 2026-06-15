@@ -44,8 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3dc9f91700248718cf0c8167c1bf429, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.Selector
-  selectionMode: 0
+  Mode: 0
   dragThreshold: 8
   selectionBoxPf: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
-  objectSelector: {}
-  tileSelector: {}
+  tileSelector:
+    selectionTileBase: {fileID: 11400000, guid: 341c7c6936268d44c80fbf7495860d92, type: 2}

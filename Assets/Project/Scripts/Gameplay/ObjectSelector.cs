@@ -13,10 +13,12 @@ namespace TRPG.Runtime
         /// <summary>
         /// 드래그 대상
         /// </summary>
-        private readonly List<ISelectable> selectedInsts = new();
+        [SerializeField] private readonly List<ISelectable> selectedInsts = new();
+
 
 
         public IReadOnlyList<ISelectable> SelectedInsts => selectedInsts;
+
 
 
         public void Selects(Vector2 startPos, Vector2 endPos)

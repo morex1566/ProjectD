@@ -27,6 +27,8 @@ namespace TRPG.Runtime
         /// </summary>
         [SerializeField] private Tilemap ground;
 
+        [SerializeField] private Tilemap selection;
+
         /// <summary>
         /// 일반 지하 흙 타일입니다.
         /// </summary>
@@ -64,6 +66,8 @@ namespace TRPG.Runtime
 
 
         public Tilemap Ground => ground;
+
+        public Tilemap Selection => selection;
 
         public Action<int> OnMapGenerated = null;
 
