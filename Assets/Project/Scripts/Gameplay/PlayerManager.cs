@@ -45,13 +45,18 @@ namespace TRPG.Runtime
 
         private void OnRightClickPerformed(InputAction.CallbackContext context)
         {
-            Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(WorldManager.CamController.Cam);
-            CommandMove(mouseWorldPos, CommandQueueMode.Replace);
+            CommandMove(CommandQueueMode.Replace);
         }
 
-        private void CommandMove(Vector3 targetPos, CommandQueueMode mode)
+        /// <summary>
+        /// 선택대상들에게 이동을 명령
+        /// </summary>
+        /// <param name="mode"></param>
+        private void CommandMove(CommandQueueMode mode)
         {
             IReadOnlyList<ISelectable> selectedInsts = selector.SelectedInsts;
+
+            Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(WorldManager.CamController.Cam);
 
             for (int i = 0; i < selectedInsts.Count; i++)
             {
@@ -59,7 +64,7 @@ namespace TRPG.Runtime
 
                 if (creature.Owner != gameObject) continue;
 
-                creature.EnqueueMove(targetPos, mode);
+                creature.EnqueueMove(mouseWorldPos, mode);
             }
         }
 

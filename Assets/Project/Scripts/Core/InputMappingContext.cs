@@ -48,12 +48,12 @@ namespace TRPG.Runtime
     ///
     ///     void OnEnable()
     ///     {
-    ///         m_Player.Enable();                                // Enable all jobs within cachedMap.
+    ///         m_Player.Enable();                                // Enable all queue within cachedMap.
     ///     }
     ///
     ///     void OnDisable()
     ///     {
-    ///         m_Player.Disable();                               // Disable all jobs within cachedMap.
+    ///         m_Player.Disable();                               // Disable all queue within cachedMap.
     ///     }
     ///
     ///     #region Interface implementation of MyActions.IPlayerActions
@@ -1423,7 +1423,7 @@ namespace TRPG.Runtime
         private readonly InputAction m_Player_Next;
         private readonly InputAction m_Player_Sprint;
         /// <summary>
-        /// Provides access target input jobs defined in input action cachedMap "Player".
+        /// Provides access target input queue defined in input action cachedMap "Player".
         /// </summary>
         public struct PlayerActions
         {
@@ -1500,7 +1500,7 @@ namespace TRPG.Runtime
             /// </summary>
             public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
             /// <summary>
-            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this cachedMap.
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input queue contained in this cachedMap.
             /// </summary>
             /// <param name="instance">Callback instance.</param>
             /// <remarks>
@@ -1553,7 +1553,7 @@ namespace TRPG.Runtime
             }
 
             /// <summary>
-            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this cachedMap.
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input queue contained in this cachedMap.
             /// </summary>
             /// <remarks>
             /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
@@ -1648,7 +1648,7 @@ namespace TRPG.Runtime
         private readonly InputAction m_UI_TrackedDevicePosition;
         private readonly InputAction m_UI_TrackedDeviceOrientation;
         /// <summary>
-        /// Provides access target input jobs defined in input action cachedMap "UI".
+        /// Provides access target input queue defined in input action cachedMap "UI".
         /// </summary>
         public struct UIActions
         {
@@ -1713,7 +1713,7 @@ namespace TRPG.Runtime
             /// </summary>
             public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
             /// <summary>
-            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this cachedMap.
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input queue contained in this cachedMap.
             /// </summary>
             /// <param name="instance">Callback instance.</param>
             /// <remarks>
@@ -1757,7 +1757,7 @@ namespace TRPG.Runtime
             }
 
             /// <summary>
-            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input jobs contained in this cachedMap.
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input queue contained in this cachedMap.
             /// </summary>
             /// <remarks>
             /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
@@ -1894,7 +1894,7 @@ namespace TRPG.Runtime
             }
         }
         /// <summary>
-        /// Interface target implement callback methods for all input action callbacks associated with input jobs defined by "Player" which allows adding and removing callbacks.
+        /// Interface target implement callback methods for all input action callbacks associated with input queue defined by "Player" which allows adding and removing callbacks.
         /// </summary>
         /// <seealso cref="PlayerActions.AddCallbacks(IPlayerActions)" />
         /// <seealso cref="PlayerActions.RemoveCallbacks(IPlayerActions)" />
@@ -1993,7 +1993,7 @@ namespace TRPG.Runtime
             void OnSprint(InputAction.CallbackContext context);
         }
         /// <summary>
-        /// Interface target implement callback methods for all input action callbacks associated with input jobs defined by "UI" which allows adding and removing callbacks.
+        /// Interface target implement callback methods for all input action callbacks associated with input queue defined by "UI" which allows adding and removing callbacks.
         /// </summary>
         /// <seealso cref="UIActions.AddCallbacks(IUIActions)" />
         /// <seealso cref="UIActions.RemoveCallbacks(IUIActions)" />

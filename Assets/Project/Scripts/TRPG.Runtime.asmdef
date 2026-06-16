@@ -15,7 +15,8 @@
         "UniTask.TextMeshPro",
         "Unity.TextMeshPro",
         "Unity.Collections",
-        "Unity.Burst"
+        "Unity.Burst",
+        "Unity.RenderPipelines.Universal.2D.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,3 +1,4 @@
+using Codice.Client.Common.GameUI;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,21 +6,21 @@ namespace TRPG.Runtime
 {
     public class CreatureJobMachine 
     {
-        private readonly Queue<CreatureJob> jobs = new();
+        private readonly Queue<CreatureJob> queue = new();
 
         public void Enqueue(CreatureJob job)
         {
-            jobs.Enqueue(job);
+            queue.Enqueue(job);
         }
 
         public bool TryDequeue(out CreatureJob job)
         {
-            return jobs.TryDequeue(out job);
+            return queue.TryDequeue(out job);
         }
 
         public void Clear()
         {
-            jobs.Clear();
+            queue.Clear();
         }
 
         /// <summary>
@@ -28,11 +29,11 @@ namespace TRPG.Runtime
         /// </summary>
         public void Execute()
         {
-            while (jobs.TryPeek(out CreatureJob job))
+            while (queue.TryPeek(out CreatureJob job))
             {
                 if (job.IsDone)
                 {
-                    jobs.Dequeue();
+                    queue.Dequeue();
                     continue;
                 }
 
@@ -40,7 +41,7 @@ namespace TRPG.Runtime
 
                 if (job.IsDone)
                 {
-                    jobs.Dequeue();
+                    queue.Dequeue();
                 }
 
                 return;

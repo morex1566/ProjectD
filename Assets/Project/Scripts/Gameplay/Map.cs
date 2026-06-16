@@ -198,14 +198,6 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 로컬 맵 좌표를 Tilemap 셀 좌표로 변환합니다.
-        /// </summary>
-        private Vector3Int ToCellPos(int x, int y)
-        {
-            return new Vector3Int(pivot.x + x, pivot.y + y, pivot.z);
-        }
-
-        /// <summary>
         /// 좌표가 맵 범위 안에 있는지 확인합니다.
         /// </summary>
         private bool IsInBounds(int x, int y)

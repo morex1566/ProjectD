@@ -8,12 +8,22 @@ namespace TRPG.Runtime
     public class AStarPathfinder : MonoBehaviour
     {
         private static AStarGrid astarGrid;
+
         private static NativeArray<byte> walkableNodes;
 
         private void Start()
         {
+            // Map의 타일 타입에 맞춰서 그리드 생성
             var mapGenerater = GetComponent<Map>();
             astarGrid = new AStarGrid(mapGenerater.MapWidth, mapGenerater.MapHeight);
+            for (int y = 0; y < astarGrid.Height; y++)
+            {
+                for (int x = 0; x < astarGrid.Width; x++)
+                {
+                    bool isWalkable = mapGenerater.GetTileType(x, y).HasFlag(MapTileType.Air);
+                    astarGrid.SetWalkable(x, y, isWalkable);
+                }
+            }
 
             RefreshJobGrid();
         }

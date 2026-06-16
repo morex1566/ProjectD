@@ -47,8 +47,17 @@ namespace TRPG.Runtime
 
             // worldpos를 tilemap의 cellpos로 전환
             var startPos = WorldManager.Map.Ground.WorldToCell(owner.transform.position);
+
+            // 마우스로 클릭한 지점에서 공중이라면 그 아래로 탐색하면서 지표면이 될때까지 클릭하도록 보정
             var targetPosInt = WorldManager.Map.Ground.WorldToCell(targetPos);
+            while (WorldManager.Map.GetTileType(targetPosInt.x, targetPosInt.y).HasFlag(MapTileType.Air) &&
+                   WorldManager.Map.GetTileType(targetPosInt.x, targetPosInt.y - 1).HasFlag(MapTileType.Air))
+            {
+                targetPosInt.y -= 1;
+            }
+
             path = AStarPathfinder.FindPath(startPos, targetPosInt);
+            SkipStartNode(startPos);
         }
 
         /// <summary>
@@ -140,6 +149,23 @@ namespace TRPG.Runtime
         {
             Vector2 worldPos = new Vector2(node.X, node.Y);
             return worldPos;
+        }
+
+        /// <summary>
+        /// A* 결과의 첫 노드는 시작 셀이므로 실제 이동 목표에서는 제외합니다.
+        /// </summary>
+        private void SkipStartNode(Vector3Int startPos)
+        {
+            if (path == null || path.Count == 0)
+            {
+                return;
+            }
+
+            AStarNode firstNode = path[0];
+            if (firstNode.X == startPos.x && firstNode.Y == startPos.y)
+            {
+                pathIndex = 1;
+            }
         }
     }
 }
