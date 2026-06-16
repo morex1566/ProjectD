@@ -1,26 +1,18 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace TRPG.Runtime
 {
-    public enum SelectionMode
-    {
-        Object,
-        Construction
-    }
-
     /// <summary>
-    /// 입력과 선택 UI를 소유하고, 현재 SelectionMode에 맞는 선택기로 작업을 위임합니다.
+    /// 입력과 선택 UI를 처리하고, 실제 선택 처리는 자식 선택기에게 위임하는 부모 컴포넌트입니다.
     /// </summary>
-    public class Selector : MonoBehaviour
+    public abstract class Selector<T> : MonoBehaviour
     {
-        [SerializeField] public SelectionMode Mode = SelectionMode.Object;
-
         /// <summary>
-        /// 드래깅이 너무 작으면 개별 클릭으로 전환되는데 그 기준 길이
+        /// 드래깅이 너무 작으면 개별 클릭으로 전환되는데 그 기준 길이입니다.
         /// </summary>
         [SerializeField] private float dragThreshold = 8f;
 
@@ -29,9 +21,9 @@ namespace TRPG.Runtime
         /// </summary>
         [SerializeField] private RectTransform selectionBoxPf = null;
 
-        [SerializeField] private ObjectSelector objectSelector = new();
+        private RectTransform selectionBoxCanvasRect;
 
-        [SerializeField] private TileSelector tileSelector = new();
+        private RectTransform selectionBox;
 
         /// <summary>
         /// 드래그 시작지점 캐싱
@@ -43,33 +35,36 @@ namespace TRPG.Runtime
         /// </summary>
         private bool isPointerDown;
 
-        private RectTransform selectionBoxCanvasRect;
+        protected List<T> selecteds = new();
 
-        private RectTransform selectionBox;
+        /// <summary>
+        /// 오브젝트 선택 결과입니다. 오브젝트 선택기가 아닌 경우 빈 목록을 반환합니다.
+        /// </summary>
+        public virtual IReadOnlyList<T> Selecteds => selecteds;
 
-        public IReadOnlyList<ISelectable> SelectedInsts => objectSelector.SelectedInsts;
 
 
-        private void Awake()
+
+        protected virtual void Awake()
         {
             CreateSelectionBox();
             HideSelectionBox();
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             InputManager.InputMappingContext.Player.LeftClick.performed += OnLeftClickStarted;
             InputManager.InputMappingContext.Player.LeftClick.canceled += OnLeftClickCanceled;
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             InputManager.InputMappingContext.Player.LeftClick.performed -= OnLeftClickStarted;
             InputManager.InputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;
             HideSelectionBox();
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (!isPointerDown) return;
             if (Pointer.current == null) return;
@@ -127,7 +122,6 @@ namespace TRPG.Runtime
             // 드래그 종료지점이 UI 위치임?
             if (ScreenEx.IsPointerOverUI(pointerScreenPos)) return;
 
-            Vector2 endPointerDownWorldPos = MouseEx.GetMouseWorldPos(WorldManager.CamController.Cam);
             float dragSqrDistance = (pointerScreenPos - startPointerDownScreenPos).sqrMagnitude;
             if (dragSqrDistance >= dragThreshold * dragThreshold)
             {
@@ -135,37 +129,25 @@ namespace TRPG.Runtime
             }
             else
             {
-                Select(endPointerDownWorldPos);
+                if (!MouseEx.TryGetWorldPos(WorldManager.CamController.Cam, pointerScreenPos, out Vector3 pointerWorldPos)) return;
+
+                Select(pointerWorldPos);
             }
         }
 
-        private void Selects(Vector2 startPos, Vector2 endPos)
-        {
-            switch (Mode)
-            {
-                case SelectionMode.Object:
-                    objectSelector.Selects(startPos, endPos);
-                    break;
+        /// <summary>
+        /// 드래그 선택 결과를 자식 선택기에서 처리합니다.
+        /// </summary>
+        protected abstract void Selects(Vector2 startPos, Vector2 endPos);
 
-                case SelectionMode.Construction:
-                    tileSelector.Selects(startPos, endPos);
-                    break;
-            }
-        }
+        /// <summary>
+        /// 단일 클릭 선택 결과를 자식 선택기에서 처리합니다.
+        /// </summary>
+        protected abstract void Select(Vector2 mouseWorldPos);
 
-        private void Select(Vector2 mouseWorldPos)
-        {
-            switch (Mode)
-            {
-                case SelectionMode.Object:
-                    objectSelector.Select(mouseWorldPos);
-                    break;
+        protected abstract void Clear();
 
-                case SelectionMode.Construction:
-                    tileSelector.Select(mouseWorldPos);
-                    break;
-            }
-        }
+        protected abstract void Add(T selectedTarget);
 
         private void CreateSelectionBox()
         {

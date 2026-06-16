@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -8,23 +7,28 @@ namespace TRPG.Runtime
     /// <summary>
     /// 타일 클릭 선택과 드래그 선택 로직을 처리합니다.
     /// </summary>
-    [Serializable]
-    public class TileSelector
+    public class ConstructionSelector : Selector<Vector3Int>
     {
-        [SerializeField] private readonly List<Vector3Int> selectedCells = new();
-
-        [SerializeField] private TileBase selectionTileBase;
+        [SerializeField] private TileBase selectIndicator;
 
 
 
-        public IReadOnlyList<Vector3Int> SelectedCells => selectedCells;
-
-
-
-        public void Selects(Vector2 startScreenPos, Vector2 endScreenPos)
+        protected override void OnEnable()
         {
-            UnSelect();
+            base.OnEnable();
 
+            Clear();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+
+            Clear();
+        }
+
+        protected override void Selects(Vector2 startScreenPos, Vector2 endScreenPos)
+        {
             Tilemap tilemap = WorldManager.Map.Ground;
             Camera cam = WorldManager.CamController.Cam;
             Rect selectionScreenRect = ScreenEx.CreateScreenRect(startScreenPos, endScreenPos);
@@ -47,46 +51,41 @@ namespace TRPG.Runtime
                     // 실제 타일이 있는 셀만 선택합니다.
                     if (!tilemap.HasTile(cellPos)) continue;
 
+                    // 이미 선택된거 아닌지?
+                    if (selecteds.Contains(cellPos)) continue;
+
                     // 셀 중앙점이 드래그 Rect 안에 들어온 타일만 선택합니다.
                     Vector3 cellCenterWorldPos = tilemap.GetCellCenterWorld(cellPos);
                     Vector2 cellCenterScreenPos = cam.WorldToScreenPoint(cellCenterWorldPos);
                     if (!selectionScreenRect.Contains(cellCenterScreenPos)) continue;
 
-                    selectedCells.Add(cellPos);
+                    Add(cellPos);
                 }
             }
-
-            Render(selectionTileBase);
         }
 
-        public void Select(Vector2 mouseWorldPos)
+        protected override void Select(Vector2 mouseWorldPos)
         {
-            UnSelect();
-
             Tilemap tilemap = WorldManager.Map.Ground;
             Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPos);
 
             // 실제 타일이 있는 셀만 선택합니다.
             if (!tilemap.HasTile(mouseCellPos)) return;
 
-            selectedCells.Add(mouseCellPos);
+            // 이미 선택된거 아닌지?
+            if (selecteds.Contains(mouseCellPos)) return;
 
-            Render(selectionTileBase);
+            Add(mouseCellPos);
         }
 
-        public void UnSelect()
+        protected override void Clear()
         {
-            Render(null);
-
-            selectedCells.Clear();
+            selecteds.Clear();
         }
 
-        public void Render(TileBase tileBase)
+        protected override void Add(Vector3Int selectedTarget)
         {
-            foreach (var cellPos in selectedCells)
-            {
-                WorldManager.Map.Selection.SetTile(cellPos, tileBase);
-            }
+            selecteds.Add(selectedTarget);
         }
     }
 }

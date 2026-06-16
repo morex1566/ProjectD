@@ -28,10 +28,22 @@ namespace TRPG.Runtime
         {
             worldPos = default;
 
-            if (camera == null) return false;
             if (Pointer.current == null) return false;
 
             Vector2 screenPosition = Pointer.current.position.ReadValue();
+
+            return TryGetWorldPos(camera, screenPosition, out worldPos);
+        }
+
+        /// <summary>
+        /// 지정된 화면 좌표에 대한 z=0 평면의 월드 좌표를 가져옵니다.
+        /// </summary>
+        public static bool TryGetWorldPos(Camera camera, Vector2 screenPosition, out Vector3 worldPos)
+        {
+            worldPos = default;
+
+            if (camera == null) return false;
+
             // 포커스 전환이나 초기 입력 프레임에서 NaN 좌표가 들어오면 해당 입력만 무시합니다.
             if (!IsFinite(screenPosition)) return false;
             if (UseCrtScreenCorrection && !TryApplyCrtScreenCorrection(camera, screenPosition, out screenPosition)) return false;

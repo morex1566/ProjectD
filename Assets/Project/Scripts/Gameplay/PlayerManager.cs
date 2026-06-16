@@ -4,10 +4,16 @@ using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
-    public enum CommandQueueMode
+    public enum CommandEnqueueType
     {
         Replace,
         Append
+    }
+
+    public enum CommandMode
+    {
+        Idle,
+        Construction
     }
 
     /// <summary>
@@ -17,7 +23,16 @@ namespace TRPG.Runtime
     {
         private static PlayerManagerSettingsData settings;
 
-        private Selector selector;
+        private CommandEnqueueType commandEnqueueMode = CommandEnqueueType.Replace;
+
+        private CommandMode commandMode = CommandMode.Idle;
+
+        private IdleSelector idleSelector;
+
+        private ConstructionSelector constructionSelector;
+
+        private Stack<PlayerCommand> commands = new();
+
 
         /// <summary>
         /// 플레이어 매니저 인스턴스와 설정 데이터를 준비합니다.
@@ -40,38 +55,62 @@ namespace TRPG.Runtime
 
         private void Start()
         {
-            selector = Instantiate(settings.Selector);
+            idleSelector = Instantiate(settings.SelectorPf, transform).GetComponent<IdleSelector>();
+            constructionSelector = Instantiate(settings.SelectorPf, transform).GetComponent<ConstructionSelector>();
         }
 
         private void OnRightClickPerformed(InputAction.CallbackContext context)
         {
-            CommandMove(CommandQueueMode.Replace);
+            CommandMove();
+            CommandConstruct();
         }
 
         /// <summary>
         /// 선택대상들에게 이동을 명령
         /// </summary>
         /// <param name="mode"></param>
-        private void CommandMove(CommandQueueMode mode)
+        private void CommandMove(CommandEnqueueType mode = CommandEnqueueType.Replace)
         {
-            IReadOnlyList<ISelectable> selectedInsts = selector.SelectedInsts;
+            // 일반 명령 상태가 아니면 이동 불가
+            if (commandMode != CommandMode.Idle) return;
 
+            // 선택 대상들에게 마우스의 cellpos로 이동하라고 명령
+            IReadOnlyList<ISelectable> selectedInsts = idleSelector.Selecteds;
             Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(WorldManager.CamController.Cam);
-
             for (int i = 0; i < selectedInsts.Count; i++)
             {
+                // 선택대상들이 크리쳐임?
                 if (selectedInsts[i] is not CreatureController creature) continue;
-
-                if (creature.Owner != gameObject) continue;
 
                 creature.EnqueueMove(mouseWorldPos, mode);
             }
         }
 
-        public static void SetSelectorSelectionMode(SelectionMode mode)
+        private void CommandConstruct(CommandEnqueueType mode = CommandEnqueueType.Replace)
         {
-            Selector selector = GetInstance().selector;
-            selector.Mode = mode;
+            // 공사 명령 상태가 아니면 공사 불가
+            if (commandMode != CommandMode.Construction) return;
+        }
+
+        public void SetCommandMode(CommandMode mode)
+        {
+            commandMode = mode;
+
+            switch (commandMode)
+            {
+                case CommandMode.Idle:
+                    constructionSelector.enabled = false;
+                    idleSelector.enabled = true;
+                    break;
+
+                case CommandMode.Construction:
+                    constructionSelector.enabled = true;
+                    idleSelector.enabled = false;
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

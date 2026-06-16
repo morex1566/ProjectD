@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,23 +6,29 @@ namespace TRPG.Runtime
     /// <summary>
     /// 오브젝트 클릭 선택과 드래그 선택 로직을 처리합니다.
     /// </summary>
-    [Serializable]
-    public class ObjectSelector
+    public class IdleSelector : Selector<ISelectable>
     {
-        /// <summary>
-        /// 드래그 대상
-        /// </summary>
-        [SerializeField] private readonly List<ISelectable> selectedInsts = new();
+        [SerializeField] private GameObject selectIndicator = null;
 
 
 
-        public IReadOnlyList<ISelectable> SelectedInsts => selectedInsts;
-
-
-
-        public void Selects(Vector2 startPos, Vector2 endPos)
+        protected override void OnEnable()
         {
-            ClearSelection();
+            base.OnEnable();
+
+            Clear();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+
+            Clear();
+        }
+
+        protected override void Selects(Vector2 startPos, Vector2 endPos)
+        {
+            Clear();
 
             Rect selectionRect = ScreenEx.CreateScreenRect(startPos, endPos);
             MonoBehaviour[] behaviours = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
@@ -40,13 +45,13 @@ namespace TRPG.Runtime
                 // 드래깅 범위에 있음?
                 if (!ScreenEx.IsWorldObjBoundsInScreenRect(cam, selectable.SelectionBounds, selectionRect)) continue;
 
-                AddSelection(selectable);
+                Add(selectable);
             }
         }
 
-        public void Select(Vector2 mouseWorldPos)
+        protected override void Select(Vector2 mouseWorldPos)
         {
-            ClearSelection();
+            Clear();
 
             MonoBehaviour[] behaviours = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             Camera cam = WorldManager.CamController.Cam;
@@ -78,24 +83,24 @@ namespace TRPG.Runtime
                 }
             }
 
-            if (bestSelectable is not null) AddSelection(bestSelectable);
+            if (bestSelectable is not null) Add(bestSelectable);
         }
 
-        public void ClearSelection()
+        protected override void Clear()
         {
-            for (int i = 0; i < selectedInsts.Count; i++)
+            for (int i = 0; i < selecteds.Count; i++)
             {
                 // 선택 리스트를 비울 때 실제 선택 상태도 함께 해제합니다.
-                selectedInsts[i].SetSelected(false);
+                selecteds[i].SetSelected(false);
             }
 
-            selectedInsts.Clear();
+            selecteds.Clear();
         }
 
-        private void AddSelection(ISelectable selectable)
+        protected override void Add(ISelectable selectedTarget)
         {
-            selectedInsts.Add(selectable);
-            selectable.SetSelected(true);
+            selecteds.Add(selectedTarget);
+            selectedTarget.SetSelected(true);
         }
     }
 }

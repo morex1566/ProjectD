@@ -5,7 +5,7 @@ namespace TRPG.Runtime
     /// <summary>
     /// 현재 공사되고 있는 곳의 모든 정보들
     /// </summary>
-    public class Construction
+    public class ConstructionJob
     {
         /// <summary>
         /// 공사 완료에 필요한 점수

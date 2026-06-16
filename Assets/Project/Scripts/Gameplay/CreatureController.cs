@@ -12,8 +12,6 @@ namespace TRPG.Runtime
 
         [SerializeField] private SpriteRenderer spriter = null;
 
-        [SerializeField] private GameObject selectionIndicator = null;
-
         public CreatureJobMachine JobMachine = null;
 
         public CreatureStatus Status = null;
@@ -65,7 +63,6 @@ namespace TRPG.Runtime
         public void SetSelected(bool isSelected)
         {
             IsSelected = isSelected;
-            selectionIndicator.SetActive(isSelected);
         }
 
         /// <summary>
@@ -96,25 +93,32 @@ namespace TRPG.Runtime
             spriter = spriteObj.GetComponentInChildren<SpriteRenderer>();
         }
 
-        public void EnqueueMove(Vector3 targetPos, CommandQueueMode mode)
+        public void EnqueueMove(Vector3 targetPos, CommandEnqueueType mode)
         {
-            if (mode == CommandQueueMode.Replace)
+            if (mode == CommandEnqueueType.Replace)
             {
                 JobMachine.Clear();
             }
 
-            JobMachine.Enqueue(new CreatureMoveJob(targetPos, Status.MoveSpeed, this, JobMachine, 1));
+            JobMachine.Enqueue(CreatureJob.CreateMove(targetPos, Status.MoveSpeed, this, 1));
         }
 
-        public void EnqueueAttack(CreatureController target, CommandQueueMode mode)
+        public void EnqueueAttack(CreatureController target, CommandEnqueueType mode)
         {
-            if (mode == CommandQueueMode.Replace)
+            if (mode == CommandEnqueueType.Replace)
             {
                 JobMachine.Clear();
             }
 
-            JobMachine.Enqueue(new CreatureAttackJob(target, this, JobMachine, 1));
+            JobMachine.Enqueue(CreatureJob.CreateAttack(target, this, 1));
         }
+
+        public void EnqueueConstruct(CommandEnqueueType mode)
+        {
+
+        }
+
+
 
         public void TakeDamage()
         {

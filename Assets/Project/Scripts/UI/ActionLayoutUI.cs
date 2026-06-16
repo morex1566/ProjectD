@@ -23,12 +23,12 @@ namespace TRPG.Runtime
 
         public void OnIdleButtonClicked()
         {
-            PlayerManager.SetSelectorSelectionMode(SelectionMode.Object);
+            PlayerManager.GetInstance().SetCommandMode(CommandMode.Idle);
         }
 
         public void OnConstructionButtonClicked()
         {
-            PlayerManager.SetSelectorSelectionMode(SelectionMode.Construction);
+            PlayerManager.GetInstance().SetCommandMode(CommandMode.Construction);
         }
     }
 }

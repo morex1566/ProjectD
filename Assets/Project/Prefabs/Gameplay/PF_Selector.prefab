@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3246341644878012925}
   - component: {fileID: 7379261557961419522}
+  - component: {fileID: 7379261557961419523}
   m_Layer: 0
   m_Name: PF_Selector
   m_TagString: Untagged
@@ -41,11 +42,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1695718276028346589}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3dc9f91700248718cf0c8167c1bf429, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.Selector
-  Mode: 0
+  m_Script: {fileID: 11500000, guid: c9d731a8de3a8a44da0a5f4b7ef41c19, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.ObjectSelector
   dragThreshold: 8
   selectionBoxPf: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
-  tileSelector:
-    selectionTileBase: {fileID: 11400000, guid: 341c7c6936268d44c80fbf7495860d92, type: 2}
+--- !u!114 &7379261557961419523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1695718276028346589}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ffe2462d41521c4ea4d8a841341da68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.TileSelector
+  dragThreshold: 8
+  selectionBoxPf: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
+  selectionTileBase: {fileID: 11400000, guid: 341c7c6936268d44c80fbf7495860d92, type: 2}
