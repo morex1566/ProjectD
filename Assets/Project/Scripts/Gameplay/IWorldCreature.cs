@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
-    public interface IWorldObject
+    public interface IWorldCreature
     {
         public string DataId { get; }
 

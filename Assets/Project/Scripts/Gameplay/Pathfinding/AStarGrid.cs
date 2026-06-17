@@ -7,6 +7,9 @@ namespace TRPG.Runtime
 {
     public class AStarGrid
     {
+        private const int StraightMoveCost = 10;
+        private const int DiagonalMoveCost = 14;
+
         private AStarNode[,] nodes;
 
         public int Width { get; }
@@ -177,10 +180,14 @@ namespace TRPG.Runtime
         {
             List<AStarNode> neighbors = new List<AStarNode>();
 
-            AddNeighbor(neighbors, node.X + 1, node.Y);
-            AddNeighbor(neighbors, node.X - 1, node.Y);
-            AddNeighbor(neighbors, node.X, node.Y + 1);
-            AddNeighbor(neighbors, node.X, node.Y - 1);
+            AddNeighbor(neighbors, node, node.X, node.Y + 1);
+            AddNeighbor(neighbors, node, node.X + 1, node.Y + 1);
+            AddNeighbor(neighbors, node, node.X + 1, node.Y);
+            AddNeighbor(neighbors, node, node.X + 1, node.Y - 1);
+            AddNeighbor(neighbors, node, node.X, node.Y - 1);
+            AddNeighbor(neighbors, node, node.X - 1, node.Y - 1);
+            AddNeighbor(neighbors, node, node.X - 1, node.Y);
+            AddNeighbor(neighbors, node, node.X - 1, node.Y + 1);
 
             return neighbors;
         }
@@ -225,9 +232,14 @@ namespace TRPG.Runtime
             }
         }
 
-        private void AddNeighbor(List<AStarNode> neighbors, int x, int y)
+        private void AddNeighbor(List<AStarNode> neighbors, AStarNode from, int x, int y)
         {
             if (!TryGetNode(x, y, out AStarNode node))
+            {
+                return;
+            }
+
+            if (!EvaluateNeighbor(from, node))
             {
                 return;
             }
@@ -235,20 +247,48 @@ namespace TRPG.Runtime
             neighbors.Add(node);
         }
 
+        private bool EvaluateNeighbor(AStarNode from, AStarNode to)
+        {
+            int moveY = to.Y - from.Y;
+
+            if (moveY == 0 || to.X == from.X)
+            {
+                return true;
+            }
+
+            // 대각선 이동 시 진행 방향의 바로 위/아래 칸이 막혀 있으면 이동하지 않습니다.
+            return TryGetNode(from.X, from.Y + moveY, out _);
+        }
+
+        private bool IsDiagonalMove(AStarNode from, AStarNode to)
+        {
+            return from.X != to.X && from.Y != to.Y;
+        }
+
+        private int CalculateOctileDistance(int distanceX, int distanceY)
+        {
+            int diagonalCount = Math.Min(distanceX, distanceY);
+            int straightCount = Math.Abs(distanceX - distanceY);
+
+            return diagonalCount * DiagonalMoveCost + straightCount * StraightMoveCost;
+        }
+
         private int CalculateHeuristic(AStarNode current, AStarNode target)
         {
             int distanceX = Math.Abs(current.X - target.X);
             int distanceY = Math.Abs(current.Y - target.Y);
 
-            return distanceX + distanceY;
+            return CalculateOctileDistance(distanceX, distanceY);
         }
 
-        /// <summary>
-        /// 만약에 대각선 이동을 넣으면 상하좌우 : 10, 대각선 14 이렇게 할 수 있음.
-        /// </summary>
         private int CalculateMoveCost(AStarNode from, AStarNode to)
         {
-            return 1;
+            if (IsDiagonalMove(from, to))
+            {
+                return DiagonalMoveCost;
+            }
+
+            return StraightMoveCost;
         }
 
         /// <summary>

@@ -47,5 +47,16 @@ namespace TRPG.Runtime
                 return;
             }
         }
+
+        /// <summary>
+        /// Job의 드로우 기즈모
+        /// </summary>
+        public void DrawGizmos()
+        {
+            foreach (var job in queue)
+            {
+                job.DrawGizmos();
+            }
+        }
     }
 }

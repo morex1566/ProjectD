@@ -104,7 +104,7 @@ namespace TRPG.Runtime
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Point"",
+                    ""name"": ""CellPos"",
                     ""Type"": ""PassThrough"",
                     ""id"": ""52805266-3466-4dbc-956c-ab62c87a7a58"",
                     ""expectedControlType"": ""Vector2"",
@@ -352,7 +352,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Point"",
+                    ""action"": ""CellPos"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -363,7 +363,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Point"",
+                    ""action"": ""CellPos"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -374,7 +374,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Touch"",
-                    ""action"": ""Point"",
+                    ""action"": ""CellPos"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -731,7 +731,7 @@ namespace TRPG.Runtime
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Point"",
+                    ""name"": ""CellPos"",
                     ""Type"": ""PassThrough"",
                     ""id"": ""32b35790-4ed0-4e9a-aa41-69ac6d629449"",
                     ""expectedControlType"": ""Vector2"",
@@ -1099,7 +1099,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Point"",
+                    ""action"": ""CellPos"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1110,7 +1110,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Point"",
+                    ""action"": ""CellPos"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1121,7 +1121,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Touch"",
-                    ""action"": ""Point"",
+                    ""action"": ""CellPos"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1304,7 +1304,7 @@ namespace TRPG.Runtime
             // Player
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
             m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
-            m_Player_Point = m_Player.FindAction("Point", throwIfNotFound: true);
+            m_Player_Point = m_Player.FindAction("CellPos", throwIfNotFound: true);
             m_Player_ScrollWheel = m_Player.FindAction("ScrollWheel", throwIfNotFound: true);
             m_Player_RightClick = m_Player.FindAction("RightClick", throwIfNotFound: true);
             m_Player_LeftClick = m_Player.FindAction("LeftClick", throwIfNotFound: true);
@@ -1321,7 +1321,7 @@ namespace TRPG.Runtime
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
             m_UI_Submit = m_UI.FindAction("Submit", throwIfNotFound: true);
             m_UI_Cancel = m_UI.FindAction("Cancel", throwIfNotFound: true);
-            m_UI_Point = m_UI.FindAction("Point", throwIfNotFound: true);
+            m_UI_Point = m_UI.FindAction("CellPos", throwIfNotFound: true);
             m_UI_Click = m_UI.FindAction("Click", throwIfNotFound: true);
             m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
             m_UI_MiddleClick = m_UI.FindAction("MiddleClick", throwIfNotFound: true);
@@ -1438,7 +1438,7 @@ namespace TRPG.Runtime
             /// </summary>
             public InputAction @Move => m_Wrapper.m_Player_Move;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Point".
+            /// Provides access target the underlying input action "Player/CellPos".
             /// </summary>
             public InputAction @Point => m_Wrapper.m_Player_Point;
             /// <summary>
@@ -1671,7 +1671,7 @@ namespace TRPG.Runtime
             /// </summary>
             public InputAction @Cancel => m_Wrapper.m_UI_Cancel;
             /// <summary>
-            /// Provides access target the underlying input action "UI/Point".
+            /// Provides access target the underlying input action "UI/CellPos".
             /// </summary>
             public InputAction @Point => m_Wrapper.m_UI_Point;
             /// <summary>
@@ -1908,7 +1908,7 @@ namespace TRPG.Runtime
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMove(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "CellPos" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
@@ -2021,7 +2021,7 @@ namespace TRPG.Runtime
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnCancel(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "CellPos" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />

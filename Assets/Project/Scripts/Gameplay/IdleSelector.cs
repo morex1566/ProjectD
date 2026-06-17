@@ -8,10 +8,6 @@ namespace TRPG.Runtime
     /// </summary>
     public class IdleSelector : Selector<ISelectable>
     {
-        [SerializeField] private GameObject selectIndicator = null;
-
-
-
         protected override void OnEnable()
         {
             base.OnEnable();

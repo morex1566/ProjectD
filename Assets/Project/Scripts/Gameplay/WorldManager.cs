@@ -10,7 +10,7 @@ namespace TRPG.Runtime
     {
         private static WorldManagerSettingsData settings = null;
 
-        private static readonly Dictionary<int, IWorldObject> worldInsts = new();
+        private static readonly Dictionary<int, CreatureController> creatures = new();
 
         private static GameObject worldRoot = null;
 
@@ -20,6 +20,11 @@ namespace TRPG.Runtime
 
         public static CreatureDataSheet creatureDataSheet = null;
 
+
+
+        public static IReadOnlyDictionary<int, CreatureController> Creatures => creatures;
+
+        public static WorldManagerSettingsData Settings => settings;
 
 
         /// <summary>
@@ -37,7 +42,7 @@ namespace TRPG.Runtime
             creatureDataSheet = ResourceManager.GetResource(settings.CreatureDataSheetRef);
         }
 
-        public static IWorldObject Spawn(IdKeyData idKeyData, Vector3 position)
+        public static IWorldCreature Spawn(IdKeyData idKeyData, Vector3 position)
         {
             CreatureData creatureData = creatureDataSheet.GetCreatureData(idKeyData.Id);
             GameObject instObj = Instantiate(creatureData.CreaturePf, position, Quaternion.identity, worldRoot.transform);
@@ -53,8 +58,8 @@ namespace TRPG.Runtime
 
         public static bool Despawn(int instanceId)
         {
-            IWorldObject worldObject = worldInsts[instanceId];
-            worldInsts.Remove(instanceId);
+            IWorldCreature worldObject = creatures[instanceId];
+            creatures.Remove(instanceId);
 
             if (worldObject is Component component)
             {
@@ -64,9 +69,9 @@ namespace TRPG.Runtime
             return true;
         }
 
-        private static void Register(IWorldObject worldObject)
+        private static void Register(CreatureController creature)
         {
-            worldInsts.Add(worldObject.InstanceId, worldObject);
+            creatures.Add(creature.InstanceId, creature);
         }
     }
 }

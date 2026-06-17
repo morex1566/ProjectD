@@ -27,6 +27,9 @@ namespace TRPG.Runtime
         /// </summary>
         [SerializeField] private Tilemap ground;
 
+        /// <summary>
+        /// 
+        /// </summary>
         [SerializeField] private Tilemap selection;
 
         /// <summary>
@@ -62,8 +65,12 @@ namespace TRPG.Runtime
         /// <summary>
         /// 맵 타일 데이터입니다.
         /// </summary>
-        private MapTileType[] tiles;
+        private MapTileType[] tileTypes;
 
+        /// <summary>
+        /// 맵 타일의 중력데이터
+        /// </summary>
+        private float[] tileGravities;
 
         public Tilemap Ground => ground;
 
@@ -76,6 +83,8 @@ namespace TRPG.Runtime
         public int MapHeight => mapHeight;
 
         public Vector2Int Center => new Vector2Int(MapWidth / 2, groundHeight);
+
+        public float[] Gravities => tileGravities;
         
 
         /// <summary>
@@ -85,6 +94,8 @@ namespace TRPG.Runtime
         {
             Generate();
         }
+
+
 
         /// <summary>
         /// 평평한 지형을 생성합니다.
@@ -103,18 +114,42 @@ namespace TRPG.Runtime
             // 기존 타일맵을 초기화합니다.
             ground.ClearAllTiles();
 
-            // 맵 데이터를 생성합니다.
-            tiles = new MapTileType[mapWidth * mapHeight];
-
-            GenerateTileData();
+            GenerateTileTypes();
+            GenerateTileGravities();
             RenderTilemap();
         }
 
         /// <summary>
+        /// 특정 위치의 타일 타입을 반환합니다.
+        /// </summary>
+        public MapTileType GetTileType(int x, int y)
+        {
+            if (IsInBounds(x, y) == false)
+            {
+                return MapTileType.Air;
+            }
+
+            return tileTypes[ToIndex(x, y)];
+        }
+
+        public void RemoveTile(Vector3Int cellPos)
+        {
+            if (!IsInBounds(cellPos.x, cellPos.y)) return;
+
+            tileTypes[ToIndex(cellPos.x, cellPos.y)] = MapTileType.Air;
+            ground.SetTile(cellPos, null);
+        }
+
+
+
+
+        /// <summary>
         /// Ground / GroundSurface / Air 데이터를 생성합니다.
         /// </summary>
-        private void GenerateTileData()
+        private void GenerateTileTypes()
         {
+            tileTypes = new MapTileType[mapWidth * mapHeight];
+
             for (int y = 0; y < mapHeight; y++)
             {
                 for (int x = 0; x < mapWidth; x++)
@@ -124,18 +159,33 @@ namespace TRPG.Runtime
                     if (y >= groundHeight)
                     {
                         // 땅 높이보다 위쪽은 공기입니다.
-                        tiles[index] = MapTileType.Air;
+                        tileTypes[index] = MapTileType.Air;
                     }
-                    else if (y == groundHeight - 1)
+                    else 
+                    if (y == groundHeight - 1)
                     {
                         // 땅의 가장 윗줄은 지표면입니다.
-                        tiles[index] = MapTileType.GroundSurface;
+                        tileTypes[index] = MapTileType.GroundSurface;
                     }
                     else
                     {
                         // 지표면 아래는 일반 땅입니다.
-                        tiles[index] = MapTileType.Ground;
+                        tileTypes[index] = MapTileType.Ground;
                     }
+                }
+            }
+        }
+
+        private void GenerateTileGravities()
+        {
+            tileGravities = new float[mapWidth * mapHeight];
+
+            for (int y = 0; y < mapHeight; y++)
+            {
+                for (int x = 0; x < mapWidth; x++)
+                {
+                    int index = ToIndex(x, y);
+                    tileGravities[index] = WorldManager.Settings.Gravities[tileTypes[index]];
                 }
             }
         }
@@ -155,25 +205,12 @@ namespace TRPG.Runtime
                     int index = ToIndex(x, y);
 
                     // 타일 타입에 맞는 TileBase를 넣습니다.
-                    tileBlock[index] = GetTileBase(tiles[index]);
+                    tileBlock[index] = GetTileBase(tileTypes[index]);
                 }
             }
 
             // 타일을 한 번에 배치합니다.
             ground.SetTilesBlock(bounds, tileBlock);
-        }
-
-        /// <summary>
-        /// 특정 위치의 타일 타입을 반환합니다.
-        /// </summary>
-        public MapTileType GetTileType(int x, int y)
-        {
-            if (IsInBounds(x, y) == false)
-            {
-                return MapTileType.Air;
-            }
-
-            return tiles[ToIndex(x, y)];
         }
 
         /// <summary>

@@ -17,6 +17,8 @@ namespace TRPG.Runtime
         public float AttackSpeed;
         public float MoveSpeed;
 
+        public CreatureAIType aiType;
+
         public GameObject SpritePf;
         public GameObject CreaturePf;
 

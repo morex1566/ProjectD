@@ -11,6 +11,10 @@ namespace TRPG.Runtime
     [CreateAssetMenu(fileName = "SO_WorldManagerSettings", menuName = "Scriptable Objects/Settings/WorldManager")]
     public partial class WorldManagerSettingsData : ScriptableObject
     {
-        public AssetReferenceT<CreatureDataSheet> CreatureDataSheetRef;
+        [Header("Map")]
+        public SerializableDictionary<MapTileType, float> Gravities = null;
+
+        [Header("Creature")]
+        public AssetReferenceT<CreatureDataSheet> CreatureDataSheetRef = null;
     }
 }

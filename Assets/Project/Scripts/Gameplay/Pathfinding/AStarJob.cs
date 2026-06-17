@@ -11,6 +11,9 @@ namespace TRPG.Runtime
     [BurstCompile]
     public struct AStarJob : IJobParallelFor
     {
+        private const int StraightMoveCost = 10;
+        private const int DiagonalMoveCost = 14;
+
         /// <summary>
         /// 요청별 GCost 상태입니다. 요청마다 전체 노드 수만큼 독립된 영역을 사용합니다.
         /// </summary>
@@ -106,15 +109,19 @@ namespace TRPG.Runtime
                 RemoveOpenAt(openOffset, ref openCount, currentOpenIndex);
                 States[nodeOffset + currentNodeIndex] = 2;
 
-                // 현재 노드의 1차원 index를 상하좌우 탐색에 사용할 x/y 좌표로 변환합니다.
+                // 현재 노드의 1차원 index를 주변 탐색에 사용할 x/y 좌표로 변환합니다.
                 int currentX = ToX(currentNodeIndex);
                 int currentY = ToY(currentNodeIndex);
 
-                // 4방향 이웃 노드를 검사하고, 더 좋은 경로라면 OpenList에 반영합니다.
-                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX + 1, currentY, ref openCount);
-                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX - 1, currentY, ref openCount);
-                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY + 1, ref openCount);
-                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY - 1, ref openCount);
+                // 8방향 이웃 노드를 검사하고, 더 좋은 경로라면 OpenList에 반영합니다.
+                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY, currentX, currentY + 1, ref openCount);
+                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY, currentX + 1, currentY + 1, ref openCount);
+                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY, currentX + 1, currentY, ref openCount);
+                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY, currentX + 1, currentY - 1, ref openCount);
+                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY, currentX, currentY - 1, ref openCount);
+                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY, currentX - 1, currentY - 1, ref openCount);
+                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY, currentX - 1, currentY, ref openCount);
+                TryOpenNeighbor(openOffset, nodeOffset, targetIndex, currentNodeIndex, currentX, currentY, currentX - 1, currentY + 1, ref openCount);
             }
 
             // OpenList가 비었다면 도달 가능한 노드를 모두 검사해도 경로가 없다는 뜻입니다.
@@ -264,6 +271,8 @@ namespace TRPG.Runtime
             int nodeOffset,
             int targetIndex,
             int currentNodeIndex,
+            int currentX,
+            int currentY,
             int neighborX,
             int neighborY,
             ref int openCount)
@@ -283,8 +292,12 @@ namespace TRPG.Runtime
                 return;
             }
 
-            // 4방향 이동 비용은 현재 구현에서 1로 고정합니다.
-            int newGCost = GCosts[nodeOffset + currentNodeIndex] + 1;
+            if (!EvaluateNeighbor(currentX, currentY, neighborX, neighborY))
+            {
+                return;
+            }
+
+            int newGCost = GCosts[nodeOffset + currentNodeIndex] + CalculateMoveCost(currentX, currentY, neighborX, neighborY);
             if (newGCost >= GCosts[neighborStateIndex])
             {
                 return;
@@ -301,6 +314,30 @@ namespace TRPG.Runtime
                 OpenList[openOffset + openCount] = neighborIndex;
                 openCount++;
             }
+        }
+
+        private bool EvaluateNeighbor(int currentX, int currentY, int neighborX, int neighborY)
+        {
+            int moveY = neighborY - currentY;
+
+            if (moveY == 0 || neighborX == currentX)
+            {
+                return true;
+            }
+
+            // 대각선 이동 시 진행 방향의 바로 위/아래 칸이 막혀 있으면 이동하지 않습니다.
+            int verticalIndex = ToIndex(currentX, currentY + moveY);
+            return WalkableNodes[verticalIndex] != 0;
+        }
+
+        private int CalculateMoveCost(int fromX, int fromY, int toX, int toY)
+        {
+            if (fromX != toX && fromY != toY)
+            {
+                return DiagonalMoveCost;
+            }
+
+            return StraightMoveCost;
         }
 
         /// <summary>
@@ -345,7 +382,7 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 현재 노드에서 목표 노드까지의 예상 비용을 Manhattan Distance로 계산합니다.
+        /// 현재 노드에서 목표 노드까지의 예상 비용을 Octile Distance로 계산합니다.
         /// </summary>
         private int CalculateHeuristic(int currentIndex, int targetIndex)
         {
@@ -358,7 +395,10 @@ namespace TRPG.Runtime
             int distanceX = Math.Abs(currentX - targetX);
             int distanceY = Math.Abs(currentY - targetY);
 
-            return distanceX + distanceY;
+            int diagonalCount = Math.Min(distanceX, distanceY);
+            int straightCount = Math.Abs(distanceX - distanceY);
+
+            return diagonalCount * DiagonalMoveCost + straightCount * StraightMoveCost;
         }
     }
 }

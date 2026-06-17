@@ -13,7 +13,7 @@ namespace TRPG.Runtime
 
     }
 
-    public sealed class DigCommand : ConstructCommand
+    public sealed class DigOrder : ConstructCommand
     {
         /// <summary>
         /// 이 명령에 참여하고 있는 크리쳐
@@ -21,7 +21,7 @@ namespace TRPG.Runtime
         private readonly List<CreatureController> creatures;
 
         /// <summary>
-        /// Dig 대상들
+        /// DigAction 대상들
         /// </summary>
         private readonly List<Vector3Int> cells;
 
@@ -30,7 +30,7 @@ namespace TRPG.Runtime
         /// </summary>
         private readonly CommandEnqueueType type;
 
-        public DigCommand(List<CreatureController> creatures, IReadOnlyList<Vector3Int> cells, CommandEnqueueType type)
+        public DigOrder(List<CreatureController> creatures, IReadOnlyList<Vector3Int> cells, CommandEnqueueType type)
         {
             this.creatures = creatures;
             this.cells = new List<Vector3Int>(cells);

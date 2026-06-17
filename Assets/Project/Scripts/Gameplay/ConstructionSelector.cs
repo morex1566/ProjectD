@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
@@ -9,7 +10,13 @@ namespace TRPG.Runtime
     /// </summary>
     public class ConstructionSelector : Selector<Vector3Int>
     {
-        [SerializeField] private TileBase selectIndicator;
+        [FormerlySerializedAs("selectIndicator")]
+        [FormerlySerializedAs("selectionTileBase")]
+        [SerializeField] private TileBase tileSelectedIndicator;
+
+
+
+        public TileBase TileSelectedIndicator => tileSelectedIndicator;
 
 
 
@@ -80,12 +87,29 @@ namespace TRPG.Runtime
 
         protected override void Clear()
         {
+            ShowIndicators(null);
             selecteds.Clear();
         }
 
         protected override void Add(Vector3Int selectedTarget)
         {
             selecteds.Add(selectedTarget);
+            ShowIndicator(selectedTarget, tileSelectedIndicator);
+        }
+
+        private void ShowIndicators(TileBase indicator)
+        {
+            for (int i = 0; i < selecteds.Count; i++)
+            {
+                ShowIndicator(selecteds[i], indicator);
+            }
+        }
+
+        private void ShowIndicator(Vector3Int cellPos, TileBase indicator)
+        {
+            if (WorldManager.Map.Selection == null) return;
+
+            WorldManager.Map.Selection.SetTile(cellPos, indicator);
         }
     }
 }

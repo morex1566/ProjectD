@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -9,5 +10,7 @@ namespace TRPG.Runtime
     public class PlayerManagerSettingsData : ScriptableObject
     {
         [SerializeField] public GameObject SelectorPf;
+
+        [SerializeField] public GameObject DigSystemPf;
     }
 }
