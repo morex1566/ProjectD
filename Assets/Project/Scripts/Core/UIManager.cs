@@ -8,6 +8,9 @@ namespace TRPG.Runtime
     /// </summary>
     public class UIManager : MonoBehaviourSingleton<UIManager>
     {
+        /// <summary>
+        /// UI가 렌더링될 공간 기준입니다.
+        /// </summary>
         public enum RenderSpace
         {
             Overlay,

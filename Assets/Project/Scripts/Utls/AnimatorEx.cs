@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// Animator 상태 전환을 코루틴에서 기다리기 위한 유틸리티입니다.
+    /// </summary>
     public static class AnimatorEx
     {
         /// <summary>

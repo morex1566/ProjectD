@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 엑셀에서 로드되는 Creature의 정적 설정 데이터입니다.
+    /// </summary>
     [Serializable]
     public class CreatureData
     {
@@ -21,13 +24,5 @@ namespace TRPG.Runtime
 
         public GameObject SpritePf;
         public GameObject CreaturePf;
-
-        /// <summary>
-        /// 셋업 데이터를 기준으로 독립적인 런타임 상태를 생성합니다.
-        /// </summary>
-        public CreatureStatus Create()
-        {
-            return new CreatureStatus(this);
-        }
     }
 }

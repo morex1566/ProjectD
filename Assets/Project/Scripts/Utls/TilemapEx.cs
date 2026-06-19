@@ -3,6 +3,9 @@ using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// Tilemap 셀에서 렌더링 리소스를 조회하는 확장 유틸리티입니다.
+    /// </summary>
     public static class TilemapEx
     {
         /// <summary>

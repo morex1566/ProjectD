@@ -129,6 +129,9 @@ namespace TRPG.Runtime
             }
         }
 
+        /// <summary>
+        /// 예약된 콜백과 실행 시각을 보관하는 내부 타이머 작업입니다.
+        /// </summary>
         private struct TimerTask : IComparable<TimerTask>
         {
             public double executionTime;

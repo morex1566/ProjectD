@@ -5,6 +5,9 @@ using UnityEngine.Rendering.Universal;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 월드 카메라 이동과 PixelPerfectCamera 기반 줌을 처리합니다.
+    /// </summary>
     [RequireComponent(typeof(Camera))]
     [RequireComponent(typeof(PixelPerfectCamera))]
     public class WorldCameraController : MonoBehaviour
@@ -27,6 +30,9 @@ namespace TRPG.Runtime
         private float zoomVelocity;
 
 
+        /// <summary>
+        /// Camera와 PixelPerfectCamera 컴포넌트를 캐싱하고 보간 목표값을 초기화합니다.
+        /// </summary>
         private void Awake()
         {
             Cam = GetComponent<Camera>();
@@ -37,6 +43,9 @@ namespace TRPG.Runtime
             currentAssetsPPU = PixelPerfectCam.assetsPPU;
         }
 
+        /// <summary>
+        /// 이동과 줌 입력 이벤트를 카메라 제어 함수에 연결합니다.
+        /// </summary>
         private void OnEnable()
         {
             InputManager.InputMappingContext.Player.Move.performed += OnWASD;
@@ -44,6 +53,9 @@ namespace TRPG.Runtime
             InputManager.InputMappingContext.Player.ScrollWheel.performed += OnScrollWheel;
         }
 
+        /// <summary>
+        /// 비활성화 시 카메라 입력 이벤트 연결을 해제합니다.
+        /// </summary>
         private void OnDisable()
         {
             InputManager.InputMappingContext.Player.Move.performed -= OnWASD;
@@ -51,6 +63,9 @@ namespace TRPG.Runtime
             InputManager.InputMappingContext.Player.ScrollWheel.performed -= OnScrollWheel;
         }
 
+        /// <summary>
+        /// 입력 목표 위치를 갱신하고 이동/줌 보간을 적용합니다.
+        /// </summary>
         private void Update()
         {
             UpdateMoveTarget();
@@ -58,6 +73,9 @@ namespace TRPG.Runtime
             SmoothZoom();
         }
 
+        /// <summary>
+        /// 현재 이동 입력을 누적해 카메라가 따라갈 목표 위치를 갱신합니다.
+        /// </summary>
         private void UpdateMoveTarget()
         {
             if (moveInput == Vector2.zero) return;
@@ -68,11 +86,17 @@ namespace TRPG.Runtime
             targetPosition += moveDelta;
         }
 
+        /// <summary>
+        /// 현재 위치를 목표 위치로 부드럽게 이동시킵니다.
+        /// </summary>
         private void SmoothMove()
         {
             transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref moveVelocity, moveSmoothTime);
         }
 
+        /// <summary>
+        /// 목표 assetsPPU를 향해 PixelPerfectCamera 줌을 부드럽게 보간합니다.
+        /// </summary>
         private void SmoothZoom()
         {
             currentAssetsPPU = Mathf.SmoothDamp(currentAssetsPPU, targetAssetsPPU, ref zoomVelocity, zoomSmoothTime);
@@ -85,11 +109,17 @@ namespace TRPG.Runtime
             }
         }
 
+        /// <summary>
+        /// WASD 이동 입력 값을 저장합니다.
+        /// </summary>
         private void OnWASD(InputAction.CallbackContext context)
         {
             moveInput = context.ReadValue<Vector2>();
         }
 
+        /// <summary>
+        /// 스크롤 방향에 따라 목표 줌 PPU를 한 단계씩 조절합니다.
+        /// </summary>
         private void OnScrollWheel(InputAction.CallbackContext context)
         {
             Vector2 scrollDelta = context.ReadValue<Vector2>();

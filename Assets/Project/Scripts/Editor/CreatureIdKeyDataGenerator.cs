@@ -7,29 +7,39 @@ using UnityEngine;
 
 namespace TRPG.Editor
 {
+    /// <summary>
+    /// CreatureDataSheet에서 CreatureData 식별 정보를 읽어 IdKeyData 에셋을 자동 생성합니다.
+    /// </summary>
     public class CreatureIdKeyDataGenerator : AssetPostprocessor
     {
-        private const string MenuPath = "Tools/TRPG/Data/Generate Creature Id Keys";
-        private const string CreatureSheetFilter = "t:CreatureDataSheet";
+        private const string MenuPath = "Tools/TRPG/Data/Generate CreatureContext Id Keys";
+        private const string CreatureSheetFilter = "t:CreatureSheet";
         private const string OutputFolder = "Assets/Project/Datas/Gen";
         private const string AssetNamePrefix = "SO_IdKey_";
 
         private static bool isGenerationScheduled;
 
-
-
+        /// <summary>
+        /// 에디터 로드 직후 IdKeyData 생성 작업을 한 번 예약합니다.
+        /// </summary>
         [InitializeOnLoadMethod]
         private static void ScheduleInitialGeneration()
         {
             ScheduleGeneration();
         }
 
+        /// <summary>
+        /// 메뉴에서 수동으로 모든 CreatureContext IdKeyData를 생성합니다.
+        /// </summary>
         [MenuItem(MenuPath)]
         public static void GenerateFromMenu()
         {
             GenerateAllCreatureIdKeys(true);
         }
 
+        /// <summary>
+        /// 엑셀 또는 CreatureSheet 변경이 있으면 IdKeyData 생성을 예약합니다.
+        /// </summary>
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
             if (!ContainsGenerationTarget(importedAssets) &&
@@ -43,6 +53,9 @@ namespace TRPG.Editor
             ScheduleGeneration();
         }
 
+        /// <summary>
+        /// 같은 임포트 사이클에서 중복 실행되지 않도록 IdKeyData 생성을 지연 예약합니다.
+        /// </summary>
         private static void ScheduleGeneration()
         {
             if (isGenerationScheduled) return;
@@ -57,6 +70,9 @@ namespace TRPG.Editor
             };
         }
 
+        /// <summary>
+        /// 변경된 에셋 경로 중 IdKeyData 재생성이 필요한 대상이 있는지 확인합니다.
+        /// </summary>
         private static bool ContainsGenerationTarget(IEnumerable<string> assetPaths)
         {
             foreach (string assetPath in assetPaths)
@@ -66,12 +82,15 @@ namespace TRPG.Editor
                 string extension = Path.GetExtension(assetPath);
 
                 if (extension == ".xls" || extension == ".xlsx") return true;
-                if (assetPath.EndsWith("CreatureDataSheet.asset", StringComparison.Ordinal)) return true;
+                if (assetPath.EndsWith("CreatureSheet.asset", StringComparison.Ordinal)) return true;
             }
 
             return false;
         }
 
+        /// <summary>
+        /// 모든 CreatureData를 순회하며 대응하는 IdKeyData를 생성하거나 갱신합니다.
+        /// </summary>
         private static void GenerateAllCreatureIdKeys(bool logResult)
         {
             EnsureOutputFolder();
@@ -108,10 +127,13 @@ namespace TRPG.Editor
 
             if (logResult)
             {
-                Debug.Log($"Creature IdKeyData generation complete. Created: {createdCount}, Updated: {updatedCount}, Skipped: {skippedCount}");
+                Debug.Log($"CreatureContext IdKeyData generation complete. Created: {createdCount}, Updated: {updatedCount}, Skipped: {skippedCount}");
             }
         }
 
+        /// <summary>
+        /// 프로젝트의 CreatureSheet 에셋들에서 중복 DataId를 제외하고 CreatureData를 열거합니다.
+        /// </summary>
         private static IEnumerable<CreatureData> LoadCreatureData()
         {
             HashSet<string> yieldedDataIds = new();
@@ -120,7 +142,7 @@ namespace TRPG.Editor
             foreach (string sheetGuid in sheetGuids)
             {
                 string sheetPath = AssetDatabase.GUIDToAssetPath(sheetGuid);
-                CreatureDataSheet sheet = AssetDatabase.LoadAssetAtPath<CreatureDataSheet>(sheetPath);
+                CreatureSheet sheet = AssetDatabase.LoadAssetAtPath<CreatureSheet>(sheetPath);
 
                 if (sheet == null || sheet.Entities == null) continue;
 
@@ -143,6 +165,9 @@ namespace TRPG.Editor
             }
         }
 
+        /// <summary>
+        /// DataId에 대응하는 IdKeyData 에셋을 찾거나 새로 생성합니다.
+        /// </summary>
         private static IdKeyData LoadOrCreateIdKeyData(string dataId, ref int createdCount)
         {
             string assetPath = GetAssetPath(dataId);
@@ -172,6 +197,9 @@ namespace TRPG.Editor
             return idKeyData;
         }
 
+        /// <summary>
+        /// CreatureData의 키 필드를 IdKeyData에 복사하고 변경 여부를 반환합니다.
+        /// </summary>
         private static bool ApplyCreatureData(IdKeyData idKeyData, CreatureData creatureData)
         {
             bool changed = false;
@@ -184,6 +212,9 @@ namespace TRPG.Editor
             return changed;
         }
 
+        /// <summary>
+        /// 문자열 값이 달라졌을 때만 대상 필드를 갱신합니다.
+        /// </summary>
         private static bool SetIfDifferent(ref string target, string value)
         {
             if (value == null)
@@ -197,6 +228,9 @@ namespace TRPG.Editor
             return true;
         }
 
+        /// <summary>
+        /// DataId를 현재 명명 규칙에 맞는 IdKeyData 에셋 경로로 변환합니다.
+        /// </summary>
         private static string GetAssetPath(string dataId)
         {
             string safeDataId = SanitizeFileName(dataId);
@@ -204,6 +238,9 @@ namespace TRPG.Editor
             return $"{OutputFolder}/{AssetNamePrefix}{ToPascalDelimitedName(safeDataId)}.asset";
         }
 
+        /// <summary>
+        /// 이전 명명 규칙으로 생성됐을 수 있는 IdKeyData 에셋 경로들을 반환합니다.
+        /// </summary>
         private static IEnumerable<string> GetLegacyAssetPaths(string dataId)
         {
             string safeDataId = SanitizeFileName(dataId);
@@ -212,6 +249,9 @@ namespace TRPG.Editor
             yield return $"{OutputFolder}/{AssetNamePrefix}{ToUpperFirstLetter(safeDataId)}.asset";
         }
 
+        /// <summary>
+        /// 기존 에셋 이름이 현재 규칙과 다르면 AssetDatabase에서 이름을 변경합니다.
+        /// </summary>
         private static void RenameAssetIfNeeded(IdKeyData idKeyData, string desiredAssetPath)
         {
             string currentAssetPath = AssetDatabase.GetAssetPath(idKeyData);
@@ -228,6 +268,9 @@ namespace TRPG.Editor
             }
         }
 
+        /// <summary>
+        /// 파일명에 사용할 수 없는 문자를 밑줄로 치환합니다.
+        /// </summary>
         private static string SanitizeFileName(string fileName)
         {
             foreach (char invalidChar in Path.GetInvalidFileNameChars())
@@ -238,6 +281,9 @@ namespace TRPG.Editor
             return fileName;
         }
 
+        /// <summary>
+        /// 문자열의 첫 글자만 대문자로 변환합니다.
+        /// </summary>
         private static string ToUpperFirstLetter(string value)
         {
             if (string.IsNullOrEmpty(value)) return value;
@@ -245,6 +291,9 @@ namespace TRPG.Editor
             return char.ToUpperInvariant(value[0]) + value.Substring(1);
         }
 
+        /// <summary>
+        /// 구분자를 유지한 채 각 구간의 첫 글자를 대문자로 변환합니다.
+        /// </summary>
         private static string ToPascalDelimitedName(string value)
         {
             if (string.IsNullOrEmpty(value)) return value;
@@ -272,6 +321,9 @@ namespace TRPG.Editor
             return new string(chars);
         }
 
+        /// <summary>
+        /// IdKeyData 출력 폴더가 없으면 생성하고 AssetDatabase에 임포트합니다.
+        /// </summary>
         private static void EnsureOutputFolder()
         {
             if (AssetDatabase.IsValidFolder(OutputFolder)) return;

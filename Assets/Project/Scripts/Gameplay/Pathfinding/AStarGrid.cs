@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// MapTileType 배열을 A* 탐색용 노드 그래프로 변환하고 경로를 계산합니다.
+    /// </summary>
     public class AStarGrid
     {
         private const int StraightMoveCost = 10;
@@ -18,17 +20,21 @@ namespace TRPG.Runtime
 
         public int NodeCount => Width * Height;
 
-        public AStarGrid(int width, int height)
+        /// <summary>
+        /// MapTileType 배열을 기반으로 이동 가능한 AStarNode 그리드를 생성합니다.
+        /// </summary>
+        public AStarGrid(MapTileType[] mapTileTypes, int width, int height)
         {
             Width = width;
             Height = height;
             nodes = new AStarNode[width, height];
 
-            for (int x = 0; x < width; x++)
+            for (int y = 0; y < Height; y++)
             {
-                for (int y = 0; y < height; y++)
+                for (int x = 0; x < Width; x++)
                 {
-                    nodes[x, y] = new AStarNode(x, y, true);
+                    bool isWalkable = mapTileTypes[ToIndex(x, y)].HasFlag(MapTileType.Air);
+                    nodes[x, y] = new AStarNode(x, y, isWalkable);
                 }
             }
         }
@@ -56,6 +62,9 @@ namespace TRPG.Runtime
             return true;
         }
 
+        /// <summary>
+        /// 좌표에 해당하는 노드를 반환합니다.
+        /// </summary>
         public AStarNode GetNode(int x, int y)
         {
             return nodes[x, y];
@@ -91,16 +100,6 @@ namespace TRPG.Runtime
         public bool IsInside(int x, int y)
         {
             return x >= 0 && x < Width && y >= 0 && y < Height;
-        }
-
-        public void SetWalkable(int x, int y, bool isWalkable)
-        {
-            if (!IsInside(x, y))
-            {
-                return;
-            }
-
-            nodes[x, y].IsWalkable = isWalkable;
         }
 
         /// <summary>
@@ -193,27 +192,6 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// byte는 지나갈 수 있는지 아닌지를 말함 JobSystem용 함수
-        /// </summary>
-        public void CopyWalkableTo(NativeArray<byte> destination)
-        {
-            if (destination.Length < NodeCount)
-            {
-                throw new ArgumentException("Walkable 상태를 복사할 NativeArray 길이가 부족합니다.", nameof(destination));
-            }
-
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    // 2차원 노드 좌표를 Job에서 사용할 1차원 index로 변환합니다.
-                    int index = ToIndex(x, y);
-                    destination[index] = nodes[x, y].IsWalkable ? (byte)1 : (byte)0;
-                }
-            }
-        }
-
-        /// <summary>
         /// A*는 탐색 중 노드에 상태를 저장함
         /// 다음 탐색 전에 이전 상태를 지워야 함
         /// </summary>
@@ -232,6 +210,12 @@ namespace TRPG.Runtime
             }
         }
 
+
+
+
+        /// <summary>
+        /// 후보 좌표가 이동 가능한 이웃인지 검사한 뒤 목록에 추가합니다.
+        /// </summary>
         private void AddNeighbor(List<AStarNode> neighbors, AStarNode from, int x, int y)
         {
             if (!TryGetNode(x, y, out AStarNode node))
@@ -247,6 +231,9 @@ namespace TRPG.Runtime
             neighbors.Add(node);
         }
 
+        /// <summary>
+        /// 대각선 이동 시 수직 방향에 발판이 있는지 검사해 허용 여부를 결정합니다.
+        /// </summary>
         private bool EvaluateNeighbor(AStarNode from, AStarNode to)
         {
             int moveY = to.Y - from.Y;
@@ -260,11 +247,17 @@ namespace TRPG.Runtime
             return TryGetNode(from.X, from.Y + moveY, out _);
         }
 
+        /// <summary>
+        /// 두 노드의 이동이 대각선인지 확인합니다.
+        /// </summary>
         private bool IsDiagonalMove(AStarNode from, AStarNode to)
         {
             return from.X != to.X && from.Y != to.Y;
         }
 
+        /// <summary>
+        /// 대각 이동을 허용하는 Octile 거리 비용을 계산합니다.
+        /// </summary>
         private int CalculateOctileDistance(int distanceX, int distanceY)
         {
             int diagonalCount = Math.Min(distanceX, distanceY);
@@ -273,6 +266,9 @@ namespace TRPG.Runtime
             return diagonalCount * DiagonalMoveCost + straightCount * StraightMoveCost;
         }
 
+        /// <summary>
+        /// 현재 노드에서 목표 노드까지의 휴리스틱 비용을 계산합니다.
+        /// </summary>
         private int CalculateHeuristic(AStarNode current, AStarNode target)
         {
             int distanceX = Math.Abs(current.X - target.X);
@@ -281,6 +277,9 @@ namespace TRPG.Runtime
             return CalculateOctileDistance(distanceX, distanceY);
         }
 
+        /// <summary>
+        /// 실제 이동 방향에 따른 한 칸 이동 비용을 반환합니다.
+        /// </summary>
         private int CalculateMoveCost(AStarNode from, AStarNode to)
         {
             if (IsDiagonalMove(from, to))

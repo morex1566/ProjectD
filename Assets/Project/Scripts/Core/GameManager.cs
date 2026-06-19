@@ -14,6 +14,9 @@ namespace TRPG.Runtime
 #endif
     public class GameManager : MonoBehaviourSingleton<GameManager>
     {
+        /// <summary>
+        /// 씬 로드 전 필요한 전역 시스템과 런타임 리소스를 초기화합니다.
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         private static void OnBeforeSplashSceneLoaded()
         {
@@ -23,6 +26,9 @@ namespace TRPG.Runtime
             ResourceManager.Init();
         }
 
+        /// <summary>
+        /// 씬 오브젝트가 로드된 뒤 씬 의존 매니저들을 초기화합니다.
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void OnAfterSceneLoaded()
         {
@@ -31,6 +37,9 @@ namespace TRPG.Runtime
             PlayerManager.Init();
         }
 
+        /// <summary>
+        /// GameManager 싱글톤 인스턴스를 보장합니다.
+        /// </summary>
         private static void Init()
         {
             GetInstance();

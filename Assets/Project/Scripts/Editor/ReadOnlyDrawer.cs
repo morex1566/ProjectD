@@ -41,11 +41,17 @@ namespace TRPG.Editor
             return EditorGUI.GetPropertyHeight(property, label, true);
         }
 
+        /// <summary>
+        /// 문자열이 아닌 배열/리스트 프로퍼티인지 확인합니다.
+        /// </summary>
         private static bool IsArrayOrList(SerializedProperty property)
         {
             return property.isArray && property.propertyType != SerializedPropertyType.String;
         }
 
+        /// <summary>
+        /// 단일 프로퍼티를 비활성 상태로 그립니다.
+        /// </summary>
         private static void DrawReadOnlyProperty(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginDisabledGroup(true);
@@ -53,6 +59,9 @@ namespace TRPG.Editor
             EditorGUI.EndDisabledGroup();
         }
 
+        /// <summary>
+        /// 배열/리스트를 펼침 상태와 원소 값만 보이도록 읽기 전용으로 그립니다.
+        /// </summary>
         private static void DrawReadOnlyArray(Rect position, SerializedProperty property, GUIContent label)
         {
             Rect lineRect = GetLineRect(position);
@@ -83,6 +92,9 @@ namespace TRPG.Editor
             EditorGUI.indentLevel--;
         }
 
+        /// <summary>
+        /// 배열 크기 값을 수정 불가능한 라벨로 표시합니다.
+        /// </summary>
         private static void DrawArraySize(Rect position, int size)
         {
             Rect labelRect = position;
@@ -96,6 +108,9 @@ namespace TRPG.Editor
             EditorGUI.LabelField(valueRect, size.ToString());
         }
 
+        /// <summary>
+        /// 배열/리스트가 Inspector에서 차지할 전체 높이를 계산합니다.
+        /// </summary>
         private static float GetArrayHeight(SerializedProperty property)
         {
             float height = EditorGUIUtility.singleLineHeight;
@@ -111,6 +126,9 @@ namespace TRPG.Editor
             return height;
         }
 
+        /// <summary>
+        /// 현재 위치의 한 줄 높이 Rect를 만듭니다.
+        /// </summary>
         private static Rect GetLineRect(Rect position)
         {
             return new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);

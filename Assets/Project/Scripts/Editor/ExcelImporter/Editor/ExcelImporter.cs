@@ -11,10 +11,16 @@ using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 using TRPG.Runtime;
 
+/// <summary>
+/// ExcelAssetAttribute가 붙은 ScriptableObject를 엑셀 파일에서 자동 임포트합니다.
+/// </summary>
 public class ExcelImporter : AssetPostprocessor
 {
 	const string ScriptableObjectAssetPrefix = "SO_";
 
+	/// <summary>
+	/// 엑셀 파일과 연결될 ScriptableObject 타입 정보를 보관합니다.
+	/// </summary>
 	class ExcelAssetInfo
 	{
 		public Type AssetType { get; set; }
@@ -30,6 +36,9 @@ public class ExcelImporter : AssetPostprocessor
 
 	static List<ExcelAssetInfo> cachedInfos = null; // Clear on compile.
 
+	/// <summary>
+	/// 엑셀 파일이 임포트되면 대응되는 ScriptableObject 에셋을 갱신합니다.
+	/// </summary>
 	static void OnPostprocessAllAssets (string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
 	{
 		bool imported = false;
@@ -58,6 +67,9 @@ public class ExcelImporter : AssetPostprocessor
 		}
 	}
 
+	/// <summary>
+	/// 현재 AppDomain에서 ExcelAssetAttribute가 붙은 에셋 타입을 찾습니다.
+	/// </summary>
 	static List<ExcelAssetInfo> FindExcelAssetInfos()
 	{
 		var list = new List<ExcelAssetInfo>();
@@ -79,6 +91,9 @@ public class ExcelImporter : AssetPostprocessor
 		return list;
 	}
 
+	/// <summary>
+	/// 지정 경로의 ScriptableObject 에셋을 로드하거나 없으면 새로 생성합니다.
+	/// </summary>
 	static UnityEngine.Object LoadOrCreateAsset(string assetPath, Type assetType)
 	{
 		Directory.CreateDirectory(Path.GetDirectoryName(assetPath));
@@ -121,12 +136,18 @@ public class ExcelImporter : AssetPostprocessor
 		return asset;
 	}
 
+	/// <summary>
+	/// 이전 규칙으로 생성된 에셋 경로를 계산합니다.
+	/// </summary>
 	static string GetLegacyAssetPath(string assetPath, Type assetType)
 	{
 		string directoryPath = Path.GetDirectoryName(assetPath);
 		return Path.Combine(directoryPath, assetType.Name + ".asset");
 	}
 
+	/// <summary>
+	/// xls/xlsx 확장자에 맞는 NPOI Workbook을 엽니다.
+	/// </summary>
 	static IWorkbook LoadBook(string excelPath)
 	{
 		using(FileStream stream = File.Open(excelPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -136,6 +157,9 @@ public class ExcelImporter : AssetPostprocessor
 		}
 	}
 
+	/// <summary>
+	/// 필드명과 lower camel 이름을 순서대로 시도해 Workbook에서 Sheet를 찾습니다.
+	/// </summary>
 	static ISheet GetSheetByFieldName(IWorkbook book, string fieldName)
 	{
 		ISheet sheet = book.GetSheet(fieldName);
@@ -144,6 +168,9 @@ public class ExcelImporter : AssetPostprocessor
 		return book.GetSheet(ToLowerCamelName(fieldName));
 	}
 
+	/// <summary>
+	/// 첫 번째 행을 헤더로 읽어 엑셀 컬럼명을 수집합니다.
+	/// </summary>
 	static List<string> GetFieldNamesFromSheetHeader(ISheet sheet)
 	{
 		IRow headerRow = sheet.GetRow(0);
@@ -158,6 +185,9 @@ public class ExcelImporter : AssetPostprocessor
 		return fieldNames;
 	}
 
+	/// <summary>
+	/// 엑셀 컬럼명에 대응하는 직렬화 가능 필드를 엔티티 타입에서 찾습니다.
+	/// </summary>
 	static FieldInfo GetSerializableField(Type entityType, string columnName)
 	{
 		FieldInfo entityField = entityType.GetField(
@@ -177,6 +207,9 @@ public class ExcelImporter : AssetPostprocessor
 		);
 	}
 
+	/// <summary>
+	/// 구분자 또는 첫 글자 규칙을 적용해 Unity 필드명 형태의 PascalCase로 변환합니다.
+	/// </summary>
 	static string ToPascalCaseName(string value)
 	{
 		if (string.IsNullOrWhiteSpace(value)) return value;
@@ -204,6 +237,9 @@ public class ExcelImporter : AssetPostprocessor
 		return char.ToUpperInvariant(trimmedValue[0]) + trimmedValue.Substring(1);
 	}
 
+	/// <summary>
+	/// 문자열 첫 글자를 소문자로 바꿔 lower camel 이름을 만듭니다.
+	/// </summary>
 	static string ToLowerCamelName(string value)
 	{
 		if (string.IsNullOrWhiteSpace(value)) return value;
@@ -212,6 +248,9 @@ public class ExcelImporter : AssetPostprocessor
 		return char.ToLowerInvariant(trimmedValue[0]) + trimmedValue.Substring(1);
 	}
 
+	/// <summary>
+	/// NPOI 셀 값을 대상 FieldInfo 타입에 맞는 C# 값으로 변환합니다.
+	/// </summary>
 	static object CellToFieldObject(ICell cell, FieldInfo fieldInfo, bool isFormulaEvalute = false)
 	{
 		var type = isFormulaEvalute ? cell.CachedFormulaResultType : cell.CellType;
@@ -237,6 +276,9 @@ public class ExcelImporter : AssetPostprocessor
 		}
 	}
 
+	/// <summary>
+	/// 엑셀 한 행을 엔티티 인스턴스로 만들고 직렬화 가능한 필드에 값을 채웁니다.
+	/// </summary>
 	static object CreateEntityFromRow(IRow row, List<string> columnNames, Type entityType, string sheetName)
 	{
 		var entity = Activator.CreateInstance(entityType);
@@ -263,6 +305,9 @@ public class ExcelImporter : AssetPostprocessor
 		return entity;
 	}
 
+	/// <summary>
+	/// Sheet의 데이터 행들을 엔티티 리스트 객체로 변환합니다.
+	/// </summary>
 	static object GetEntityListFromSheet(ISheet sheet, Type entityType)
 	{
 		List<string> excelColumnNames = GetFieldNamesFromSheetHeader(sheet);
@@ -289,6 +334,9 @@ public class ExcelImporter : AssetPostprocessor
 		return list;
 	}
 
+	/// <summary>
+	/// 엑셀 파일의 Sheet 데이터를 대응되는 ScriptableObject 리스트 필드에 반영합니다.
+	/// </summary>
 	static void ImportExcel(string excelPath, ExcelAssetInfo info)
 	{
 		string assetPath = "";

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -9,11 +9,17 @@ using NPOI.HSSF.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 
+/// <summary>
+/// 선택한 엑셀 파일의 Sheet 목록을 기반으로 ExcelAsset Script 템플릿을 생성합니다.
+/// </summary>
 public class ExcelAssetScriptMenu
 {
 	const string ScriptTemplateName = "ExcelAssetScriptTemplete.cs.txt";
 	const string FieldTemplete = "\t//public List<EntityType> #FIELDNAME#; // Replace 'EntityType' to an actual Type that is serializable.";
 
+	/// <summary>
+	/// 선택한 엑셀 파일에 대응하는 ExcelAsset Script 파일을 생성합니다.
+	/// </summary>
 	[MenuItem("Assets/Create/ExcelAssetScript", false)]
 	static void CreateScript()
 	{
@@ -34,6 +40,9 @@ public class ExcelAssetScriptMenu
 		AssetDatabase.Refresh();
 	}
 
+	/// <summary>
+	/// 메뉴가 엑셀 파일 하나를 선택했을 때만 활성화되도록 검증합니다.
+	/// </summary>
 	[MenuItem("Assets/Create/ExcelAssetScript", true)]
 	static bool CreateScriptValidation()
 	{
@@ -43,6 +52,9 @@ public class ExcelAssetScriptMenu
 		return Path.GetExtension(path) == ".xls" || Path.GetExtension(path) == ".xlsx";
 	}
 
+	/// <summary>
+	/// 엑셀 파일의 모든 Sheet 이름을 읽습니다.
+	/// </summary>
 	static List<string> GetSheetNames(string excelPath)
 	{
 		var sheetNames = new List<string>();
@@ -61,6 +73,9 @@ public class ExcelAssetScriptMenu
 		return sheetNames;
 	}
 
+	/// <summary>
+	/// 프로젝트 안에서 ExcelAsset Script 템플릿 파일을 찾아 내용을 읽습니다.
+	/// </summary>
 	static string GetScriptTempleteString()
 	{
 		string currentDirectory = Directory.GetCurrentDirectory();
@@ -71,6 +86,9 @@ public class ExcelAssetScriptMenu
 		return templateString;
 	}
 
+	/// <summary>
+	/// 템플릿의 자리표시자를 엑셀 이름과 Sheet 필드 목록으로 치환합니다.
+	/// </summary>
 	static string BuildScriptString(string excelName, List<string> sheetNames)
 	{
 		string scriptString = GetScriptTempleteString();

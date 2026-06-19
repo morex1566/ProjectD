@@ -16,12 +16,18 @@ namespace TRPG.Runtime
         }
     }
 
+    /// <summary>
+    /// Vector3 최소/최대 범위와 랜덤 선택 기능을 보관합니다.
+    /// </summary>
     [System.Serializable]
     public struct Vector3Range
     {
         public Vector3 Min;
         public Vector3 Max;
 
+        /// <summary>
+        /// Min과 Max 사이의 임의 Vector3 값을 반환합니다.
+        /// </summary>
         public Vector3 Random()
         {
             return new Vector3
@@ -33,24 +39,36 @@ namespace TRPG.Runtime
         }
     }
 
+    /// <summary>
+    /// float 최소/최대 범위와 랜덤 선택 기능을 보관합니다.
+    /// </summary>
     [System.Serializable]
     public struct FloatRange
     {
         public float Min;
         public float Max;
 
+        /// <summary>
+        /// Min과 Max 사이의 임의 float 값을 반환합니다.
+        /// </summary>
         public float Random()
         {
             return UnityEngine.Random.Range(Min, Max);
         }
     }
 
+    /// <summary>
+    /// int 최소/최대 범위와 랜덤 선택 기능을 보관합니다.
+    /// </summary>
     [System.Serializable]
     public struct IntRange
     {
         public int Min;
         public int Max;
 
+        /// <summary>
+        /// Min 이상 Max 미만의 임의 int 값을 반환합니다.
+        /// </summary>
         public int Random()
         {
             return UnityEngine.Random.Range(Min, Max);

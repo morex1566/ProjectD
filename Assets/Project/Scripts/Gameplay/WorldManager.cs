@@ -14,11 +14,11 @@ namespace TRPG.Runtime
 
         private static GameObject worldRoot = null;
 
-        public static Map Map = null;
+        public static MapController MapController = null;
 
         public static WorldCameraController CamController = null;
 
-        public static CreatureDataSheet creatureDataSheet = null;
+        public static CreatureSheet creatureDataSheet = null;
 
 
 
@@ -37,12 +37,15 @@ namespace TRPG.Runtime
             settings = Resources.Load<WorldManagerSettingsData>("SO_WorldManagerSettings");
 
             worldRoot = new GameObject("World");
-            Map = GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<Map>();
+            MapController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<MapController>();
             CamController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
             creatureDataSheet = ResourceManager.GetResource(settings.CreatureDataSheetRef);
         }
 
-        public static IWorldCreature Spawn(IdKeyData idKeyData, Vector3 position)
+        /// <summary>
+        /// IdKeyData로 CreatureData를 찾아 월드에 CreatureContext 프리팹을 생성하고 등록합니다.
+        /// </summary>
+        public static IWorldCreature Spawn(IdKeyData idKeyData, GameObject owner, Vector3 position)
         {
             CreatureData creatureData = creatureDataSheet.GetCreatureData(idKeyData.Id);
             GameObject instObj = Instantiate(creatureData.CreaturePf, position, Quaternion.identity, worldRoot.transform);
@@ -50,12 +53,16 @@ namespace TRPG.Runtime
 
             CreatureController creatureController = instObj.GetComponent<CreatureController>();
             creatureController.Init(creatureData);
+            creatureController.SetOwner(owner);
 
             Register(creatureController);
 
             return creatureController;
         }
 
+        /// <summary>
+        /// 인스턴스 ID에 해당하는 월드 Creature를 제거합니다.
+        /// </summary>
         public static bool Despawn(int instanceId)
         {
             IWorldCreature worldObject = creatures[instanceId];
@@ -69,6 +76,9 @@ namespace TRPG.Runtime
             return true;
         }
 
+        /// <summary>
+        /// 생성된 Creature를 인스턴스 ID 기준 조회 테이블에 등록합니다.
+        /// </summary>
         private static void Register(CreatureController creature)
         {
             creatures.Add(creature.InstanceId, creature);

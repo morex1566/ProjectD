@@ -4,6 +4,9 @@ using UnityEngine.EventSystems;
 
 namespace TRPG.Runtime
 {
+    /// <summary>
+    /// 화면 좌표, UI 판정, 선택 Rect 계산을 위한 화면 좌표 유틸리티입니다.
+    /// </summary>
     public static class ScreenEx
     {
         /// <summary>
