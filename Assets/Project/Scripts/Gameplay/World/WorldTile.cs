@@ -7,9 +7,9 @@ namespace TRPG.Runtime
     /// 맵의 단일 셀에 저장되는 데이터입니다.
     /// </summary>
     [Serializable]
-    public struct Tile
+    public struct WorldTile
     {
-        public TileType Type;
+        public WorldTileType Type;
         public Vector2Int Pos;
         public float Gravity;
     }

@@ -8,25 +8,25 @@ namespace TRPG.Runtime
     /// 맵 런타임 객체와 Unity Tilemap 표현을 연결합니다.
     /// </summary>
     [Serializable]
-    public class MapController : MonoBehaviour
+    public class WorldMapController : MonoBehaviour
     {
-        [Header(nameof(MapController))]
+        [Header(nameof(WorldMapController))]
 
         /// <summary>
         /// 맵 생성 시작 셀 위치입니다.
         /// </summary>
         [SerializeField] private Vector3Int pivot = Vector3Int.zero;
 
-        [SerializeField] private MapData data;
+        [SerializeField] private WorldMapData data;
 
         /// <summary>
         /// 런타임 맵 상태입니다.
         /// </summary>
-        private MapContext map;
+        private WorldMapContext map;
 
-        public MapContext Map => map;
+        public WorldMapContext Map => map;
 
-        public MapData MapData => data;
+        public WorldMapData MapData => data;
 
         public Action<int> OnMapGenerated = null;
 
@@ -54,11 +54,11 @@ namespace TRPG.Runtime
         ///// <summary>
         ///// 특정 위치의 타일 타입을 반환합니다.
         ///// </summary>
-        //public TileType TryGetTileType(int x, int y)
+        //public WorldTileType TryGetTileType(int x, int y)
         //{
         //    if (map == null)
         //    {
-        //        return TileType.Air;
+        //        return WorldTileType.Air;
         //    }
 
         //    return map.TryGetTileType(x, y);
@@ -76,14 +76,14 @@ namespace TRPG.Runtime
         ///// <summary>
         ///// MapData를 런타임 Map으로 교체하고 변경 이벤트를 연결합니다.
         ///// </summary>
-        //private void SetMap(MapData mapData)
+        //private void SetMap(WorldMapData mapData)
         //{
         //    if (map != null)
         //    {
         //        map.TileChanged -= OnTileChanged;
         //    }
 
-        //    map = new MapContext(mapData);
+        //    map = new WorldMapContext(mapData);
         //    map.TileChanged += OnTileChanged;
 
         //    OnMapGenerated?.Invoke(map.Width * map.Height);
@@ -92,7 +92,7 @@ namespace TRPG.Runtime
         ///// <summary>
         ///// 변경된 단일 타일을 Tilemap에 반영합니다.
         ///// </summary>
-        //private void OnTileChanged(Vector3Int cellPos, TileType tileType)
+        //private void OnTileChanged(Vector3Int cellPos, WorldTileType tileType)
         //{
         //    ground.SetTile(cellPos, GetTileBase(tileType));
         //}
@@ -109,7 +109,7 @@ namespace TRPG.Runtime
 
         //    ground.ClearAllTiles();
 
-        //    MapData data = map.Data;
+        //    WorldMapData data = map.Data;
         //    BoundsInt bounds = new BoundsInt(data.Pivot.x, data.Pivot.y, 0, map.Width, map.Height, 1);
         //    TileBase[] tileBlock = new TileBase[map.Width * map.Height];
 
@@ -131,17 +131,17 @@ namespace TRPG.Runtime
         ///// <summary>
         ///// 타일 타입에 맞는 TileBase를 반환합니다.
         ///// </summary>
-        //private TileBase GetTileBase(TileType tileType)
+        //private TileBase GetTileBase(WorldTileType tileType)
         //{
         //    switch (tileType)
         //    {
-        //        case TileType.Ground:
+        //        case WorldTileType.Ground:
         //            return groundTile;
 
-        //        case TileType.GroundSurface:
+        //        case WorldTileType.GroundSurface:
         //            return groundSurfaceTile;
 
-        //        case TileType.Air:
+        //        case WorldTileType.Air:
         //            return null;
 
         //        default:

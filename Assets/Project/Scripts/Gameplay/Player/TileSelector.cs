@@ -45,7 +45,7 @@ namespace TRPG.Runtime
         /// </summary>
         protected override void Selects(Camera cam, Vector2 startScreenPos, Vector2 endScreenPos)
         {
-            //Tilemap tilemap = WorldManager.MapController.Ground;
+            //Tilemap tilemap = WorldManager.WorldMapController.Ground;
             //Camera cam = WorldManager.CamController.Cam;
             //Rect selectionScreenRect = ScreenEx.CreateScreenRect(startScreenPos, endScreenPos);
 
@@ -85,7 +85,7 @@ namespace TRPG.Runtime
         /// </summary>
         protected override void Select(Camera cam, Vector2 mouseWorldPos)
         {
-            //Tilemap tilemap = WorldManager.MapController.Ground;
+            //Tilemap tilemap = WorldManager.WorldMapController.Ground;
             //Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPos);
 
             //// 실제 타일이 있는 셀만 선택합니다.
@@ -131,9 +131,9 @@ namespace TRPG.Runtime
         /// </summary>
         private void ShowIndicator(Vector3Int cellPos, TileBase indicator)
         {
-            //if (WorldManager.MapController.Selection == null) return;
+            //if (WorldManager.WorldMapController.Selection == null) return;
 
-            //WorldManager.MapController.Selection.SetTile(cellPos, indicator);
+            //WorldManager.WorldMapController.Selection.SetTile(cellPos, indicator);
         }
     }
 }

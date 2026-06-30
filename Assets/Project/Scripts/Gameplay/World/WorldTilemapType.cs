@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TRPG.Runtime
 {
     [Flags]
-    public enum TilemapType
+    public enum WorldTilemapType
     {
         None = 0,
         Ground = 1 << 0,

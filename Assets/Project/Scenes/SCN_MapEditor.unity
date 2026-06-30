@@ -186,8 +186,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2122291813069907922, guid: 4152ac2cdbc431c43b920eb448e7009b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 287197922}
   m_SourcePrefab: {fileID: 100100000, guid: 4152ac2cdbc431c43b920eb448e7009b, type: 3}
+--- !u!1 &287197921 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2122291813069907922, guid: 4152ac2cdbc431c43b920eb448e7009b, type: 3}
+  m_PrefabInstance: {fileID: 287197920}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &287197922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287197921}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4f8266255eba534b986bcfc51327896, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MapDrawer
+  currBrush: {fileID: 0}
 --- !u!1 &386705292
 GameObject:
   m_ObjectHideFlags: 0

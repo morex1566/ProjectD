@@ -35,9 +35,9 @@ namespace TRPG.Runtime
             return GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
         }
 
-        public MapController GetMapController()
+        public WorldMapController GetMapController()
         {
-            return GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<MapController>();
+            return GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<WorldMapController>();
         }
     }
 }

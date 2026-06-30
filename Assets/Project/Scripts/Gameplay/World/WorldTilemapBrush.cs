@@ -8,8 +8,8 @@ namespace TRPG.Runtime
     /// <summary>
     /// 하나의 논리 타일 타입에 사용할 후보 타일과 출현 가중치를 보관합니다.
     /// </summary>
-    [CreateAssetMenu(fileName = "SO_MapBrush", menuName = "Scriptable Objects/Map/Brush")]
-    public class MapBrush : ScriptableObject
+    [CreateAssetMenu(fileName = "SO_TilemapBrush", menuName = "Scriptable Objects/World/TilemapBrush")]
+    public class WorldTilemapBrush : ScriptableObject
     {
         /// <summary>
         /// 무작위 선택에 사용되는 단일 타일 후보입니다.
@@ -24,11 +24,11 @@ namespace TRPG.Runtime
             [SerializeField] public float Gravity;
         }
 
-        [SerializeField] private TileType tileType = TileType.Ground;
+        [SerializeField] private WorldTileType tileType = WorldTileType.Ground;
 
         [SerializeField] private List<WeightedTile> tiles = new();
 
-        public TileType TileType => tileType;
+        public WorldTileType TileType => tileType;
 
 
 
@@ -40,7 +40,7 @@ namespace TRPG.Runtime
             int value = (int)tileType;
             if (value > 0 && (value & (value - 1)) == 0) return;
 
-            tileType = TileType.Ground;
+            tileType = WorldTileType.Ground;
         }
 
         /// <summary>

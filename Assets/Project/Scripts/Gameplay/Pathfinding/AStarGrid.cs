@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// TileType 배열을 A* 탐색용 노드 그래프로 변환하고 경로를 계산합니다.
+    /// WorldTileType 배열을 A* 탐색용 노드 그래프로 변환하고 경로를 계산합니다.
     /// </summary>
     public class AStarGrid
     {
@@ -21,9 +21,9 @@ namespace TRPG.Runtime
         public int NodeCount => Width * Height;
 
         /// <summary>
-        /// TileType 배열을 기반으로 이동 가능한 AStarNode 그리드를 생성합니다.
+        /// WorldTileType 배열을 기반으로 이동 가능한 AStarNode 그리드를 생성합니다.
         /// </summary>
-        public AStarGrid(TileType[] mapTileTypes, int width, int height)
+        public AStarGrid(WorldTileType[] mapTileTypes, int width, int height)
         {
             Width = width;
             Height = height;
@@ -33,7 +33,7 @@ namespace TRPG.Runtime
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    bool isWalkable = mapTileTypes[ToIndex(x, y)].HasFlag(TileType.Air);
+                    bool isWalkable = mapTileTypes[ToIndex(x, y)].HasFlag(WorldTileType.Air);
                     nodes[x, y] = new AStarNode(x, y, isWalkable);
                 }
             }
