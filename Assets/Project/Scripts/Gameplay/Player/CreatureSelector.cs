@@ -31,13 +31,12 @@ namespace TRPG.Runtime
         /// <summary>
         /// 드래그 사각형 안에 들어온 선택 가능 오브젝트를 모두 선택합니다.
         /// </summary>
-        protected override void Selects(Vector2 startPos, Vector2 endPos)
+        protected override void Selects(Camera cam, Vector2 startPos, Vector2 endPos)
         {
             Clear();
 
             Rect selectionRect = ScreenEx.CreateScreenRect(startPos, endPos);
             MonoBehaviour[] behaviours = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            Camera cam = WorldManager.CamController.Cam;
 
             for (int i = 0; i < behaviours.Length; i++)
             {
@@ -57,12 +56,11 @@ namespace TRPG.Runtime
         /// <summary>
         /// 클릭 위치를 포함하는 선택 가능 오브젝트 중 카메라에 가장 가까운 대상을 선택합니다.
         /// </summary>
-        protected override void Select(Vector2 mouseWorldPos)
+        protected override void Select(Camera cam, Vector2 mouseWorldPos)
         {
             Clear();
 
             MonoBehaviour[] behaviours = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            Camera cam = WorldManager.CamController.Cam;
             ISelectable bestSelectable = null;
             float bestSqrDistance = float.MaxValue;
             int bestInstanceId = int.MaxValue;

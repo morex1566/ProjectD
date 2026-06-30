@@ -24,13 +24,19 @@ namespace TRPG.Runtime
 
 
 
+        public static ResourceManagerSettingsData Settings { get; private set; }
+
+
 
         /// <summary>
-        /// 기존 초기화 호출부와의 호환성을 유지합니다.
+        /// ResourceManager 인스턴스를 보장하고 Core 리소스를 선로드합니다.
         /// </summary>
         public static void Init()
         {
             GetInstance();
+            Load(UnityConstant.Addressable.Label.Core);
+
+            Settings = GetResource<ResourceManagerSettingsData>(UnityConstant.Addressable.Label.Core);
         }
 
         /// <summary>
@@ -113,6 +119,30 @@ namespace TRPG.Runtime
             }
 
             return cachedResources.TryGetValue(primaryKey, out Object resource) ? resource as T : null;
+        }
+
+        /// <summary>
+        /// 선로드된 리소스 캐시에서 Addressables 주소에 대응하는 리소스를 반환합니다.
+        /// </summary>
+        public static T GetResource<T>(string address) where T : Object
+        {
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                Debug.LogWarning($"GetResource failed. Invalid address.");
+                return null;
+            }
+
+            if (!cachedResources.TryGetValue(address, out Object resource))
+            {
+                if (!TryGetPrimaryKey(address, typeof(T), out string primaryKey) ||
+                    !cachedResources.TryGetValue(primaryKey, out resource))
+                {
+                    Debug.LogWarning($"GetResource failed. Resource not cached. Address: {address}");
+                    return null;
+                }
+            }
+
+            return resource as T;
         }
 
         /// <summary>

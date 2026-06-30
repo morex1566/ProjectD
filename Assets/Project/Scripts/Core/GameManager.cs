@@ -1,4 +1,3 @@
-using DG.Tweening;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -21,9 +20,9 @@ namespace TRPG.Runtime
         private static void OnBeforeSplashSceneLoaded()
         {
             Init();
-            DOTween.Init();
-            InputManager.Init();
             ResourceManager.Init();
+            DOTweenManager.Init();
+            InputManager.Init();
         }
 
         /// <summary>

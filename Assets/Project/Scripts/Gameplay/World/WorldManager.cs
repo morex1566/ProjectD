@@ -12,11 +12,7 @@ namespace TRPG.Runtime
 
         private static GameObject worldRoot = null;
 
-        public static MapController MapController = null;
-
-        public static WorldCameraController CamController = null;
-
-        public static CreatureSheet creatureDataSheet = null;
+        public static WorldManagerSettingsData Settings { get; private set; }
 
 
 
@@ -29,10 +25,19 @@ namespace TRPG.Runtime
         public static void Init()
         {
             GetInstance();
+            Settings = ResourceManager.GetResource<WorldManagerSettingsData>(UnityConstant.Addressable.Label.Core);
 
             worldRoot = new GameObject("World");
-            MapController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<MapController>();
-            CamController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
+        }
+
+        public WorldCameraController GetWorldCameraController()
+        {
+            return GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
+        }
+
+        public MapController GetMapController()
+        {
+            return GameObject.FindGameObjectWithTag(UnityConstant.Tags.Map).GetComponent<MapController>();
         }
     }
 }

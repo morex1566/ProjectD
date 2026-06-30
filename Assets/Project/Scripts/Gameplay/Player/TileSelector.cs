@@ -43,7 +43,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 드래그 화면 영역과 겹치는 실제 타일 셀들을 공사 대상으로 선택합니다.
         /// </summary>
-        protected override void Selects(Vector2 startScreenPos, Vector2 endScreenPos)
+        protected override void Selects(Camera cam, Vector2 startScreenPos, Vector2 endScreenPos)
         {
             //Tilemap tilemap = WorldManager.MapController.Ground;
             //Camera cam = WorldManager.CamController.Cam;
@@ -83,7 +83,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 클릭한 월드 좌표가 포함된 타일 셀을 공사 대상으로 선택합니다.
         /// </summary>
-        protected override void Select(Vector2 mouseWorldPos)
+        protected override void Select(Camera cam, Vector2 mouseWorldPos)
         {
             //Tilemap tilemap = WorldManager.MapController.Ground;
             //Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPos);

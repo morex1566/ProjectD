@@ -21,6 +21,8 @@ namespace TRPG.Runtime
         /// </summary>
         [SerializeField] private RectTransform selectionBoxPf = null;
 
+        private Camera cam;
+
         private RectTransform selectionBoxCanvasRect;
 
         private RectTransform selectionBox;
@@ -51,6 +53,8 @@ namespace TRPG.Runtime
         {
             CreateSelectionBox();
             HideSelectionBox();
+
+            cam = WorldManager.GetInstance().GetWorldCameraController().Cam;
         }
 
         /// <summary>
@@ -148,25 +152,25 @@ namespace TRPG.Runtime
             float dragSqrDistance = (pointerScreenPos - startPointerDownScreenPos).sqrMagnitude;
             if (dragSqrDistance >= dragThreshold * dragThreshold)
             {
-                Selects(startPointerDownScreenPos, pointerScreenPos);
+                Selects(cam, startPointerDownScreenPos, pointerScreenPos);
             }
             else
             {
-                if (!MouseEx.TryGetWorldPos(WorldManager.CamController.Cam, pointerScreenPos, out Vector3 pointerWorldPos)) return;
+                if (!MouseEx.TryGetWorldPos(cam, pointerScreenPos, out Vector3 pointerWorldPos)) return;
 
-                Select(pointerWorldPos);
+                Select(cam, pointerWorldPos);
             }
         }
 
         /// <summary>
         /// 드래그 선택 결과를 자식 선택기에서 처리합니다.
         /// </summary>
-        protected abstract void Selects(Vector2 startPos, Vector2 endPos);
+        protected abstract void Selects(Camera cam, Vector2 startPos, Vector2 endPos);
 
         /// <summary>
         /// 단일 클릭 선택 결과를 자식 선택기에서 처리합니다.
         /// </summary>
-        protected abstract void Select(Vector2 mouseWorldPos);
+        protected abstract void Select(Camera cam, Vector2 mouseWorldPos);
 
         /// <summary>
         /// 현재 선택된 대상과 표시 상태를 자식 선택기에서 정리합니다.

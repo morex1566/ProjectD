@@ -20,12 +20,15 @@ namespace TRPG.Runtime
 
         public static Action OnResolutionChange;
 
+        public static UIManagerSettingsData Settings { get; private set; }
+
         /// <summary>
         /// UI 매니저 초기화 진입점입니다.
         /// </summary>
         public static void Init()
         {
             GetInstance();
+            Settings = ResourceManager.GetResource<UIManagerSettingsData>(UnityConstant.Addressable.Label.Core);
         }
 
         

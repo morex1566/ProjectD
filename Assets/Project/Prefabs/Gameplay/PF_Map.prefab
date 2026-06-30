@@ -264,10 +264,11 @@ GameObject:
   m_Component:
   - component: {fileID: 7491423020794455166}
   - component: {fileID: 2638994553970251304}
+  - component: {fileID: 412898629360580187}
   m_Layer: 0
   m_Name: PF_Map
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_TagString: Map
+  m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -300,3 +301,17 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!114 &412898629360580187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8466830091487982026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dad2fc13bf2b36c4cb48703bbaeee237, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MapController
+  pivot: {x: 0, y: 0, z: 0}
+  data: {fileID: 0}
