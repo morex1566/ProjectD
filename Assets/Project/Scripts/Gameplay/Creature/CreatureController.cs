@@ -16,7 +16,7 @@ namespace TRPG.Runtime
     /// <summary>
     /// Creature의 런타임 상태, 선택 상태, Job 큐를 관리하는 월드 컴포넌트입니다.
     /// </summary>
-    public class CreatureController : MonoBehaviour, ISelectable, IWorldCreature
+    public class CreatureController : MonoBehaviour, ISelectable
     {
         [SerializeField] private CreatureData data = null;
 
@@ -26,11 +26,7 @@ namespace TRPG.Runtime
 
         private CreatureJobQueue jobQueue = null;
 
-        private CreatureStateMachine stateMachine = null;
-
         private CreatureContext context = null;
-
-        private CreatureDetector detector = null;
 
 
 
@@ -93,7 +89,6 @@ namespace TRPG.Runtime
             data = creatureData;
             jobQueue = new CreatureJobQueue();
             context = new CreatureContext(data);
-            detector = new CreatureDetector(this, context);
 
             ClearSprite();
             SetSprite();

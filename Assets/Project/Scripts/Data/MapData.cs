@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -8,47 +9,17 @@ namespace TRPG.Runtime
     [CreateAssetMenu(fileName = "SO_Map", menuName = "Scriptable Objects/MapController")]
     public class MapData : ScriptableObject
     {
-        [SerializeField, Min(1)] private int width = 1;
-
-        [SerializeField, Min(1)] private int height = 1;
-
-        [SerializeField, Min(1)] private int groundHeight = 1;
-
         [SerializeField] private Vector3Int pivot = Vector3Int.zero;
 
         [SerializeField] private Vector3Int startSpawnPoint = Vector3Int.zero;
 
-        [SerializeField] private MapTileType[] tileTypes = { MapTileType.Air };
-
-        [SerializeField] private float[] tileGravities = { 0f };
-
-        public int Width => width;
-
-        public int Height => height;
-
-        public int GroundHeight => groundHeight;
+        [SerializeField, ReadOnly] private SerializableDictionary<Vector2Int, MapTile> MapTiles = new();
 
         public Vector3Int Pivot => pivot;
 
         public Vector3Int StartSpawnPoint => startSpawnPoint;
 
-        public float[] Gravities => tileGravities;
 
-        /// <summary>
-        /// 런타임 생성 또는 에디터 도구에서 맵 데이터를 초기화합니다.
-        /// </summary>
-        public void Init(int width, int height, int groundHeight, Vector3Int pivot)
-        {
-            this.width = Mathf.Max(1, width);
-            this.height = Mathf.Max(1, height);
-            this.groundHeight = Mathf.Clamp(groundHeight, 1, this.height);
-            this.pivot = pivot;
-            startSpawnPoint = Vector3Int.zero;
-
-            int tileCount = this.width * this.height;
-            tileTypes = new MapTileType[tileCount];
-            tileGravities = new float[tileCount];
-        }
 
         /// <summary>
         /// 맵 로컬 좌표 기준의 시작 스폰 위치를 저장합니다.
@@ -59,42 +30,19 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 특정 위치의 타일 타입을 반환합니다.
+        /// 전체 타일 데이터를 한 번에 교체합니다.
         /// </summary>
-        public MapTileType GetTileType(int x, int y)
+        public void SetTiles(IReadOnlyList<MapTile> tiles)
         {
-            return tileTypes[ToIndex(x, y)];
-        }
+            Dictionary<Vector2Int, MapTile> values = new();
 
-        /// <summary>
-        /// 특정 위치의 타일 타입을 저장합니다.
-        /// </summary>
-        public void SetTileType(int x, int y, MapTileType tileType)
-        {
-            tileTypes[ToIndex(x, y)] = tileType;
-        }
-
-        /// <summary>
-        /// 특정 위치의 중력 값을 반환합니다.
-        /// </summary>
-        public float GetGravity(int x, int y)
-        {
-            if (!IsInBounds(x, y))
+            for (int i = 0; i < tiles.Count; i++)
             {
-                return 0f;
+                MapTile tile = tiles[i];
+                values[tile.Pos] = tile;
             }
 
-            return tileGravities[ToIndex(x, y)];
-        }
-
-        /// <summary>
-        /// 특정 위치의 중력 값을 저장합니다.
-        /// </summary>
-        public void SetGravity(int x, int y, float gravity)
-        {
-            if (!IsInBounds(x, y)) return;
-
-            tileGravities[ToIndex(x, y)] = gravity;
+            MapTiles.SetValues(values);
         }
 
         /// <summary>
@@ -102,15 +50,15 @@ namespace TRPG.Runtime
         /// </summary>
         public bool IsInBounds(int x, int y)
         {
-            return x >= 0 && x < width && y >= 0 && y < height;
+            return MapTiles.ContainsKey(new Vector2Int(x, y));
         }
 
         /// <summary>
-        /// 2차원 좌표를 1차원 배열 인덱스로 변환합니다.
+        /// 특정 위치의 타일 데이터를 반환합니다.
         /// </summary>
-        public int ToIndex(int x, int y)
+        public bool TryGetTile(int x, int y, out MapTile tile)
         {
-            return x + y * width;
+            return MapTiles.TryGetValue(new Vector2Int(x, y), out tile);
         }
     }
 }

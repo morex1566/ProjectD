@@ -18,8 +18,6 @@ namespace TRPG.Runtime
             Camera
         }
 
-        private static UIManagerSettingsData settings;
-
         public static Action OnResolutionChange;
 
         /// <summary>
@@ -28,7 +26,6 @@ namespace TRPG.Runtime
         public static void Init()
         {
             GetInstance();
-            settings = Resources.Load<UIManagerSettingsData>("SO_UIManagerSettings");
         }
 
         

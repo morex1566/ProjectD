@@ -1,110 +1,49 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TRPG.Runtime
 {
-    /// <summary>
-    /// 맵 타일 타입입니다.
-    /// </summary>
-    public enum MapTileType
-    {
-        None,
-        Ground,
-        GroundSurface,
-        Air,
-    }
-
     /// <summary>
     /// 런타임에서 사용하는 맵 상태와 규칙입니다.
     /// </summary>
     [Serializable]
     public class MapContext
     {
-        private readonly MapData data;
+        [SerializeField] private Vector3Int pivot = Vector3Int.zero;
 
-        public MapData Data => data;
+        [SerializeField] private Vector3Int startSpawnPoint = Vector3Int.zero;
 
-        public int Width => data.Width;
+        [SerializeField, ReadOnly] private SerializableDictionary<Vector2Int, MapTile> MapTiles = new();
 
-        public int Height => data.Height;
+        public Vector3Int Pivot => pivot;
 
-        public float[] Gravities;
+        public Vector3Int StartSpawnPoint => startSpawnPoint;
 
-        public MapTileType[] TileTypes;
 
-        public event Action<Vector3Int, MapTileType> TileChanged;
 
         /// <summary>
-        /// MapData의 타일과 중력 정보를 런타임 배열로 복사합니다.
+        /// 맵 로컬 좌표 기준의 시작 스폰 위치를 저장합니다.
         /// </summary>
-        public MapContext(MapData data)
+        public void SetStartSpawnPoint(Vector3Int cellPos)
         {
-            this.data = data;
-
-            Gravities = new float[Width * Height];
-            TileTypes = new MapTileType[Width * Height];
-
-            for (int y = 0; y < data.Height; y++)
-            {
-                for (int x = 0; x < data.Width; x++)
-                {
-                    int index = ToIndex(x, y);
-                    TileTypes[index] = data.GetTileType(x, y);
-                    Gravities[index] = WorldManager.Settings.Gravities[TileTypes[index]];
-                }
-            }
+            startSpawnPoint = cellPos;
         }
 
         /// <summary>
-        /// 특정 위치의 타일 타입을 반환합니다.
+        /// 전체 타일 데이터를 한 번에 교체합니다.
         /// </summary>
-        public MapTileType GetTileType(int x, int y)
+        public void SetTiles(IReadOnlyList<MapTile> tiles)
         {
-            if (!IsInBounds(x, y))
+            Dictionary<Vector2Int, MapTile> values = new();
+
+            for (int i = 0; i < tiles.Count; i++)
             {
-                return MapTileType.Air;
+                MapTile tile = tiles[i];
+                values[tile.Pos] = tile;
             }
 
-            return TileTypes[ToIndex(x, y)];
-        }
-
-        /// <summary>
-        /// 특정 위치의 중력 값을 반환합니다.
-        /// </summary>
-        public float GetGravity(int x, int y)
-        {
-            if (!IsInBounds(x, y))
-            {
-                return 0f;
-            }
-
-            return Gravities[ToIndex(x, y)];
-        }
-
-        /// <summary>
-        /// 타일을 제거하고 변경 이벤트를 발생시킵니다.
-        /// </summary>
-        public bool RemoveTile(Vector3Int cellPos)
-        {
-            if (!IsInBounds(cellPos.x, cellPos.y)) return false;
-
-            int index = ToIndex(cellPos.x, cellPos.y);
-            TileTypes[index] = MapTileType.Air;
-            Gravities[index] = WorldManager.Settings.Gravities[MapTileType.Air];
-
-            TileChanged?.Invoke(cellPos, MapTileType.Air);
-            return true;
-        }
-
-        /// <summary>
-        /// 지정 좌표가 땅 계열 타일인지 확인합니다.
-        /// </summary>
-        public bool IsGround(int x, int y)
-        {
-            MapTileType tileType = GetTileType(x, y);
-
-            return tileType.HasFlag(MapTileType.Ground) ||
-                   tileType.HasFlag(MapTileType.GroundSurface);
+            MapTiles.SetValues(values);
         }
 
         /// <summary>
@@ -112,15 +51,15 @@ namespace TRPG.Runtime
         /// </summary>
         public bool IsInBounds(int x, int y)
         {
-            return x >= 0 && x < Width && y >= 0 && y < Height;
+            return MapTiles.ContainsKey(new Vector2Int(x, y));
         }
 
         /// <summary>
-        /// 2차원 배열을 1차원으로
+        /// 특정 위치의 타일 데이터를 반환합니다.
         /// </summary>
-        public int ToIndex(int x, int y)
+        public bool TryGetTile(int x, int y, out MapTile tile)
         {
-            return x + y * Width;
+            return MapTiles.TryGetValue(new Vector2Int(x, y), out tile);
         }
     }
 }

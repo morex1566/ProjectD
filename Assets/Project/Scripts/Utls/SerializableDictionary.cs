@@ -123,6 +123,26 @@ namespace TRPG.Runtime
         }
 
         ///<summary>
+        /// 기존 값을 지우고 여러 Key-Value를 한 번에 저장합니다.
+        ///</summary>
+        public void SetValues(IReadOnlyDictionary<TKey, TValue> values)
+        {
+            entries.Clear();
+            dictionary.Clear();
+
+            foreach (KeyValuePair<TKey, TValue> pair in values)
+            {
+                entries.Add(new Entry
+                {
+                    Key = pair.Key,
+                    Value = pair.Value
+                });
+
+                dictionary.Add(pair.Key, pair.Value);
+            }
+        }
+
+        ///<summary>
         /// 해당 Key가 존재하는지 확인합니다.
         ///</summary>
         public bool ContainsKey(TKey key)
