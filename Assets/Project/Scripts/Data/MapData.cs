@@ -46,6 +46,22 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// 단일 셀의 맵 데이터를 저장하거나 덮어씁니다.
+        /// </summary>
+        public void SetTile(MapTile tile)
+        {
+            MapTiles.SetValue(tile.Pos, tile);
+        }
+
+        /// <summary>
+        /// 단일 셀의 맵 데이터를 제거합니다.
+        /// </summary>
+        public bool RemoveTile(Vector2Int cellPos)
+        {
+            return MapTiles.Remove(cellPos);
+        }
+
+        /// <summary>
         /// 좌표가 맵 범위 안에 있는지 확인합니다.
         /// </summary>
         public bool IsInBounds(int x, int y)
