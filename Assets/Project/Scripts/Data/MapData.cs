@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
@@ -13,7 +14,7 @@ namespace TRPG.Runtime
 
         [SerializeField] private Vector3Int startSpawnPoint = Vector3Int.zero;
 
-        [SerializeField, ReadOnly] private SerializableDictionary<Vector2Int, MapTile> MapTiles = new();
+        private SerializableDictionary<Vector2Int, Tile> mapTiles = new();
 
         public Vector3Int Pivot => pivot;
 
@@ -32,25 +33,25 @@ namespace TRPG.Runtime
         /// <summary>
         /// 전체 타일 데이터를 한 번에 교체합니다.
         /// </summary>
-        public void SetTiles(IReadOnlyList<MapTile> tiles)
+        public void SetTiles(IReadOnlyList<Tile> tiles)
         {
-            Dictionary<Vector2Int, MapTile> values = new();
+            Dictionary<Vector2Int, Tile> values = new();
 
             for (int i = 0; i < tiles.Count; i++)
             {
-                MapTile tile = tiles[i];
+                Tile tile = tiles[i];
                 values[tile.Pos] = tile;
             }
 
-            MapTiles.SetValues(values);
+            mapTiles.SetValues(values);
         }
 
         /// <summary>
         /// 단일 셀의 맵 데이터를 저장하거나 덮어씁니다.
         /// </summary>
-        public void SetTile(MapTile tile)
+        public void SetTile(Tile tile)
         {
-            MapTiles.SetValue(tile.Pos, tile);
+            mapTiles.SetValue(tile.Pos, tile);
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace TRPG.Runtime
         /// </summary>
         public bool RemoveTile(Vector2Int cellPos)
         {
-            return MapTiles.Remove(cellPos);
+            return mapTiles.Remove(cellPos);
         }
 
         /// <summary>
@@ -66,15 +67,15 @@ namespace TRPG.Runtime
         /// </summary>
         public bool IsInBounds(int x, int y)
         {
-            return MapTiles.ContainsKey(new Vector2Int(x, y));
+            return mapTiles.ContainsKey(new Vector2Int(x, y));
         }
 
         /// <summary>
         /// 특정 위치의 타일 데이터를 반환합니다.
         /// </summary>
-        public bool TryGetTile(int x, int y, out MapTile tile)
+        public bool TryGetTile(int x, int y, out Tile tile)
         {
-            return MapTiles.TryGetValue(new Vector2Int(x, y), out tile);
+            return mapTiles.TryGetValue(new Vector2Int(x, y), out tile);
         }
     }
 }

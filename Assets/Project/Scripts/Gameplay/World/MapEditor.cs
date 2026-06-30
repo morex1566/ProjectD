@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
@@ -8,6 +9,53 @@ namespace TRPG.Runtime
     /// </summary>
     public class MapEditor : MonoBehaviour
     {
-        
+        [SerializeField] private Tilemap targetTilemap;
+
+        [SerializeField] private MapBrush currentBrush;
+
+        [SerializeField] private MapData mapData;
+
+        /// <summary>
+        /// 지정한 셀에 현재 브러시로 타일을 칠합니다.
+        /// </summary>
+        public bool Paint(Vector3Int cellPos)
+        {
+            if (targetTilemap == null || mapData == null || currentBrush == null)
+            {
+                return false;
+            }
+
+            if (!currentBrush.TryGetRandomTile(out TileBase tile))
+            {
+                return false;
+            }
+
+            targetTilemap.SetTile(cellPos, tile);
+
+            mapData.SetTile(new Tile
+            {
+                Type = currentBrush.TileType,
+                Pos = new Vector2Int(cellPos.x, cellPos.y),
+                Gravity = 0f
+            });
+
+            return true;
+        }
+
+        /// <summary>
+        /// 지정한 셀의 Tilemap 타일과 저장 데이터를 제거합니다.
+        /// </summary>
+        public bool Erase(Vector3Int cellPos)
+        {
+            if (targetTilemap == null || mapData == null)
+            {
+                return false;
+            }
+
+            targetTilemap.SetTile(cellPos, null);
+            mapData.RemoveTile(new Vector2Int(cellPos.x, cellPos.y));
+
+            return true;
+        }
     }
 }

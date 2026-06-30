@@ -7,7 +7,7 @@ namespace TRPG.Runtime
     /// 맵 타일 타입입니다.
     /// </summary>
     [Flags]
-    public enum MapTileType
+    public enum TileType
     {
         None = 0,
         Ground = 1 << 0,

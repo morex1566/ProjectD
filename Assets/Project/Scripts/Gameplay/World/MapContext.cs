@@ -14,7 +14,7 @@ namespace TRPG.Runtime
 
         [SerializeField] private Vector3Int startSpawnPoint = Vector3Int.zero;
 
-        [SerializeField, ReadOnly] private SerializableDictionary<Vector2Int, MapTile> MapTiles = new();
+        [SerializeField, ReadOnly] private SerializableDictionary<Vector2Int, Tile> MapTiles = new();
 
         public Vector3Int Pivot => pivot;
 
@@ -33,13 +33,13 @@ namespace TRPG.Runtime
         /// <summary>
         /// 전체 타일 데이터를 한 번에 교체합니다.
         /// </summary>
-        public void SetTiles(IReadOnlyList<MapTile> tiles)
+        public void SetTiles(IReadOnlyList<Tile> tiles)
         {
-            Dictionary<Vector2Int, MapTile> values = new();
+            Dictionary<Vector2Int, Tile> values = new();
 
             for (int i = 0; i < tiles.Count; i++)
             {
-                MapTile tile = tiles[i];
+                Tile tile = tiles[i];
                 values[tile.Pos] = tile;
             }
 
@@ -57,7 +57,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 특정 위치의 타일 데이터를 반환합니다.
         /// </summary>
-        public bool TryGetTile(int x, int y, out MapTile tile)
+        public bool TryGetTile(int x, int y, out Tile tile)
         {
             return MapTiles.TryGetValue(new Vector2Int(x, y), out tile);
         }

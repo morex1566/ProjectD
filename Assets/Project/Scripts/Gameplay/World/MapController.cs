@@ -54,11 +54,11 @@ namespace TRPG.Runtime
         ///// <summary>
         ///// 특정 위치의 타일 타입을 반환합니다.
         ///// </summary>
-        //public MapTileType TryGetTileType(int x, int y)
+        //public TileType TryGetTileType(int x, int y)
         //{
         //    if (map == null)
         //    {
-        //        return MapTileType.Air;
+        //        return TileType.Air;
         //    }
 
         //    return map.TryGetTileType(x, y);
@@ -92,7 +92,7 @@ namespace TRPG.Runtime
         ///// <summary>
         ///// 변경된 단일 타일을 Tilemap에 반영합니다.
         ///// </summary>
-        //private void OnTileChanged(Vector3Int cellPos, MapTileType tileType)
+        //private void OnTileChanged(Vector3Int cellPos, TileType tileType)
         //{
         //    ground.SetTile(cellPos, GetTileBase(tileType));
         //}
@@ -131,17 +131,17 @@ namespace TRPG.Runtime
         ///// <summary>
         ///// 타일 타입에 맞는 TileBase를 반환합니다.
         ///// </summary>
-        //private TileBase GetTileBase(MapTileType tileType)
+        //private TileBase GetTileBase(TileType tileType)
         //{
         //    switch (tileType)
         //    {
-        //        case MapTileType.Ground:
+        //        case TileType.Ground:
         //            return groundTile;
 
-        //        case MapTileType.GroundSurface:
+        //        case TileType.GroundSurface:
         //            return groundSurfaceTile;
 
-        //        case MapTileType.Air:
+        //        case TileType.Air:
         //            return null;
 
         //        default:

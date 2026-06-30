@@ -20,13 +20,17 @@ namespace TRPG.Runtime
             [SerializeField] public TileBase Tile;
 
             [SerializeField, Min(1)] public int Weight = 1;
+
+            [SerializeField] public float Gravity;
         }
 
-        [SerializeField] private MapTileType tileType = MapTileType.Ground;
+        [SerializeField] private TileType tileType = TileType.Ground;
 
         [SerializeField] private List<WeightedTile> tiles = new();
 
-        public MapTileType TileType => tileType;
+        public TileType TileType => tileType;
+
+
 
         /// <summary>
         /// 브러시 하나에는 단일 타일 타입만 지정되도록 보정합니다.
@@ -36,7 +40,7 @@ namespace TRPG.Runtime
             int value = (int)tileType;
             if (value > 0 && (value & (value - 1)) == 0) return;
 
-            tileType = MapTileType.Ground;
+            tileType = TileType.Ground;
         }
 
         /// <summary>
@@ -71,23 +75,6 @@ namespace TRPG.Runtime
                 }
 
                 randomWeight -= candidate.Weight;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 지정한 타일이 후보 목록에 포함되어 있는지 확인합니다.
-        /// </summary>
-        public bool Contains(TileBase tile)
-        {
-            for (int i = 0; i < tiles.Count; i++)
-            {
-                WeightedTile candidate = tiles[i];
-                if (candidate != null && candidate.Tile == tile)
-                {
-                    return true;
-                }
             }
 
             return false;

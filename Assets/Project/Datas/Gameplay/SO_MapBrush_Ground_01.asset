@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MapBrush
   tileType: 1
   tiles:
-  - Tile: {fileID: 11400000, guid: 61e213e3f1d60e842ad33197a86a6809, type: 2}
+  - Tile: {fileID: 11400000, guid: 68bcc733e513a6248bd35a44201f96ca, type: 2}
     Weight: 65
-  - Tile: {fileID: 11400000, guid: 5e5eddf04a4bd134ca75a6c5865ca671, type: 2}
+    Gravity: 0
+  - Tile: {fileID: 11400000, guid: 3ea8230633f44a94caab92c5204d4e1e, type: 2}
     Weight: 35
+    Gravity: 0
