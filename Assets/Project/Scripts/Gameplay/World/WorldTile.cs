@@ -10,14 +10,12 @@ namespace TRPG.Runtime
     [Serializable]
     public struct WorldTile
     {
-        [SerializeField, ReadOnly] public GameObject Owner;
+        [SerializeField, ReadOnly] public Vector3Int Pos;
 
-        [SerializeField, ReadOnly] public WorldTileType Type;
+        [SerializeField] public WorldTileType Type;
 
-        [SerializeField, ReadOnly] public Vector2Int Pos;
+        [SerializeField] public float Gravity;
 
-        [SerializeField, ReadOnly] public float Gravity;
-
-        [SerializeField, ReadOnly] public TileBase TileBase;
+        [SerializeField] public TileBase TileBase;
     }
 }

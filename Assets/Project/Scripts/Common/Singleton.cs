@@ -38,6 +38,12 @@ namespace TRPG.Runtime
 
         private const string ManagerRootName = "[Manager]";
 
+
+
+        public static T Instance => GetInstance();
+
+
+
         /// <summary>
         /// 씬에 존재하는 MonoBehaviour 싱글톤을 찾거나 매니저 루트 아래에 생성합니다.
         /// </summary>

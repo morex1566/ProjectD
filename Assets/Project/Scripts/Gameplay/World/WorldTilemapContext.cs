@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
@@ -15,20 +17,39 @@ namespace TRPG.Runtime
     {
         [Header(nameof(WorldTilemapContext))]
 
-        [SerializeField, ReadOnly] private WorldGridContext owner;
-
         [SerializeField] WorldTilemapType tilemapType = WorldTilemapType.WorldTilemapDefault;
 
-        [SerializeField, ReadOnly] private SerializableDictionary<Vector2Int, WorldTile> mapTiles = new();
+        [SerializeField, ReadOnly] private TilemapRenderer tilemapRenderer;
+
+        [SerializeField, ReadOnly] private Tilemap tilemap;
+
+        [SerializeField, ReadOnly] private WorldGridContext owner;
+
+        [SerializeField, ReadOnly] private SerializableDictionary<Vector3Int, WorldTile> mapTiles = new();
 
 
 
         public WorldTilemapType TilemapType => tilemapType;
 
+        public Tilemap Tilemap => tilemap;
+
 
 
         private void OnValidate()
         {
+            Init();
+        }
+
+        private void Awake()
+        {
+            Init();
+        }
+
+        public void Init()
+        {
+            tilemapRenderer = GetComponent<TilemapRenderer>();
+            tilemap = GetComponent<Tilemap>();
+
             // 인스펙터 레이어를 바꾸면
             if (Application.isPlaying)
             {
@@ -36,7 +57,9 @@ namespace TRPG.Runtime
             }
             else
             {
+#if UNITY_EDITOR
                 EditorApplication.delayCall += () => SetTilemapType(tilemapType);
+#endif
             }
         }
 
@@ -60,49 +83,21 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 저장용 TilemapData의 현재 값을 런타임 컨텍스트에 반영합니다.
-        /// </summary>
-        public void SetData(WorldTilemapData tilemapData)
-        {
-            if (tilemapData == null)
-            {
-                mapTiles.SetValues(new Dictionary<Vector2Int, WorldTile>());
-                return;
-            }
-
-            mapTiles.SetValues(tilemapData.MapTiles);
-        }
-
-        /// <summary>
-        /// 전체 타일 데이터를 한 번에 교체합니다.
-        /// </summary>
-        public void SetTiles(IReadOnlyList<WorldTile> tiles)
-        {
-            Dictionary<Vector2Int, WorldTile> values = new();
-
-            for (int i = 0; i < tiles.Count; i++)
-            {
-                WorldTile tile = tiles[i];
-                values[tile.Pos] = tile;
-            }
-
-            mapTiles.SetValues(values);
-        }
-
-        /// <summary>
         /// 단일 셀의 맵 데이터를 저장하거나 덮어씁니다.
         /// </summary>
         public void SetTile(WorldTile tile)
         {
             mapTiles.SetValue(tile.Pos, tile);
+            tilemap?.SetTile(tile.Pos, tile.TileBase);
         }
 
         /// <summary>
         /// 단일 셀의 맵 데이터를 제거합니다.
         /// </summary>
-        public bool RemoveTile(Vector2Int cellPos)
+        public void RemoveTile(Vector3Int cellPos)
         {
-            return mapTiles.Remove(cellPos);
+            mapTiles.Remove(cellPos);
+            tilemap?.SetTile(cellPos, null);
         }
 
         /// <summary>
@@ -110,7 +105,7 @@ namespace TRPG.Runtime
         /// </summary>
         public bool IsInBounds(int x, int y)
         {
-            return mapTiles.ContainsKey(new Vector2Int(x, y));
+            return mapTiles.ContainsKey(new Vector3Int(x, y, 0));
         }
 
         /// <summary>
@@ -118,7 +113,7 @@ namespace TRPG.Runtime
         /// </summary>
         public bool TryGetTile(int x, int y, out WorldTile tile)
         {
-            return mapTiles.TryGetValue(new Vector2Int(x, y), out tile);
+            return mapTiles.TryGetValue(new Vector3Int(x, y, 0), out tile);
         }
     }
 }

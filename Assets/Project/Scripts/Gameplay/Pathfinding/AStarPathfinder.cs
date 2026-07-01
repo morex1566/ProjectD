@@ -16,7 +16,7 @@ namespace TRPG.Runtime
         private void Start()
         {
             // Map의 타일 타입에 맞춰서 그리드 생성
-            var mapController = GetComponent<WorldGridController>();
+            // var mapController = GetComponent<WorldGridController>();
             // astarGrid = new AStarGrid(mapController.TileTypes, mapController.MapWidth, mapController.MapHeight);
         }
 

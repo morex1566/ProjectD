@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43a978f5216dcca4ea3f449af9fe6b14, type: 3}
+  m_Name: SO_TilemapBrush_Ground_01
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldTilemapBrush
+  tiles:
+    entries:
+    - Key: 60
+      Value:
+        Owner: {fileID: 0}
+        Pos: {x: 0, y: 0, z: 0}
+        Type: 1
+        Gravity: 0
+        TileBase: {fileID: 11400000, guid: 41f9d7e500327df4ea3aaebdc00ff2a3, type: 2}
+    - Key: 40
+      Value:
+        Owner: {fileID: 0}
+        Pos: {x: 0, y: 0, z: 0}
+        Type: 1
+        Gravity: 0
+        TileBase: {fileID: 11400000, guid: f604b66758b21f3499a1838c902cfea6, type: 2}
+    - Key: 40
+      Value:
+        Owner: {fileID: 0}
+        Pos: {x: 0, y: 0, z: 0}
+        Type: 1
+        Gravity: 0
+        TileBase: {fileID: 11400000, guid: 66e6417155cf4bc4f8dd2a2fd9cbf395, type: 2}

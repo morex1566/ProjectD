@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,6 +15,8 @@ namespace TRPG.Runtime
     public class WorldGridContext : MonoBehaviour
     {
         [Header(nameof(WorldGridContext))]
+
+        [SerializeField, ReadOnly] private Grid grid;
 
         ///<summary>
         /// 인스펙터에서 설정하는 Tilemap 컨텍스트 목록입니다.
@@ -29,14 +34,12 @@ namespace TRPG.Runtime
         public IReadOnlyDictionary<WorldTilemapType, WorldTilemapContext> TilemapContextMap => tilemapContextMap;
 
 
-
-
-        ///<summary>
-        /// 컴포넌트가 활성화될 때 Tilemap 컨텍스트 캐시를 갱신합니다.
-        ///</summary>
-        private void Awake()
+        /// <summary>
+        /// 타일맵 추가된거거나 사라지는 경우
+        /// </summary>
+        private void OnTransformChildrenChanged()
         {
-            Rebuild();
+            Init();
         }
 
         ///<summary>
@@ -44,22 +47,23 @@ namespace TRPG.Runtime
         ///</summary>
         private void OnValidate()
         {
-            // 인스펙터 레이어를 바꾸면
-            if (Application.isPlaying)
-            {
-                Rebuild();
-            }
-            else
-            {
-                EditorApplication.delayCall += () => Rebuild();
-            }
+            Init();
         }
 
-        /// <summary>
-        /// 타일맵 추가된거거나 사라지는 경우
-        /// </summary>
-        private void OnTransformChildrenChanged()
+        ///<summary>
+        /// 컴포넌트가 활성화될 때 Tilemap 컨텍스트 캐시를 갱신합니다.
+        ///</summary>
+        private void Awake()
         {
+            Init();
+        }
+
+
+
+        private void Init()
+        {
+            grid = GetComponent<Grid>();
+
             // 인스펙터 레이어를 바꾸면
             if (Application.isPlaying)
             {
@@ -67,7 +71,9 @@ namespace TRPG.Runtime
             }
             else
             {
+#if UNITY_EDITOR
                 EditorApplication.delayCall += () => Rebuild();
+#endif
             }
         }
 
@@ -77,9 +83,12 @@ namespace TRPG.Runtime
             GameObject tilemapInst = new GameObject(nameof(Tilemap));
             tilemapInst.transform.SetParent(transform);
             {
+                tilemapInst.AddComponent<Tilemap>();
+                tilemapInst.AddComponent<TilemapRenderer>();
                 WorldTilemapContext tilemapContextComp = tilemapInst.AddComponent<WorldTilemapContext>();
                 tilemapContextComp.SetOwner(this);
                 tilemapContextComp.SetTilemapType(WorldTilemapType.WorldTilemapDefault);
+                tilemapContextComp.Init();
 
                 tilemapContexts.Add(tilemapContextComp);
             }
@@ -92,9 +101,12 @@ namespace TRPG.Runtime
             GameObject tilemapInst = new GameObject(nameof(Tilemap));
             tilemapInst.transform.SetParent(transform);
             {
+                tilemapInst.AddComponent<Tilemap>();
+                tilemapInst.AddComponent<TilemapRenderer>();
                 WorldTilemapContext tilemapContextComp = tilemapInst.AddComponent<WorldTilemapContext>();
                 tilemapContextComp.SetOwner(this);
                 tilemapContextComp.SetTilemapType(tilemapType);
+                tilemapContextComp.Init();
 
                 tilemapContexts.Add(tilemapContextComp);
             }
@@ -118,29 +130,7 @@ namespace TRPG.Runtime
                     continue;
                 }
 
-                // None은 실제 Tilemap 타입이 아니므로 제외합니다.
-                if (tilemapContext.TilemapType == WorldTilemapType.None)
-                {
-                    continue;
-                }
-
-                // 중복 타입이 있으면 마지막 값으로 덮어씁니다.
-                tilemapContextMap[tilemapContext.TilemapType] = tilemapContext;
-            }
-        }
-
-        private void RebuildInternal()
-        {
-            tilemapContexts.RemoveAll(context => context == null);
-            tilemapContextMap.Clear();
-
-            foreach (WorldTilemapContext tilemapContext in tilemapContexts)
-            {
-                // 비어있는 컨텍스트는 제외합니다.
-                if (tilemapContext == null)
-                {
-                    continue;
-                }
+                tilemapContext.SetOwner(this);
 
                 // None은 실제 Tilemap 타입이 아니므로 제외합니다.
                 if (tilemapContext.TilemapType == WorldTilemapType.None)

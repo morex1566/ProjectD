@@ -59,15 +59,15 @@ namespace TRPG.Runtime
     ///     #region Interface implementation of MyActions.IPlayerActions
     ///
     ///     // Invoked when "MoveX" action is either started, performed or canceled.
-    ///     public void OnMove(InputAction.CallbackContext context)
+    ///     public void OnMove(InputAction.CallbackContext gridContext)
     ///     {
-    ///         Debug.Log($"OnMove: {context.ReadValue&lt;Vector2&gt;()}");
+    ///         Debug.Log($"OnMove: {gridContext.ReadValue&lt;Vector2&gt;()}");
     ///     }
     ///
     ///     // Invoked when "Attack" action is either started, performed or canceled.
-    ///     public void OnAttack(InputAction.CallbackContext context)
+    ///     public void OnAttack(InputAction.CallbackContext gridContext)
     ///     {
-    ///         Debug.Log($"OnAttack: {context.ReadValue&lt;float&gt;()}");
+    ///         Debug.Log($"OnAttack: {gridContext.ReadValue&lt;float&gt;()}");
     ///     }
     ///
     ///     #endregion

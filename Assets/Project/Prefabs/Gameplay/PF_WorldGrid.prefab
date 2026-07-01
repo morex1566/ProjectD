@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 7491423020794455166}
   - component: {fileID: 2638994553970251304}
   - component: {fileID: 1752784067799025704}
-  - component: {fileID: 986415359912849831}
+  - component: {fileID: 7690866558165233099}
   m_Layer: 20
-  m_Name: PF_Grid
-  m_TagString: Untagged
+  m_Name: PF_WorldGrid
+  m_TagString: WorldGrid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldGridContext
   tilemapContexts: []
---- !u!114 &986415359912849831
+--- !u!114 &7690866558165233099
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -71,5 +71,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dad2fc13bf2b36c4cb48703bbaeee237, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldGridController
-  pivot: {x: 0, y: 0, z: 0}
   context: {fileID: 1752784067799025704}
+  brush: {fileID: 0}

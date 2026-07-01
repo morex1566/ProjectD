@@ -7,27 +7,11 @@ namespace TRPG.Runtime
     [Serializable]
     public class WorldTilemapData : ScriptableObject
     {
-        [SerializeField] private SerializableDictionary<Vector2Int, WorldTile> mapTiles = new();
+        [SerializeField] private SerializableDictionary<Vector3Int, WorldTile> mapTiles = new();
 
-        public Dictionary<Vector2Int, WorldTile> MapTiles => mapTiles.ToDictionary();
+        public Dictionary<Vector3Int, WorldTile> MapTiles => mapTiles.ToDictionary();
 
 
-
-        /// <summary>
-        /// 전체 타일 데이터를 한 번에 교체합니다.
-        /// </summary>
-        public void SetTiles(IReadOnlyList<WorldTile> tiles)
-        {
-            Dictionary<Vector2Int, WorldTile> values = new();
-
-            for (int i = 0; i < tiles.Count; i++)
-            {
-                WorldTile tile = tiles[i];
-                values[tile.Pos] = tile;
-            }
-
-            mapTiles.SetValues(values);
-        }
 
         /// <summary>
         /// 단일 셀의 맵 데이터를 저장하거나 덮어씁니다.
@@ -40,7 +24,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 단일 셀의 맵 데이터를 제거합니다.
         /// </summary>
-        public bool RemoveTile(Vector2Int cellPos)
+        public bool RemoveTile(Vector3Int cellPos)
         {
             return mapTiles.Remove(cellPos);
         }
@@ -50,7 +34,7 @@ namespace TRPG.Runtime
         /// </summary>
         public bool IsInBounds(int x, int y)
         {
-            return mapTiles.ContainsKey(new Vector2Int(x, y));
+            return mapTiles.ContainsKey(new Vector3Int(x, y, 0));
         }
 
         /// <summary>
@@ -58,7 +42,7 @@ namespace TRPG.Runtime
         /// </summary>
         public bool TryGetTile(int x, int y, out WorldTile tile)
         {
-            return mapTiles.TryGetValue(new Vector2Int(x, y), out tile);
+            return mapTiles.TryGetValue(new Vector3Int(x, y, 0), out tile);
         }
     }
 }

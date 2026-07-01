@@ -6,9 +6,7 @@ TagManager:
   tags:
   - Creature
   - WorldCamera
-  - MapBackground
-  - Map
-  - MapUI
+  - WorldGrid
   layers:
   - Default
   - TransparentFX
@@ -30,7 +28,7 @@ TagManager:
   - 
   - 
   - 
-  - WorldMap
+  - WorldGrid
   - WorldTilemapDefault
   - WorldTilemapGround
   - WorldTilemapBackground

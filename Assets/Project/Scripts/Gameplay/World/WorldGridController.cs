@@ -13,14 +13,17 @@ namespace TRPG.Runtime
         [Header(nameof(WorldGridController))]
 
         /// <summary>
-        /// 맵 생성 시작 셀 위치입니다.
-        /// </summary>
-        [SerializeField] private Vector3Int pivot = Vector3Int.zero;
-
-        /// <summary>
         /// 런타임 맵 상태입니다.
         /// </summary>
-        [SerializeField, ReadOnly] private WorldGridContext context = null;
+        [SerializeField, ReadOnly] private WorldGridContext gridContext = null;
+
+
+        [Header("Ground")]
+
+        [SerializeField] private WorldTilemapBrush groundBrush = null;
+
+        [SerializeField] private Vector2Int size = Vector2Int.zero;
+
 
 
 
@@ -36,7 +39,43 @@ namespace TRPG.Runtime
 
         private void Init()
         {
-            context = GetComponent<WorldGridContext>();
+            gridContext = GetComponent<WorldGridContext>();
+        }
+
+        /// <summary>
+        /// 현재 브러시에서 랜덤 타일을 뽑아 지정 좌표에 그립니다.
+        /// </summary>
+        public void Draw(WorldTilemapType tilemapType, Vector3Int cellPos)
+        {
+            if (groundBrush == null)
+            {
+                return;
+            }
+
+            if (groundBrush.TryGetRandomTile(out WorldTile tile) == false)
+            {
+                return;
+            }
+
+            if (gridContext.TilemapContextMap.TryGetValue(tilemapType, out WorldTilemapContext tilemapContext) == false)
+            {
+                return;
+            }
+
+            tile.Pos = cellPos;
+            tilemapContext.SetTile(tile);
+        }
+
+        [ContextMenu(nameof(DrawGround))]
+        public void DrawGround()
+        {
+            for (int y = 0; y < size.x; y++)
+            {
+                for (int x = 0; x < size.y; x++)
+                {
+                    Draw(WorldTilemapType.WorldTilemapGround, new Vector3Int(x, y));
+                }
+            }
         }
     }
 }
