@@ -58,13 +58,17 @@ namespace TRPG.Runtime
             Init();
         }
 
-
+        private void OnDestroy()
+        {
+#if UNITY_EDITOR
+            EditorApplication.delayCall -= RebuildDelayed;
+#endif
+        }
 
         private void Init()
         {
             grid = GetComponent<Grid>();
 
-            // 인스펙터 레이어를 바꾸면
             if (Application.isPlaying)
             {
                 Rebuild();
@@ -72,7 +76,8 @@ namespace TRPG.Runtime
             else
             {
 #if UNITY_EDITOR
-                EditorApplication.delayCall += () => Rebuild();
+                EditorApplication.delayCall -= RebuildDelayed;
+                EditorApplication.delayCall += RebuildDelayed;
 #endif
             }
         }
@@ -88,7 +93,7 @@ namespace TRPG.Runtime
                 WorldTilemapContext tilemapContextComp = tilemapInst.AddComponent<WorldTilemapContext>();
                 tilemapContextComp.SetOwner(this);
                 tilemapContextComp.SetTilemapType(WorldTilemapType.WorldTilemapDefault);
-                tilemapContextComp.Set();
+                tilemapContextComp.Init();
 
                 tilemapContexts.Add(tilemapContextComp);
             }
@@ -209,5 +214,17 @@ namespace TRPG.Runtime
             tile = default;
             return false;
         }
+
+#if UNITY_EDITOR
+        private void RebuildDelayed()
+        {
+            if (this == null)
+            {
+                return;
+            }
+
+            Rebuild();
+        }
+#endif
     }
 }

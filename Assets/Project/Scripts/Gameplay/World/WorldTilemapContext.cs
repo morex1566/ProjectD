@@ -37,30 +37,30 @@ namespace TRPG.Runtime
 
         private void OnValidate()
         {
-            Set();
+            Init();
         }
 
         private void Awake()
         {
-            Set();
+            Init();
         }
 
-        public void Set()
+        private void OnDestroy()
+        {
+#if UNITY_EDITOR
+            EditorApplication.delayCall -= SetTilemapTypeDelayed;
+#endif
+        }
+
+        public void Init()
         {
             tilemapRenderer = GetComponent<TilemapRenderer>();
             tilemap = GetComponent<Tilemap>();
 
-            // 인스펙터 레이어를 바꾸면
-            if (Application.isPlaying)
-            {
-                SetTilemapType(tilemapType);
-            }
-            else
-            {
 #if UNITY_EDITOR
-                EditorApplication.delayCall += () => SetTilemapType(tilemapType);
+            EditorApplication.delayCall -= SetTilemapTypeDelayed;
+            EditorApplication.delayCall += SetTilemapTypeDelayed;
 #endif
-            }
         }
 
         public void SetOwner(WorldGridContext owner)
@@ -70,16 +70,22 @@ namespace TRPG.Runtime
 
         public void SetTilemapType(WorldTilemapType tilemapType)
         {
-            this.tilemapType = tilemapType;
+            if (this == null)
+            {
+                return;
+            }
 
-            // GameObject.layer에는 LayerMask 비트값이 아니라 Unity Layer 인덱스를 넣어야 합니다.
+            this.tilemapType = tilemapType;
             int layer = LayerMask.NameToLayer(tilemapType.ToString());
             if (layer >= 0)
             {
                 gameObject.layer = layer;
             }
 
-            owner?.Rebuild();
+            if (owner != null)
+            {
+                owner.Rebuild();
+            }
         }
 
         /// <summary>
@@ -121,5 +127,17 @@ namespace TRPG.Runtime
             mapTiles.Clear();
             tilemap.ClearAllTiles();
         }
+
+#if UNITY_EDITOR
+        private void SetTilemapTypeDelayed()
+        {
+            if (this == null)
+            {
+                return;
+            }
+
+            SetTilemapType(tilemapType);
+        }
+#endif
     }
 }
