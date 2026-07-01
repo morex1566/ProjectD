@@ -48,9 +48,14 @@ namespace TRPG.Runtime
         /// </summary>
         private void OnEnable()
         {
-            InputManager.InputMappingContext.Player.Move.performed += OnWASD;
-            InputManager.InputMappingContext.Player.Move.canceled += OnWASD;
-            InputManager.InputMappingContext.Player.ScrollWheel.performed += OnScrollWheel;
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == false)
+            {
+                return;
+            }
+
+            inputMappingContext.Player.Move.performed += OnWASD;
+            inputMappingContext.Player.Move.canceled += OnWASD;
+            inputMappingContext.Player.ScrollWheel.performed += OnScrollWheel;
         }
 
         /// <summary>
@@ -58,9 +63,14 @@ namespace TRPG.Runtime
         /// </summary>
         private void OnDisable()
         {
-            InputManager.InputMappingContext.Player.Move.performed -= OnWASD;
-            InputManager.InputMappingContext.Player.Move.canceled -= OnWASD;
-            InputManager.InputMappingContext.Player.ScrollWheel.performed -= OnScrollWheel;
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == false)
+            {
+                return;
+            }
+
+            inputMappingContext.Player.Move.performed -= OnWASD;
+            inputMappingContext.Player.Move.canceled -= OnWASD;
+            inputMappingContext.Player.ScrollWheel.performed -= OnScrollWheel;
         }
 
         /// <summary>

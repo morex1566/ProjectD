@@ -18,7 +18,13 @@ namespace TRPG.Runtime
             Camera
         }
 
-        public static Action OnResolutionChange;
+        private Action onResolutionChange;
+
+        public static Action OnResolutionChange
+        {
+            get => GetInstance().onResolutionChange;
+            set => GetInstance().onResolutionChange = value;
+        }
 
         public static UIManagerSettingsData Settings { get; private set; }
 

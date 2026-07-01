@@ -75,6 +75,8 @@ namespace TRPG.Runtime
                 return;
             }
 
+            tilemapContext.Clear();
+
             for (int y = 0; y < size.x; y++)
             {
                 for (int x = 0; x < size.y; x++)

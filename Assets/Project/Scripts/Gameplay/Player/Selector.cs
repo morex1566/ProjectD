@@ -54,7 +54,7 @@ namespace TRPG.Runtime
             CreateSelectionBox();
             HideSelectionBox();
 
-            cam = WorldManager.GetInstance().GetWorldCameraController().Cam;
+            cam = WorldManager.GetWorldCameraController().Cam;
         }
 
         /// <summary>
@@ -62,8 +62,10 @@ namespace TRPG.Runtime
         /// </summary>
         protected virtual void OnEnable()
         {
-            InputManager.InputMappingContext.Player.LeftClick.performed += OnLeftClickStarted;
-            InputManager.InputMappingContext.Player.LeftClick.canceled += OnLeftClickCanceled;
+            if (!InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext)) return;
+
+            inputMappingContext.Player.LeftClick.performed += OnLeftClickStarted;
+            inputMappingContext.Player.LeftClick.canceled += OnLeftClickCanceled;
         }
 
         /// <summary>
@@ -71,8 +73,12 @@ namespace TRPG.Runtime
         /// </summary>
         protected virtual void OnDisable()
         {
-            InputManager.InputMappingContext.Player.LeftClick.performed -= OnLeftClickStarted;
-            InputManager.InputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext))
+            {
+                inputMappingContext.Player.LeftClick.performed -= OnLeftClickStarted;
+                inputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;
+            }
+
             HideSelectionBox();
         }
 

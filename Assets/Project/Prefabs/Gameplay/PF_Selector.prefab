@@ -62,4 +62,3 @@ MonoBehaviour:
   dragThreshold: 4
   selectionBoxPf: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
   selectedWithBorderTileBase: {fileID: 11400000, guid: 707d26c372578f24fbfe4c83dc808657, type: 2}
-  selectedWithoutBorderTileBase: {fileID: 11400000, guid: d3de57b49b0bf9c4787deb3a6d9c769f, type: 2}

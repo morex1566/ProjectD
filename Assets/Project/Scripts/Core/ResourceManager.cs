@@ -14,13 +14,13 @@ namespace TRPG.Runtime
     public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
     {
         // Key : Labelname, Value : primarykey
-        private static readonly Dictionary<string, List<string>> cachedLabelPrimaryKeys = new();
+        private readonly Dictionary<string, List<string>> cachedLabelPrimaryKeys = new();
 
         // 게임 오브젝트의 AssetReference가 찾을 실제 리소스 캐시입니다. Key는 location.PrimaryKey입니다.
-        private static readonly Dictionary<string, Object> cachedResources = new();
+        private readonly Dictionary<string, Object> cachedResources = new();
 
         // Addressables.Release는 로드 때 받은 handle 기준으로 처리합니다.
-        private static readonly Dictionary<string, AsyncOperationHandle<Object>> cachedHandles = new();
+        private readonly Dictionary<string, AsyncOperationHandle<Object>> cachedHandles = new();
 
 
 
@@ -44,16 +44,18 @@ namespace TRPG.Runtime
         /// </summary>
         public static IList<Object> Load(string label)
         {
-            if (cachedLabelPrimaryKeys.TryGetValue(label, out List<string> cachedPrimaryKeys))
+            ResourceManager manager = GetInstance();
+
+            if (manager.cachedLabelPrimaryKeys.TryGetValue(label, out List<string> cachedPrimaryKeys))
             {
-                return GetCachedAssets(cachedPrimaryKeys);
+                return manager.GetCachedAssets(cachedPrimaryKeys);
             }
 
             // 리소스 경로 로드하기
             AsyncOperationHandle<IList<IResourceLocation>> locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(Object));
             List<string> loadedPrimaryKeys = new();
             List<Object> loadedAssets = new();
-            cachedLabelPrimaryKeys[label] = loadedPrimaryKeys;
+            manager.cachedLabelPrimaryKeys[label] = loadedPrimaryKeys;
 
             try
             {
@@ -67,13 +69,13 @@ namespace TRPG.Runtime
                     // 로드 실패
                     if (asset == null)
                     {
-                        ReleaseResource(assetHandle);
+                        manager.ReleaseResource(assetHandle);
                         continue;
                     }
 
                     // 로드 성공
-                    cachedResources[location.PrimaryKey] = asset;
-                    cachedHandles[location.PrimaryKey] = assetHandle;
+                    manager.cachedResources[location.PrimaryKey] = asset;
+                    manager.cachedHandles[location.PrimaryKey] = assetHandle;
                     loadedPrimaryKeys.Add(location.PrimaryKey);
                     loadedAssets.Add(asset);
                 }
@@ -91,7 +93,7 @@ namespace TRPG.Runtime
             finally
             {
                 // 사용한 리소스 경로 삭제하기
-                ReleaseResource(locationsHandle);
+                manager.ReleaseResource(locationsHandle);
             }
         }
 
@@ -100,6 +102,8 @@ namespace TRPG.Runtime
         /// </summary>
         public static T GetResource<T>(AssetReferenceT<T> reference) where T : Object
         {
+            ResourceManager manager = GetInstance();
+
             if (typeof(Component).IsAssignableFrom(typeof(T)))
             {
                 Debug.LogWarning($"Use AssetReferenceT<GameObject> instead of AssetReferenceT<{typeof(T).Name}>.");
@@ -118,7 +122,7 @@ namespace TRPG.Runtime
                 return null;
             }
 
-            return cachedResources.TryGetValue(primaryKey, out Object resource) ? resource as T : null;
+            return manager.cachedResources.TryGetValue(primaryKey, out Object resource) ? resource as T : null;
         }
 
         /// <summary>
@@ -126,16 +130,18 @@ namespace TRPG.Runtime
         /// </summary>
         public static T GetResource<T>(string address) where T : Object
         {
+            ResourceManager manager = GetInstance();
+
             if (string.IsNullOrWhiteSpace(address))
             {
                 Debug.LogWarning($"GetResource failed. Invalid address.");
                 return null;
             }
 
-            if (!cachedResources.TryGetValue(address, out Object resource))
+            if (!manager.cachedResources.TryGetValue(address, out Object resource))
             {
                 if (!TryGetPrimaryKey(address, typeof(T), out string primaryKey) ||
-                    !cachedResources.TryGetValue(primaryKey, out resource))
+                    !manager.cachedResources.TryGetValue(primaryKey, out resource))
                 {
                     Debug.LogWarning($"GetResource failed. Resource not cached. Address: {address}");
                     return null;
@@ -150,20 +156,22 @@ namespace TRPG.Runtime
         /// </summary>
         public static void Unload(string label)
         {
-            if (!cachedLabelPrimaryKeys.Remove(label, out List<string> primaryKeys))
+            ResourceManager manager = GetInstance();
+
+            if (!manager.cachedLabelPrimaryKeys.Remove(label, out List<string> primaryKeys))
             {
                 return;
             }
 
             foreach (string primaryKey in primaryKeys)
             {
-                if (cachedHandles.TryGetValue(primaryKey, out AsyncOperationHandle<Object> handle))
+                if (manager.cachedHandles.TryGetValue(primaryKey, out AsyncOperationHandle<Object> handle))
                 {
-                    ReleaseResource(handle);
+                    manager.ReleaseResource(handle);
                 }
 
-                cachedHandles.Remove(primaryKey);
-                cachedResources.Remove(primaryKey);
+                manager.cachedHandles.Remove(primaryKey);
+                manager.cachedResources.Remove(primaryKey);
             }
         }
 
@@ -173,7 +181,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// primaryKey 목록을 현재 캐시된 Unity Object 목록으로 변환합니다.
         /// </summary>
-        private static List<Object> GetCachedAssets(List<string> primaryKeys)
+        private List<Object> GetCachedAssets(List<string> primaryKeys)
         {
             List<Object> assets = new();
 
@@ -209,7 +217,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 유효한 Addressables handle만 Release합니다.
         /// </summary>
-        private static void ReleaseResource<T>(AsyncOperationHandle<T> handle)
+        private void ReleaseResource<T>(AsyncOperationHandle<T> handle)
         {
             if (handle.IsValid() == false)
             {

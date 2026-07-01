@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace TRPG.Runtime
 {
@@ -10,36 +11,43 @@ namespace TRPG.Runtime
     {
         public static PlayerManagerSettingsData Settings;
 
-        private static PlayerCommandSystemType commandSystemType = PlayerCommandSystemType.None;
+        [SerializeField, ReadOnly] private PlayerCommandSystemType commandSystemType = PlayerCommandSystemType.None;
 
-        private static CreatureSelector creatureSelector;
+        [SerializeField, ReadOnly] private CreatureSelector creatureSelector;
 
-        private static WorldTileSelector worldTileSelector;
+        [SerializeField, ReadOnly] private WorldTileSelector worldTileSelector;
 
-        public event Action<PlayerCommandSystemType> CommandSystemModeChanged;
+
+
+        [SerializeField, ReadOnly] public UnityEvent<PlayerCommandSystemType> CommandSystemModeChanged;
+
+
 
         /// <summary>
         /// 플레이어 매니저 인스턴스와 설정 데이터를 준비합니다.
         /// </summary>
         public static void Init()
         {
-            GetInstance();
+            PlayerManager manager = GetInstance();
+
             Settings = ResourceManager.GetResource<PlayerManagerSettingsData>(UnityConstant.Addressable.Label.Core);
 
-            GameObject selectorInst = Instantiate(Settings.SelectorPf, instance.transform);
-            creatureSelector = selectorInst.GetComponent<CreatureSelector>();
-            worldTileSelector = selectorInst.GetComponent<WorldTileSelector>();
+            GameObject selectorInst = Instantiate(Settings.SelectorPf, manager.transform);
+            manager.creatureSelector = selectorInst.GetComponent<CreatureSelector>();
+            manager.worldTileSelector = selectorInst.GetComponent<WorldTileSelector>();
         }
 
-        public void SetCommandSystemType(PlayerCommandSystemType type)
+        public static void SetCommandSystemType(PlayerCommandSystemType type)
         {
-            commandSystemType = type;
+            PlayerManager manager = GetInstance();
 
-            if (creatureSelector != null) creatureSelector.enabled = type == PlayerCommandSystemType.Idle;
+            manager.commandSystemType = type;
 
-            if (worldTileSelector != null) worldTileSelector.enabled = type == PlayerCommandSystemType.Construction;
+            if (manager.creatureSelector != null) manager.creatureSelector.enabled = type == PlayerCommandSystemType.Idle;
 
-            CommandSystemModeChanged?.Invoke(type);
+            if (manager.worldTileSelector != null) manager.worldTileSelector.enabled = type == PlayerCommandSystemType.Construction;
+
+            manager.CommandSystemModeChanged?.Invoke(type);
         }
     }
 }

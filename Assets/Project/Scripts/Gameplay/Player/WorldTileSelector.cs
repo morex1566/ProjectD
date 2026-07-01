@@ -47,7 +47,7 @@ namespace TRPG.Runtime
             Vector3 endWorldPos = ScreenEx.ScreenToWorldPos(cam, endScreenPos);
 
             // 셀 좌표
-            Tilemap tilemap = WorldManager.Instance.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
+            Tilemap tilemap = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
             Vector3Int startCellPos = tilemap.WorldToCell(startWorldPos);
             Vector3Int endCellPos = tilemap.WorldToCell(endWorldPos);
             Vector3Int minCellPos = Vector3Int.Min(startCellPos, endCellPos);
@@ -91,7 +91,7 @@ namespace TRPG.Runtime
         protected override void Select(Camera cam, Vector2 mouseWorldPos)
         {
             // 셀 좌표
-            Tilemap tilemap = WorldManager.Instance.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
+            Tilemap tilemap = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
             Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPos);
 
             // 실제 타일이 있는 셀만 선택합니다.
@@ -108,12 +108,12 @@ namespace TRPG.Runtime
         /// </summary>
         protected override void Clear()
         {
-            selecteds.Clear();
-
             for (int i = 0; i < selecteds.Count; i++)
             {
                 RemoveSelectUI(selecteds[i]);
             }
+
+            selecteds.Clear();
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace TRPG.Runtime
         /// </summary>
         private void SetSelectUI(Vector3Int cellPos, TileBase selectTileBase)
         {
-            WorldTilemapContext tilemapContext = WorldManager.Instance.GetWorldTilemapContext(WorldTilemapType.WorldTilemapUI);
+            WorldTilemapContext tilemapContext = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapUI);
 
             if (tilemapContext == null) return;
 
@@ -149,7 +149,7 @@ namespace TRPG.Runtime
 
         private void RemoveSelectUI(Vector3Int cellPos)
         {
-            WorldTilemapContext tilemapContext = WorldManager.Instance.GetWorldTilemapContext(WorldTilemapType.WorldTilemapUI);
+            WorldTilemapContext tilemapContext = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapUI);
 
             if (tilemapContext == null) return;
 

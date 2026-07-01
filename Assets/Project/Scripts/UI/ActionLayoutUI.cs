@@ -29,12 +29,12 @@ namespace TRPG.Runtime
 
         private void OnIdleButtonClicked()
         {
-            PlayerManager.Instance.SetCommandSystemType(PlayerCommandSystemType.Idle);
+            PlayerManager.SetCommandSystemType(PlayerCommandSystemType.Idle);
         }
 
         private void OnConstructionButtonClicked()
         {
-            PlayerManager.Instance.SetCommandSystemType(PlayerCommandSystemType.Construction);
+            PlayerManager.SetCommandSystemType(PlayerCommandSystemType.Construction);
         }
     }
 }

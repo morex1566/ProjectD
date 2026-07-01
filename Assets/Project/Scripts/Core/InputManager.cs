@@ -39,17 +39,27 @@ namespace TRPG.Runtime
     /// </summary>
     public class InputManager : MonoBehaviourSingleton<InputManager>
     {
-        public static InputMappingContext InputMappingContext;
+        private InputMappingContext inputMappingContext;
+
+        public InputMappingContext InputMappingContext => GetInstance().inputMappingContext;
+
+
+
+        public static bool TryGetInputMappingContext(out InputMappingContext context)
+        {
+            context = instance != null ? instance.inputMappingContext : null;
+            return context != null;
+        }
 
         /// <summary>
         /// 입력 매핑 컨텍스트를 생성하고 활성화합니다.
         /// </summary>
         public static void Init()
         {
-            GetInstance();
+            InputManager manager = GetInstance();
 
-            InputMappingContext = new InputMappingContext();
-            InputMappingContext.Enable();
+            manager.inputMappingContext = new InputMappingContext();
+            manager.inputMappingContext.Enable();
         }
     }
 }

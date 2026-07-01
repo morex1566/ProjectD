@@ -8,15 +8,11 @@ namespace TRPG.Runtime
     /// </summary>
     public partial class WorldManager : MonoBehaviourSingleton<WorldManager>
     {
-        private static readonly Dictionary<int, CreatureController> creatures = new();
-
-        private static GameObject worldRoot = null;
-
         public static WorldManagerSettingsData Settings { get; private set; }
 
+        private GameObject worldRoot = null;
 
 
-        public static IReadOnlyDictionary<int, CreatureController> Creatures => creatures;
 
 
         /// <summary>
@@ -24,20 +20,25 @@ namespace TRPG.Runtime
         /// </summary>
         public static void Init()
         {
-            GetInstance();
+            WorldManager manager = GetInstance();
             Settings = ResourceManager.GetResource<WorldManagerSettingsData>(UnityConstant.Addressable.Label.Core);
 
-            worldRoot = new GameObject("World");
+            manager.worldRoot = new GameObject("World");
         }
 
-        public WorldCameraController GetWorldCameraController()
+        public static WorldCameraController GetWorldCameraController()
         {
-            return GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
+            return GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera)?.GetComponent<WorldCameraController>();
         }
 
-        public WorldTilemapContext GetWorldTilemapContext(WorldTilemapType worldTilemapType)
+        public static WorldTilemapContext GetWorldTilemapContext(WorldTilemapType worldTilemapType)
         {
-            WorldGridContext gridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid).GetComponent<WorldGridContext>();
+            WorldGridContext gridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridContext>();
+
+            if (gridContext == null)
+            {
+                return null;
+            }
 
             if (gridContext.TilemapContextMap.TryGetValue(worldTilemapType, out WorldTilemapContext tilemapContext) == false)
             {

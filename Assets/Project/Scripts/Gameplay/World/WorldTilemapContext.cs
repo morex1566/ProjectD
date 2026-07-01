@@ -80,6 +80,7 @@ namespace TRPG.Runtime
             if (layer >= 0)
             {
                 gameObject.layer = layer;
+                tilemapRenderer.sortingOrder = layer;
             }
 
             if (owner != null)
