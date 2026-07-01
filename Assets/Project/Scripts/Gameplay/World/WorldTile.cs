@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
@@ -9,8 +10,14 @@ namespace TRPG.Runtime
     [Serializable]
     public struct WorldTile
     {
-        public WorldTileType Type;
-        public Vector2Int Pos;
-        public float Gravity;
+        [SerializeField, ReadOnly] public GameObject Owner;
+
+        [SerializeField, ReadOnly] public WorldTileType Type;
+
+        [SerializeField, ReadOnly] public Vector2Int Pos;
+
+        [SerializeField, ReadOnly] public float Gravity;
+
+        [SerializeField, ReadOnly] public TileBase TileBase;
     }
 }

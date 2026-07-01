@@ -48,7 +48,16 @@ namespace TRPG.Runtime
         /// </summary>
         public bool TryGetRandomTile(out TileBase tile)
         {
+            return TryGetRandomTile(out tile, out _);
+        }
+
+        /// <summary>
+        /// 가중치에 따라 타일 하나와 해당 타일의 중력 값을 선택합니다.
+        /// </summary>
+        public bool TryGetRandomTile(out TileBase tile, out float gravity)
+        {
             tile = null;
+            gravity = 0f;
             int totalWeight = 0;
 
             for (int i = 0; i < tiles.Count; i++)
@@ -71,10 +80,30 @@ namespace TRPG.Runtime
                 if (randomWeight < candidate.Weight)
                 {
                     tile = candidate.Tile;
+                    gravity = candidate.Gravity;
                     return true;
                 }
 
                 randomWeight -= candidate.Weight;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 저장된 맵을 재현할 때 사용할 기본 타일을 반환합니다.
+        /// </summary>
+        public bool TryGetDefaultTile(out TileBase tile)
+        {
+            tile = null;
+
+            for (int i = 0; i < tiles.Count; i++)
+            {
+                WeightedTile candidate = tiles[i];
+                if (candidate == null || candidate.Tile == null) continue;
+
+                tile = candidate.Tile;
+                return true;
             }
 
             return false;

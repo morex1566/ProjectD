@@ -7,7 +7,9 @@ namespace TRPG.Runtime
     [Serializable]
     public class WorldTilemapData : ScriptableObject
     {
-        private SerializableDictionary<Vector2Int, WorldTile> mapTiles = new();
+        [SerializeField] private SerializableDictionary<Vector2Int, WorldTile> mapTiles = new();
+
+        public Dictionary<Vector2Int, WorldTile> MapTiles => mapTiles.ToDictionary();
 
 
 

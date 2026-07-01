@@ -10,13 +10,15 @@ namespace TRPG.Runtime
     /// </summary>
     public class TileSelector : Selector<Vector3Int>
     {
-        [FormerlySerializedAs("selectIndicator")]
-        [FormerlySerializedAs("selectionTileBase")]
-        [SerializeField] private TileBase tileSelectedIndicator;
+        [SerializeField] private TileBase selectedWithBorderTileBase;
+
+        [SerializeField] private TileBase selectedWithoutBorderTileBase;
 
 
 
-        public TileBase TileSelectedIndicator => tileSelectedIndicator;
+
+
+        public TileBase TileSelectedIndicator => selectedWithBorderTileBase;
 
 
 
@@ -45,7 +47,7 @@ namespace TRPG.Runtime
         /// </summary>
         protected override void Selects(Camera cam, Vector2 startScreenPos, Vector2 endScreenPos)
         {
-            //Tilemap tilemap = WorldManager.WorldMapController.Ground;
+            //Tilemap tilemap = WorldManager.WorldGridController.WorldTilemapGround;
             //Camera cam = WorldManager.CamController.Cam;
             //Rect selectionScreenRect = ScreenEx.CreateScreenRect(startScreenPos, endScreenPos);
 
@@ -85,7 +87,7 @@ namespace TRPG.Runtime
         /// </summary>
         protected override void Select(Camera cam, Vector2 mouseWorldPos)
         {
-            //Tilemap tilemap = WorldManager.WorldMapController.Ground;
+            //Tilemap tilemap = WorldManager.WorldGridController.WorldTilemapGround;
             //Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPos);
 
             //// 실제 타일이 있는 셀만 선택합니다.
@@ -112,7 +114,7 @@ namespace TRPG.Runtime
         protected override void Add(Vector3Int selectedTarget)
         {
             selecteds.Add(selectedTarget);
-            ShowIndicator(selectedTarget, tileSelectedIndicator);
+            ShowIndicator(selectedTarget, selectedWithBorderTileBase);
         }
 
         /// <summary>
@@ -127,13 +129,13 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// Selection Tilemap의 단일 셀 표시를 설정합니다.
+        /// WorldTilemapUI Tilemap의 단일 셀 표시를 설정합니다.
         /// </summary>
         private void ShowIndicator(Vector3Int cellPos, TileBase indicator)
         {
-            //if (WorldManager.WorldMapController.Selection == null) return;
+            //if (WorldManager.WorldGridController.WorldTilemapUI == null) return;
 
-            //WorldManager.WorldMapController.Selection.SetTile(cellPos, indicator);
+            //WorldManager.WorldGridController.WorldTilemapUI.SetTile(cellPos, indicator);
         }
     }
 }
