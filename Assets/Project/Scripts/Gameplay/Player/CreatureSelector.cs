@@ -8,6 +8,8 @@ namespace TRPG.Runtime
     /// </summary>
     public class CreatureSelector : Selector<ISelectable>
     {
+        // [SerializeField] private GameObject selectedEffect;
+
         /// <summary>
         /// 오브젝트 선택 모드 진입 시 이전 선택 상태를 비웁니다.
         /// </summary>

@@ -35,11 +35,11 @@ namespace TRPG.Runtime
             return GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera).GetComponent<WorldCameraController>();
         }
 
-        public WorldTilemapContext GetWorldTilemap(WorldTilemapType worldTilemapType)
+        public WorldTilemapContext GetWorldTilemapContext(WorldTilemapType worldTilemapType)
         {
             WorldGridContext gridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid).GetComponent<WorldGridContext>();
 
-            if (gridContext.TilemapContextMap.TryGetValue(worldTilemapType, out WorldTilemapContext tilemapContext))
+            if (gridContext.TilemapContextMap.TryGetValue(worldTilemapType, out WorldTilemapContext tilemapContext) == false)
             {
                 return null;
             }

@@ -40,12 +40,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1695718276028346589}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9d731a8de3a8a44da0a5f4b7ef41c19, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.IdleSelector
-  dragThreshold: 8
+  dragThreshold: 4
   selectionBoxPf: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
 --- !u!114 &7379261557961419523
 MonoBehaviour:
@@ -59,6 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ffe2462d41521c4ea4d8a841341da68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.ConstructionSelector
-  dragThreshold: 8
+  dragThreshold: 4
   selectionBoxPf: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
-  tileSelectedIndicator: {fileID: 11400000, guid: 341c7c6936268d44c80fbf7495860d92, type: 2}
+  selectedWithBorderTileBase: {fileID: 11400000, guid: 707d26c372578f24fbfe4c83dc808657, type: 2}
+  selectedWithoutBorderTileBase: {fileID: 11400000, guid: d3de57b49b0bf9c4787deb3a6d9c769f, type: 2}

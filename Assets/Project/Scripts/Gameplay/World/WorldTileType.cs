@@ -14,5 +14,6 @@ namespace TRPG.Runtime
         GroundSurface = 1 << 1,
         Air = 1 << 2,
         Background = 1 << 3,
+        UI = 1 << 4,
     }
 }

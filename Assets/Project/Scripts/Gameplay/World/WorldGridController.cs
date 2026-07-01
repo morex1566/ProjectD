@@ -74,10 +74,6 @@ namespace TRPG.Runtime
                 Debug.LogError($"require {WorldTilemapType.WorldTilemapGround}");
                 return;
             }
-            else
-            {
-                tilemapContext.Clear();
-            }
 
             for (int y = 0; y < size.x; y++)
             {

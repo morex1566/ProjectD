@@ -12,8 +12,6 @@ namespace TRPG.Runtime
     {
         [SerializeField] private TileBase selectedWithBorderTileBase;
 
-        [SerializeField] private TileBase selectedWithoutBorderTileBase;
-
 
 
         /// <summary>
@@ -49,7 +47,7 @@ namespace TRPG.Runtime
             Vector3 endWorldPos = ScreenEx.ScreenToWorldPos(cam, endScreenPos);
 
             // 셀 좌표
-            Tilemap tilemap = WorldManager.Instance.GetWorldTilemap(WorldTilemapType.WorldTilemapGround).Tilemap;
+            Tilemap tilemap = WorldManager.Instance.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
             Vector3Int startCellPos = tilemap.WorldToCell(startWorldPos);
             Vector3Int endCellPos = tilemap.WorldToCell(endWorldPos);
             Vector3Int minCellPos = Vector3Int.Min(startCellPos, endCellPos);
@@ -93,7 +91,7 @@ namespace TRPG.Runtime
         protected override void Select(Camera cam, Vector2 mouseWorldPos)
         {
             // 셀 좌표
-            Tilemap tilemap = WorldManager.Instance.GetWorldTilemap(WorldTilemapType.WorldTilemapGround).Tilemap;
+            Tilemap tilemap = WorldManager.Instance.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
             Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPos);
 
             // 실제 타일이 있는 셀만 선택합니다.
@@ -111,37 +109,51 @@ namespace TRPG.Runtime
         protected override void Clear()
         {
             selecteds.Clear();
-            ShowIndicators(null);
+
+            for (int i = 0; i < selecteds.Count; i++)
+            {
+                RemoveSelectUI(selecteds[i]);
+            }
         }
 
         /// <summary>
         /// 선택 목록에 셀을 추가하고 선택 표시 타일을 그립니다.
         /// </summary>
-        protected override void Add(Vector3Int selectedTarget)
+        protected override void Add(Vector3Int selectedTargetCellPos)
         {
-            selecteds.Add(selectedTarget);
-            ShowIndicator(selectedTarget, selectedWithBorderTileBase);
+            selecteds.Add(selectedTargetCellPos);
+            SetSelectUI(selectedTargetCellPos, selectedWithBorderTileBase);
         }
 
         /// <summary>
         /// 현재 선택된 모든 셀에 같은 표시 타일을 적용합니다.
         /// </summary>
-        private void ShowIndicators(TileBase indicator)
+        private void SetSelectUI(Vector3Int cellPos, TileBase selectTileBase)
         {
-            for (int i = 0; i < selecteds.Count; i++)
+            WorldTilemapContext tilemapContext = WorldManager.Instance.GetWorldTilemapContext(WorldTilemapType.WorldTilemapUI);
+
+            if (tilemapContext == null) return;
+
+            if (selectTileBase == null) return;
+
+            WorldTile worldTile = new WorldTile
             {
-                ShowIndicator(selecteds[i], indicator);
-            }
+                Pos = cellPos,
+                Type = WorldTileType.UI,
+                Gravity = 0f,
+                TileBase = selectTileBase
+            };
+
+            tilemapContext.SetTile(worldTile);
         }
 
-        /// <summary>
-        /// WorldTilemapUI Tilemap의 단일 셀 표시를 설정합니다.
-        /// </summary>
-        private void ShowIndicator(Vector3Int cellPos, TileBase indicator)
+        private void RemoveSelectUI(Vector3Int cellPos)
         {
-            //if (WorldManager.WorldGridController.WorldTilemapUI == null) return;
+            WorldTilemapContext tilemapContext = WorldManager.Instance.GetWorldTilemapContext(WorldTilemapType.WorldTilemapUI);
 
-            //WorldManager.WorldGridController.WorldTilemapUI.SetTile(cellPos, indicator);
+            if (tilemapContext == null) return;
+
+            tilemapContext.RemoveTile(cellPos);
         }
     }
 }
