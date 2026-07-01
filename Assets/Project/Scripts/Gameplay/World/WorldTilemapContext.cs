@@ -37,15 +37,15 @@ namespace TRPG.Runtime
 
         private void OnValidate()
         {
-            Init();
+            Set();
         }
 
         private void Awake()
         {
-            Init();
+            Set();
         }
 
-        public void Init()
+        public void Set()
         {
             tilemapRenderer = GetComponent<TilemapRenderer>();
             tilemap = GetComponent<Tilemap>();
@@ -88,7 +88,7 @@ namespace TRPG.Runtime
         public void SetTile(WorldTile tile)
         {
             mapTiles.SetValue(tile.Pos, tile);
-            tilemap?.SetTile(tile.Pos, tile.TileBase);
+            tilemap.SetTile(tile.Pos, tile.TileBase);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace TRPG.Runtime
         public void RemoveTile(Vector3Int cellPos)
         {
             mapTiles.Remove(cellPos);
-            tilemap?.SetTile(cellPos, null);
+            tilemap.SetTile(cellPos, null);
         }
 
         /// <summary>
@@ -114,6 +114,12 @@ namespace TRPG.Runtime
         public bool TryGetTile(int x, int y, out WorldTile tile)
         {
             return mapTiles.TryGetValue(new Vector3Int(x, y, 0), out tile);
+        }
+
+        public void Clear()
+        {
+            mapTiles.Clear();
+            tilemap.ClearAllTiles();
         }
     }
 }

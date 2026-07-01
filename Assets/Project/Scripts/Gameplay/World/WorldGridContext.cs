@@ -88,25 +88,7 @@ namespace TRPG.Runtime
                 WorldTilemapContext tilemapContextComp = tilemapInst.AddComponent<WorldTilemapContext>();
                 tilemapContextComp.SetOwner(this);
                 tilemapContextComp.SetTilemapType(WorldTilemapType.WorldTilemapDefault);
-                tilemapContextComp.Init();
-
-                tilemapContexts.Add(tilemapContextComp);
-            }
-
-            Rebuild();
-        }
-
-        public void CreateTilemap(WorldTilemapType tilemapType = WorldTilemapType.WorldTilemapDefault)
-        {
-            GameObject tilemapInst = new GameObject(nameof(Tilemap));
-            tilemapInst.transform.SetParent(transform);
-            {
-                tilemapInst.AddComponent<Tilemap>();
-                tilemapInst.AddComponent<TilemapRenderer>();
-                WorldTilemapContext tilemapContextComp = tilemapInst.AddComponent<WorldTilemapContext>();
-                tilemapContextComp.SetOwner(this);
-                tilemapContextComp.SetTilemapType(tilemapType);
-                tilemapContextComp.Init();
+                tilemapContextComp.Set();
 
                 tilemapContexts.Add(tilemapContextComp);
             }

@@ -69,6 +69,16 @@ namespace TRPG.Runtime
         [ContextMenu(nameof(DrawGround))]
         public void DrawGround()
         {
+            if (gridContext.TilemapContextMap.TryGetValue(WorldTilemapType.WorldTilemapGround, out WorldTilemapContext tilemapContext) == false)
+            {
+                Debug.LogError($"require {WorldTilemapType.WorldTilemapGround}");
+                return;
+            }
+            else
+            {
+                tilemapContext.Clear();
+            }
+
             for (int y = 0; y < size.x; y++)
             {
                 for (int x = 0; x < size.y; x++)
