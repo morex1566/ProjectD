@@ -4,7 +4,7 @@
 //     version 1.18.0
 //     from Assets/Settings/IMC_InputMappingContext.inputactions
 //
-//     Changes target this file may cause incorrect behavior and will be lost if
+//     Changes to this file may cause incorrect behavior and will be lost if
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ using UnityEngine.InputSystem.Utilities;
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// Provides programmatic access target <see cref="InputActionAsset" />, <see cref="InputActionMap" />, <see cref="InputAction" /> and <see cref="InputControlScheme" /> instances defined in asset "Assets/Settings/IMC_InputMappingContext.inputactions".
+    /// Provides programmatic access to <see cref="InputActionAsset" />, <see cref="InputActionMap" />, <see cref="InputAction" /> and <see cref="InputControlScheme" /> instances defined in asset "Assets/Settings/IMC_InputMappingContext.inputactions".
     /// </summary>
     /// <remarks>
     /// This class is source generated and any manual edits will be discarded if the associated asset is reimported or modified.
@@ -32,12 +32,12 @@ namespace TRPG.Runtime
     /// public class Example : MonoBehaviour, MyActions.IPlayerActions
     /// {
     ///     private MyActions_Actions m_Actions;                  // Source code representation of asset.
-    ///     private MyActions_Actions.PlayerActions m_Player;     // Source code representation of action cachedMap.
+    ///     private MyActions_Actions.PlayerActions m_Player;     // Source code representation of action map.
     ///
     ///     void Awake()
     ///     {
     ///         m_Actions = new MyActions_Actions();              // Create asset object.
-    ///         m_Player = m_Actions.Player;                      // Extract action cachedMap object.
+    ///         m_Player = m_Actions.Player;                      // Extract action map object.
     ///         m_Player.AddCallbacks(this);                      // Register callback interface IPlayerActions.
     ///     }
     ///
@@ -48,26 +48,26 @@ namespace TRPG.Runtime
     ///
     ///     void OnEnable()
     ///     {
-    ///         m_Player.Enable();                                // Enable all queue within cachedMap.
+    ///         m_Player.Enable();                                // Enable all actions within map.
     ///     }
     ///
     ///     void OnDisable()
     ///     {
-    ///         m_Player.Disable();                               // Disable all queue within cachedMap.
+    ///         m_Player.Disable();                               // Disable all actions within map.
     ///     }
     ///
     ///     #region Interface implementation of MyActions.IPlayerActions
     ///
-    ///     // Invoked when "MoveX" action is either started, performed or canceled.
-    ///     public void OnMove(InputAction.CallbackContext gridContext)
+    ///     // Invoked when "Move" action is either started, performed or canceled.
+    ///     public void OnMove(InputAction.CallbackContext context)
     ///     {
-    ///         Debug.Log($"OnMove: {gridContext.ReadValue&lt;Vector2&gt;()}");
+    ///         Debug.Log($"OnMove: {context.ReadValue&lt;Vector2&gt;()}");
     ///     }
     ///
     ///     // Invoked when "Attack" action is either started, performed or canceled.
-    ///     public void OnAttack(InputAction.CallbackContext gridContext)
+    ///     public void OnAttack(InputAction.CallbackContext context)
     ///     {
-    ///         Debug.Log($"OnAttack: {gridContext.ReadValue&lt;float&gt;()}");
+    ///         Debug.Log($"OnAttack: {context.ReadValue&lt;float&gt;()}");
     ///     }
     ///
     ///     #endregion
@@ -77,7 +77,7 @@ namespace TRPG.Runtime
     public partial class @InputMappingContext: IInputActionCollection2, IDisposable
     {
         /// <summary>
-        /// Provides access target the underlying asset instance.
+        /// Provides access to the underlying asset instance.
         /// </summary>
         public InputActionAsset asset { get; }
 
@@ -95,8 +95,8 @@ namespace TRPG.Runtime
             ""id"": ""df70fa95-8a34-4494-b137-73ab6b9c7d37"",
             ""actions"": [
                 {
-                    ""name"": ""MoveX"",
-                    ""Type"": ""Value"",
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
                     ""id"": ""351f2ccd-1f9f-44bf-9bec-d62ac5c5f408"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -104,8 +104,8 @@ namespace TRPG.Runtime
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""CellPos"",
-                    ""Type"": ""PassThrough"",
+                    ""name"": ""Point"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""52805266-3466-4dbc-956c-ab62c87a7a58"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -114,7 +114,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""ScrollWheel"",
-                    ""Type"": ""PassThrough"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""544507be-9aa4-4c97-bb9f-0fb3a4814e84"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -123,7 +123,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""RightClick"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""8279cba3-046c-45fa-84a2-d77ccb114281"",
                     ""expectedControlType"": """",
                     ""processors"": """",
@@ -132,7 +132,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""LeftClick"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""f2117ed3-be2d-4d66-b6b2-ecd1427ce623"",
                     ""expectedControlType"": """",
                     ""processors"": """",
@@ -141,7 +141,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Look"",
-                    ""Type"": ""Value"",
+                    ""type"": ""Value"",
                     ""id"": ""6b444451-8a00-4d00-a97e-f47457f736a8"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -150,7 +150,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Attack"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""6c2ab1b8-8984-453a-af3d-a3c78ae1679a"",
                     ""expectedControlType"": """",
                     ""processors"": """",
@@ -159,7 +159,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Interact"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""852140f2-7766-474d-8707-702459ba45f3"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -168,7 +168,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Crouch"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""27c5f898-bc57-4ee1-8800-db469aca5fe3"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -177,7 +177,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Jump"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""f1ba0d36-48eb-4cd5-b651-1c94a6531f70"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -186,7 +186,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Previous"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""2776c80d-3c14-4091-8c56-d04ced07a2b0"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -195,7 +195,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Next"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -204,7 +204,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Sprint"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""641cd816-40e6-41b4-8c3d-04687c349290"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -220,7 +220,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -231,7 +231,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -242,7 +242,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -253,7 +253,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -264,7 +264,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -275,7 +275,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -286,7 +286,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -297,7 +297,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -308,7 +308,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -319,7 +319,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -330,7 +330,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -341,7 +341,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Joystick"",
-                    ""action"": ""MoveX"",
+                    ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -352,7 +352,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""CellPos"",
+                    ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -363,7 +363,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""CellPos"",
+                    ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -374,7 +374,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Touch"",
-                    ""action"": ""CellPos"",
+                    ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -705,7 +705,7 @@ namespace TRPG.Runtime
             ""actions"": [
                 {
                     ""name"": ""Navigate"",
-                    ""Type"": ""PassThrough"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""c95b2375-e6d9-4b88-9c4c-c5e76515df4b"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -714,7 +714,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Submit"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""7607c7b6-cd76-4816-beef-bd0341cfe950"",
                     ""expectedControlType"": """",
                     ""processors"": """",
@@ -723,7 +723,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Cancel"",
-                    ""Type"": ""Button"",
+                    ""type"": ""Button"",
                     ""id"": ""15cef263-9014-4fd5-94d9-4e4a6234a6ef"",
                     ""expectedControlType"": """",
                     ""processors"": """",
@@ -731,8 +731,8 @@ namespace TRPG.Runtime
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""CellPos"",
-                    ""Type"": ""PassThrough"",
+                    ""name"": ""Point"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""32b35790-4ed0-4e9a-aa41-69ac6d629449"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -741,7 +741,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""Click"",
-                    ""Type"": ""PassThrough"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""3c7022bf-7922-4f7c-a998-c437916075ad"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -750,7 +750,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""RightClick"",
-                    ""Type"": ""PassThrough"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""44b200b1-1557-4083-816c-b22cbdf77ddf"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -759,7 +759,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""MiddleClick"",
-                    ""Type"": ""PassThrough"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""dad70c86-b58c-4b17-88ad-f5e53adf419e"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -768,7 +768,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""ScrollWheel"",
-                    ""Type"": ""PassThrough"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""0489e84a-4833-4c40-bfae-cea84b696689"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -777,7 +777,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""TrackedDevicePosition"",
-                    ""Type"": ""PassThrough"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""24908448-c609-4bc3-a128-ea258674378a"",
                     ""expectedControlType"": ""Vector3"",
                     ""processors"": """",
@@ -786,7 +786,7 @@ namespace TRPG.Runtime
                 },
                 {
                     ""name"": ""TrackedDeviceOrientation"",
-                    ""Type"": ""PassThrough"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be"",
                     ""expectedControlType"": ""Quaternion"",
                     ""processors"": """",
@@ -1099,7 +1099,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""CellPos"",
+                    ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1110,7 +1110,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""CellPos"",
+                    ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1121,7 +1121,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Touch"",
-                    ""action"": ""CellPos"",
+                    ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1303,8 +1303,8 @@ namespace TRPG.Runtime
 }");
             // Player
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
-            m_Player_Move = m_Player.FindAction("MoveX", throwIfNotFound: true);
-            m_Player_Point = m_Player.FindAction("CellPos", throwIfNotFound: true);
+            m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
+            m_Player_Point = m_Player.FindAction("Point", throwIfNotFound: true);
             m_Player_ScrollWheel = m_Player.FindAction("ScrollWheel", throwIfNotFound: true);
             m_Player_RightClick = m_Player.FindAction("RightClick", throwIfNotFound: true);
             m_Player_LeftClick = m_Player.FindAction("LeftClick", throwIfNotFound: true);
@@ -1321,7 +1321,7 @@ namespace TRPG.Runtime
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
             m_UI_Submit = m_UI.FindAction("Submit", throwIfNotFound: true);
             m_UI_Cancel = m_UI.FindAction("Cancel", throwIfNotFound: true);
-            m_UI_Point = m_UI.FindAction("CellPos", throwIfNotFound: true);
+            m_UI_Point = m_UI.FindAction("Point", throwIfNotFound: true);
             m_UI_Click = m_UI.FindAction("Click", throwIfNotFound: true);
             m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
             m_UI_MiddleClick = m_UI.FindAction("MiddleClick", throwIfNotFound: true);
@@ -1423,70 +1423,70 @@ namespace TRPG.Runtime
         private readonly InputAction m_Player_Next;
         private readonly InputAction m_Player_Sprint;
         /// <summary>
-        /// Provides access target input queue defined in input action cachedMap "Player".
+        /// Provides access to input actions defined in input action map "Player".
         /// </summary>
         public struct PlayerActions
         {
             private @InputMappingContext m_Wrapper;
 
             /// <summary>
-            /// Construct a new instance of the input action cachedMap wrapper class.
+            /// Construct a new instance of the input action map wrapper class.
             /// </summary>
             public PlayerActions(@InputMappingContext wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access target the underlying input action "Player/MoveX".
+            /// Provides access to the underlying input action "Player/Move".
             /// </summary>
             public InputAction @Move => m_Wrapper.m_Player_Move;
             /// <summary>
-            /// Provides access target the underlying input action "Player/CellPos".
+            /// Provides access to the underlying input action "Player/Point".
             /// </summary>
             public InputAction @Point => m_Wrapper.m_Player_Point;
             /// <summary>
-            /// Provides access target the underlying input action "Player/ScrollWheel".
+            /// Provides access to the underlying input action "Player/ScrollWheel".
             /// </summary>
             public InputAction @ScrollWheel => m_Wrapper.m_Player_ScrollWheel;
             /// <summary>
-            /// Provides access target the underlying input action "Player/RightClick".
+            /// Provides access to the underlying input action "Player/RightClick".
             /// </summary>
             public InputAction @RightClick => m_Wrapper.m_Player_RightClick;
             /// <summary>
-            /// Provides access target the underlying input action "Player/LeftClick".
+            /// Provides access to the underlying input action "Player/LeftClick".
             /// </summary>
             public InputAction @LeftClick => m_Wrapper.m_Player_LeftClick;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Look".
+            /// Provides access to the underlying input action "Player/Look".
             /// </summary>
             public InputAction @Look => m_Wrapper.m_Player_Look;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Attack".
+            /// Provides access to the underlying input action "Player/Attack".
             /// </summary>
             public InputAction @Attack => m_Wrapper.m_Player_Attack;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Interact".
+            /// Provides access to the underlying input action "Player/Interact".
             /// </summary>
             public InputAction @Interact => m_Wrapper.m_Player_Interact;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Crouch".
+            /// Provides access to the underlying input action "Player/Crouch".
             /// </summary>
             public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Jump".
+            /// Provides access to the underlying input action "Player/Jump".
             /// </summary>
             public InputAction @Jump => m_Wrapper.m_Player_Jump;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Previous".
+            /// Provides access to the underlying input action "Player/Previous".
             /// </summary>
             public InputAction @Previous => m_Wrapper.m_Player_Previous;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Next".
+            /// Provides access to the underlying input action "Player/Next".
             /// </summary>
             public InputAction @Next => m_Wrapper.m_Player_Next;
             /// <summary>
-            /// Provides access target the underlying input action "Player/Sprint".
+            /// Provides access to the underlying input action "Player/Sprint".
             /// </summary>
             public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
             /// <summary>
-            /// Provides access target the underlying input action cachedMap instance.
+            /// Provides access to the underlying input action map instance.
             /// </summary>
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
@@ -1496,11 +1496,11 @@ namespace TRPG.Runtime
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
             public bool enabled => Get().enabled;
             /// <summary>
-            /// Implicitly converts an <see ref="PlayerActions" /> target an <see ref="InputActionMap" /> instance.
+            /// Implicitly converts an <see ref="PlayerActions" /> to an <see ref="InputActionMap" /> instance.
             /// </summary>
             public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
             /// <summary>
-            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input queue contained in this cachedMap.
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
             /// </summary>
             /// <param name="instance">Callback instance.</param>
             /// <remarks>
@@ -1553,7 +1553,7 @@ namespace TRPG.Runtime
             }
 
             /// <summary>
-            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input queue contained in this cachedMap.
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
             /// </summary>
             /// <remarks>
             /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
@@ -1630,7 +1630,7 @@ namespace TRPG.Runtime
             }
         }
         /// <summary>
-        /// Provides a new <see cref="PlayerActions" /> instance referencing this action cachedMap.
+        /// Provides a new <see cref="PlayerActions" /> instance referencing this action map.
         /// </summary>
         public PlayerActions @Player => new PlayerActions(this);
 
@@ -1648,58 +1648,58 @@ namespace TRPG.Runtime
         private readonly InputAction m_UI_TrackedDevicePosition;
         private readonly InputAction m_UI_TrackedDeviceOrientation;
         /// <summary>
-        /// Provides access target input queue defined in input action cachedMap "UI".
+        /// Provides access to input actions defined in input action map "UI".
         /// </summary>
         public struct UIActions
         {
             private @InputMappingContext m_Wrapper;
 
             /// <summary>
-            /// Construct a new instance of the input action cachedMap wrapper class.
+            /// Construct a new instance of the input action map wrapper class.
             /// </summary>
             public UIActions(@InputMappingContext wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access target the underlying input action "UI/Navigate".
+            /// Provides access to the underlying input action "UI/Navigate".
             /// </summary>
             public InputAction @Navigate => m_Wrapper.m_UI_Navigate;
             /// <summary>
-            /// Provides access target the underlying input action "UI/Submit".
+            /// Provides access to the underlying input action "UI/Submit".
             /// </summary>
             public InputAction @Submit => m_Wrapper.m_UI_Submit;
             /// <summary>
-            /// Provides access target the underlying input action "UI/Cancel".
+            /// Provides access to the underlying input action "UI/Cancel".
             /// </summary>
             public InputAction @Cancel => m_Wrapper.m_UI_Cancel;
             /// <summary>
-            /// Provides access target the underlying input action "UI/CellPos".
+            /// Provides access to the underlying input action "UI/Point".
             /// </summary>
             public InputAction @Point => m_Wrapper.m_UI_Point;
             /// <summary>
-            /// Provides access target the underlying input action "UI/Click".
+            /// Provides access to the underlying input action "UI/Click".
             /// </summary>
             public InputAction @Click => m_Wrapper.m_UI_Click;
             /// <summary>
-            /// Provides access target the underlying input action "UI/RightClick".
+            /// Provides access to the underlying input action "UI/RightClick".
             /// </summary>
             public InputAction @RightClick => m_Wrapper.m_UI_RightClick;
             /// <summary>
-            /// Provides access target the underlying input action "UI/MiddleClick".
+            /// Provides access to the underlying input action "UI/MiddleClick".
             /// </summary>
             public InputAction @MiddleClick => m_Wrapper.m_UI_MiddleClick;
             /// <summary>
-            /// Provides access target the underlying input action "UI/ScrollWheel".
+            /// Provides access to the underlying input action "UI/ScrollWheel".
             /// </summary>
             public InputAction @ScrollWheel => m_Wrapper.m_UI_ScrollWheel;
             /// <summary>
-            /// Provides access target the underlying input action "UI/TrackedDevicePosition".
+            /// Provides access to the underlying input action "UI/TrackedDevicePosition".
             /// </summary>
             public InputAction @TrackedDevicePosition => m_Wrapper.m_UI_TrackedDevicePosition;
             /// <summary>
-            /// Provides access target the underlying input action "UI/TrackedDeviceOrientation".
+            /// Provides access to the underlying input action "UI/TrackedDeviceOrientation".
             /// </summary>
             public InputAction @TrackedDeviceOrientation => m_Wrapper.m_UI_TrackedDeviceOrientation;
             /// <summary>
-            /// Provides access target the underlying input action cachedMap instance.
+            /// Provides access to the underlying input action map instance.
             /// </summary>
             public InputActionMap Get() { return m_Wrapper.m_UI; }
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
@@ -1709,11 +1709,11 @@ namespace TRPG.Runtime
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
             public bool enabled => Get().enabled;
             /// <summary>
-            /// Implicitly converts an <see ref="UIActions" /> target an <see ref="InputActionMap" /> instance.
+            /// Implicitly converts an <see ref="UIActions" /> to an <see ref="InputActionMap" /> instance.
             /// </summary>
             public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
             /// <summary>
-            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input queue contained in this cachedMap.
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
             /// </summary>
             /// <param name="instance">Callback instance.</param>
             /// <remarks>
@@ -1757,7 +1757,7 @@ namespace TRPG.Runtime
             }
 
             /// <summary>
-            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input queue contained in this cachedMap.
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
             /// </summary>
             /// <remarks>
             /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
@@ -1825,12 +1825,12 @@ namespace TRPG.Runtime
             }
         }
         /// <summary>
-        /// Provides a new <see cref="UIActions" /> instance referencing this action cachedMap.
+        /// Provides a new <see cref="UIActions" /> instance referencing this action map.
         /// </summary>
         public UIActions @UI => new UIActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         /// <summary>
-        /// Provides access target the input control scheme.
+        /// Provides access to the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme KeyboardMouseScheme
@@ -1843,7 +1843,7 @@ namespace TRPG.Runtime
         }
         private int m_GamepadSchemeIndex = -1;
         /// <summary>
-        /// Provides access target the input control scheme.
+        /// Provides access to the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme GamepadScheme
@@ -1856,7 +1856,7 @@ namespace TRPG.Runtime
         }
         private int m_TouchSchemeIndex = -1;
         /// <summary>
-        /// Provides access target the input control scheme.
+        /// Provides access to the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme TouchScheme
@@ -1869,7 +1869,7 @@ namespace TRPG.Runtime
         }
         private int m_JoystickSchemeIndex = -1;
         /// <summary>
-        /// Provides access target the input control scheme.
+        /// Provides access to the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme JoystickScheme
@@ -1882,7 +1882,7 @@ namespace TRPG.Runtime
         }
         private int m_XRSchemeIndex = -1;
         /// <summary>
-        /// Provides access target the input control scheme.
+        /// Provides access to the input control scheme.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
         public InputControlScheme XRScheme
@@ -1894,21 +1894,21 @@ namespace TRPG.Runtime
             }
         }
         /// <summary>
-        /// Interface target implement callback methods for all input action callbacks associated with input queue defined by "Player" which allows adding and removing callbacks.
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Player" which allows adding and removing callbacks.
         /// </summary>
         /// <seealso cref="PlayerActions.AddCallbacks(IPlayerActions)" />
         /// <seealso cref="PlayerActions.RemoveCallbacks(IPlayerActions)" />
         public interface IPlayerActions
         {
             /// <summary>
-            /// Method invoked when associated input action "MoveX" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Move" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMove(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "CellPos" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
@@ -1993,7 +1993,7 @@ namespace TRPG.Runtime
             void OnSprint(InputAction.CallbackContext context);
         }
         /// <summary>
-        /// Interface target implement callback methods for all input action callbacks associated with input queue defined by "UI" which allows adding and removing callbacks.
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
         /// </summary>
         /// <seealso cref="UIActions.AddCallbacks(IUIActions)" />
         /// <seealso cref="UIActions.RemoveCallbacks(IUIActions)" />
@@ -2021,7 +2021,7 @@ namespace TRPG.Runtime
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnCancel(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "CellPos" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />

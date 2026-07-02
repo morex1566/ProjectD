@@ -51,13 +51,15 @@ MonoBehaviour:
     DescKey: 
     Faction: 
     Hp: 0
-    Atk: 0
+    Damage: 0
     DetectRange: 0
-    FactionData: {fileID: 0}
+    AttackRange: 0
+    AttackSpeed: 0
+    MoveSpeed: 0
+    AIType: 0
     SpritePf: {fileID: 0}
     CreaturePf: {fileID: 0}
   spriter: {fileID: 0}
-  selectionIndicator: {fileID: 8129819452764731733}
 --- !u!1 &8129819452764731733
 GameObject:
   m_ObjectHideFlags: 0

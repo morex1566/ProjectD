@@ -1,11 +1,20 @@
 {
-	"name": "DOTweenPro.EditorScripts",
-	"references": [
-		"DOTween.Modules",
-		"DOTweenPro.Scripts"
-	],
-	"includePlatforms": [
-		"Editor"
-	],
-	"autoReferenced": false
+    "name": "DOTweenPro.EditorScripts",
+    "rootNamespace": "",
+    "references": [
+        "DOTween.Modules",
+        "DOTweenPro.Scripts",
+        "Unity.Addressables.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

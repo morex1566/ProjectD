@@ -10,8 +10,11 @@ using DG.DOTweenEditor.UI;
 using DG.Tweening;
 using DG.Tweening.Core;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using DOTweenSettings = DG.Tweening.Core.DOTweenSettings;
+
 #if !DOTWEEN_NOUI // UI_MARKER
 using UnityEngine.UI;
 #endif
@@ -155,7 +158,7 @@ namespace DG.DOTweenEditor
         static string[] _datString; // String representation of DOTweenAnimation enum (here for caching reasons)
 
         DOTweenAnimation _src;
-        DOTweenSettings _settings;
+        [SerializeField] public DOTweenSettings _settings;
         bool _runtimeEditMode; // If TRUE allows to change and save stuff at runtime
         bool _refreshRequired; // If TRUE refreshes components data
         int _totComponentsOnSrc; // Used to determine if a Component is added or removed from the source
@@ -182,7 +185,7 @@ namespace DG.DOTweenEditor
         void OnEnable()
         {
             _src = target as DOTweenAnimation;
-            _settings = DOTweenUtilityWindow.GetDOTweenSettings();
+            _settings = DOTweenSettingsProvider.GetSettings();
 
             onStartProperty = base.serializedObject.FindProperty("onStart");
             onPlayProperty = base.serializedObject.FindProperty("onPlay");
@@ -752,13 +755,41 @@ namespace DG.DOTweenEditor
 
         static void OnReset(DOTweenAnimation src)
         {
-            DOTweenSettings settings = DOTweenUtilityWindow.GetDOTweenSettings();
+            DOTweenSettings settings = DOTweenSettingsProvider.GetSettings();
             if (settings == null) return;
 
             Undo.RecordObject(src, "DOTweenAnimation");
             src.autoPlay = settings.defaultAutoPlay == AutoPlay.All || settings.defaultAutoPlay == AutoPlay.AutoPlayTweeners;
             src.autoKill = settings.defaultAutoKill;
             EditorUtility.SetDirty(src);
+        }
+    }
+
+    static class DOTweenSettingsProvider
+    {
+        private const string DOTweenSettingsAddress = "SO_DOTweenSettings";
+
+        public static DOTweenSettings GetSettings()
+        {
+            AddressableAssetSettings addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
+            if (addressableSettings == null) return DOTweenUtilityWindow.GetDOTweenSettings();
+
+            foreach (AddressableAssetGroup group in addressableSettings.groups)
+            {
+                if (group == null) continue;
+
+                foreach (AddressableAssetEntry entry in group.entries)
+                {
+                    if (entry == null) continue;
+                    if (entry.address != DOTweenSettingsAddress) continue;
+
+                    string assetPath = AssetDatabase.GUIDToAssetPath(entry.guid);
+                    DOTweenSettings settings = AssetDatabase.LoadAssetAtPath<DOTweenSettings>(assetPath);
+                    return settings != null ? settings : DOTweenUtilityWindow.GetDOTweenSettings();
+                }
+            }
+
+            return DOTweenUtilityWindow.GetDOTweenSettings();
         }
     }
 }

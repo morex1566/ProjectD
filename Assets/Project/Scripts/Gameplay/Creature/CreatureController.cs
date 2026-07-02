@@ -22,8 +22,6 @@ namespace TRPG.Runtime
 
         [SerializeField] private SpriteRenderer spriter = null;
 
-        [SerializeField] private GameObject selectionIndicator = null;
-
         private CreatureJobQueue jobQueue = null;
 
         private CreatureContext context = null;
@@ -69,14 +67,14 @@ namespace TRPG.Runtime
                 Gizmos.DrawWireCube(SelectionBounds.center, SelectionBounds.size);
             }
 
-#if UNITY_EDITOR
-            // Scene View에 텍스트 표시
-            Vector3 labelPos = transform.position + Vector3.up * 0.75f;
-            string label = $"InstanceId: {InstanceId}\n" + $"DataId: {DataId}";
-            Handles.Label(labelPos, label);
+//#if UNITY_EDITOR
+//            // Scene View에 텍스트 표시
+//            Vector3 labelPos = transform.position + Vector3.up * 0.75f;
+//            string label = $"InstanceId: {InstanceId}\n" + $"DataId: {DataId}";
+//            Handles.Label(labelPos, label);
 
-            jobQueue.DrawGizmos();
-#endif
+//            jobQueue.DrawGizmos();
+//#endif
         }
 
 
@@ -126,9 +124,9 @@ namespace TRPG.Runtime
         /// </summary>
         private void ShowSelectionIndicator(bool isVisible)
         {
-            if (selectionIndicator == null) return;
+            //if (selectionIndicator == null) return;
 
-            selectionIndicator.SetActive(isVisible);
+            //selectionIndicator.SetActive(isVisible);
         }
 
         /// <summary>

@@ -1,11 +1,5 @@
 fileFormatVersion: 2
 guid: e0203fd81362bab4d842d87ad09ee76e
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
 AssetOrigin:
   serializedVersion: 1
   productId: 32416
@@ -13,3 +7,13 @@ AssetOrigin:
   packageVersion: 1.0.410
   assetPath: Assets/Plugins/Demigiant/DOTweenPro/Editor/DOTweenAnimationInspector.cs
   uploadId: 862446
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _settings: {fileID: 11400000, guid: 8473cb7ddb28ba7438a668f8d55c8343, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
