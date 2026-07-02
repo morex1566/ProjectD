@@ -29,7 +29,7 @@ namespace TRPG.Runtime
 
         private void OnIdleButtonClicked()
         {
-            PlayerManager.SetCommandSystemType(PlayerCommandSystemType.Idle);
+            PlayerManager.SetCommandSystemType(PlayerCommandSystemType.Creature);
         }
 
         private void OnConstructionButtonClicked()

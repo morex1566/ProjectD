@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,16 +12,16 @@ namespace TRPG.Runtime
     {
         public static PlayerManagerSettingsData Settings;
 
-        [SerializeField, ReadOnly] private PlayerCommandSystemType commandSystemType = PlayerCommandSystemType.None;
-
         [SerializeField, ReadOnly] private CreatureSelector creatureSelector;
 
         [SerializeField, ReadOnly] private WorldTileSelector worldTileSelector;
 
+        [SerializeField, ReadOnly] private SerializableDictionary<PlayerCommandSystemType, PlayerCommandSystem> commandSystems = new();
+
+        [SerializeField, ReadOnly] private PlayerCommandSystem currentCommandSystem;
 
 
-        [SerializeField, ReadOnly] public UnityEvent<PlayerCommandSystemType> CommandSystemModeChanged;
-
+        public UnityEvent<PlayerCommandSystemType> CommandSystemModeChanged;
 
 
         /// <summary>
@@ -35,18 +36,34 @@ namespace TRPG.Runtime
             GameObject selectorInst = Instantiate(Settings.SelectorPf, manager.transform);
             manager.creatureSelector = selectorInst.GetComponent<CreatureSelector>();
             manager.worldTileSelector = selectorInst.GetComponent<WorldTileSelector>();
+
+            // 명령 시스템 초기화/등록
+            manager.currentCommandSystem = new IdleCommandSystem();
+            manager.commandSystems.Clear();
+            manager.commandSystems.Add(PlayerCommandSystemType.Idle, manager.currentCommandSystem);
+            manager.commandSystems.Add(PlayerCommandSystemType.Creature, new CreatureCommandSystem(manager.creatureSelector));
+            manager.commandSystems.Add(PlayerCommandSystemType.Construction, new ConstructionCommandSystem(manager.worldTileSelector));
+            manager.currentCommandSystem.Enter();
         }
 
         public static void SetCommandSystemType(PlayerCommandSystemType type)
         {
             PlayerManager manager = GetInstance();
 
-            manager.commandSystemType = type;
+            if (manager.currentCommandSystem.Type == type)
+            {
+                return;
+            }
 
-            if (manager.creatureSelector != null) manager.creatureSelector.enabled = type == PlayerCommandSystemType.Idle;
+            if (manager.commandSystems.TryGetValue(type, out PlayerCommandSystem nextSystem) == false)
+            {
+                return;
+            }
 
-            if (manager.worldTileSelector != null) manager.worldTileSelector.enabled = type == PlayerCommandSystemType.Construction;
-
+            // 교체 시작
+            manager.currentCommandSystem?.Exit();
+            manager.currentCommandSystem = nextSystem;
+            manager.currentCommandSystem?.Enter();
             manager.CommandSystemModeChanged?.Invoke(type);
         }
     }
