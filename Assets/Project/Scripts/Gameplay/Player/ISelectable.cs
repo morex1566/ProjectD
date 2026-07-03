@@ -13,6 +13,8 @@ namespace TRPG.Runtime
 
         Bounds SelectionBounds { get; }
 
+        GameObject SelectedInst { get; }
+
         /// <summary>
         /// 월드 좌표가 이 선택 가능 개체의 선택 영역 안에 있는지 검사합니다.
         /// </summary>

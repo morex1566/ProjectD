@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TRPG.Runtime
 {
@@ -7,7 +8,7 @@ namespace TRPG.Runtime
     {
         Idle,
         Creature,
-        Construction,
+        Mining,
     }
 
     [Serializable]
@@ -65,6 +66,11 @@ namespace TRPG.Runtime
         {
             Debug.Log("CreatureCommandSystem Enter");
 
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
+            {
+                inputMappingContext.Player.LeftClick.performed += OnLeftClickPerformed;
+            }
+
             creatureSelector.enabled = true;
         }
 
@@ -72,33 +78,89 @@ namespace TRPG.Runtime
         {
             Debug.Log("CreatureCommandSystem Exit");
 
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
+            {
+                inputMappingContext.Player.LeftClick.performed -= OnLeftClickPerformed;
+            }
+
             creatureSelector.enabled = false;
+        }
+
+        public void OnLeftClickPerformed(InputAction.CallbackContext context)
+        {
+            CommandMove();
+        }
+
+        public void CommandMove()
+        {
+            foreach (var selected in creatureSelector.Selecteds)
+            {
+                // 크리쳐가 아닌 대상?
+                CreatureController controller = selected.SelectedInst.GetComponent<CreatureController>();
+                if (controller == null)
+                {
+                    return;
+                }
+
+                // 클릭 지점이 길찾기 가능한 좌표?
+                Camera cam = WorldManager.GetWorldCameraController()?.Cam;
+                Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(cam);
+                Vector3Int targetCellPos = WorldManager.WorldToCell(mouseWorldPos);
+                if (AStarPathfinder.AStarGrid.IsInBound(targetCellPos) == false)
+                {
+                    return;
+                }
+
+                controller.JobQueue.Enqueue(new CreatureMoveJob(controller, targetCellPos));
+            }
         }
     }
 
-    public class ConstructionCommandSystem : PlayerCommandSystem
+    public class MiningCommandSystem : PlayerCommandSystem
     {
         [SerializeField, ReadOnly] private WorldTileSelector worldTileSelector;
 
 
-        public ConstructionCommandSystem(WorldTileSelector worldTileSelector)
+        public MiningCommandSystem(WorldTileSelector worldTileSelector)
         {
-            type = PlayerCommandSystemType.Construction;
+            type = PlayerCommandSystemType.Mining;
             this.worldTileSelector = worldTileSelector;
         }
 
         public override void Enter()
         {
-            Debug.Log("ConstructionCommandSystem Enter");
+            Debug.Log("MiningCommandSystem Enter");
+
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
+            {
+                inputMappingContext.Player.LeftClick.performed += OnLeftClickPerformed;
+            }
+
 
             worldTileSelector.enabled = true;
         }
 
         public override void Exit()
         {
-            Debug.Log("ConstructionCommandSystem Exit");
+            Debug.Log("MiningCommandSystem Exit");
+
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
+            {
+                inputMappingContext.Player.LeftClick.performed -= OnLeftClickPerformed;
+            }
+
 
             worldTileSelector.enabled = false;
+        }
+
+        public void OnLeftClickPerformed(InputAction.CallbackContext context)
+        {
+            Debug.Log("Test");
+        }
+
+        public void EnqueueJob()
+        {
+
         }
     }
 }

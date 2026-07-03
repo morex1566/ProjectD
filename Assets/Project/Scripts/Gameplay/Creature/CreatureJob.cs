@@ -9,40 +9,85 @@ namespace TRPG.Runtime
     /// </summary>
     public abstract class CreatureJob
     {
-        public bool IsDone;
+        protected bool isDone;
 
-        protected CreatureController owner;
+        protected bool isStarted;
 
-        /// <summary>
-        /// Job 실행에 필요한 소유 CreatureContext, Job 큐, 우선순위를 저장합니다.
-        /// </summary>
-        protected CreatureJob(CreatureController owner, CreatureJobQueue queue)
+        protected CreatureController controller;
+
+        public bool IsDone => isDone;
+
+
+        protected CreatureJob(CreatureController controller)
         {
-            this.owner = owner;
+            this.controller = controller;
         }
 
         /// <summary>
-        /// Job의 완료 조건을 평가해 IsDone을 갱신합니다.
+        /// True면 다음 Job으로 넘어갈 수 있음, False면 아직 이 작업이 끝나지 않았음.
         /// </summary>
-        public virtual void Execute()
+        /// <returns></returns>
+        public bool Evaluate()
         {
-            
+            if (isStarted == false)
+            {
+                isStarted = Start();
+            }
+
+            if (isStarted == false)
+            {
+                return false;
+            }
+
+            isDone = Update();
+
+            return isDone;
         }
 
         /// <summary>
-        /// IsDone 되었는지?
+        /// 이 잡이 실행될 수 있는지?
         /// </summary>
-        public virtual bool Evaluate()
+        protected abstract bool Start();
+
+        /// <summary>
+        /// 이 잡이 끝났는지?
+        /// </summary>
+        protected abstract bool Update();
+
+        public virtual void DrawGizmos() { }
+    }
+
+    public class CreatureMoveJob : CreatureJob
+    {
+        private readonly Vector3Int targetCellPos;
+
+        private readonly float stopDistance = 0.05f;
+
+        private List<AStarNode> path;
+
+        public CreatureMoveJob(CreatureController owner, Vector3Int targetCellPos) : base(owner)
         {
+            this.targetCellPos = targetCellPos;
+
+            // 길찾기
+            Vector3Int worldCellPos = WorldManager.WorldToCell(owner.transform.position);
+            path = AStarPathfinder.FindPath(worldCellPos, targetCellPos);
+        }
+
+        protected override bool Start()
+        {
+            // 죽으면 못움직이지...
+            if (controller.StateMahcine.CurrentStates.ContainsKey(CreatureStateType.Dead) == true)
+            {
+                return false;
+            }
+
             return true;
         }
 
-        /// <summary>
-        /// Job 디버깅용 기즈모를 그립니다.
-        /// </summary>
-        public virtual void DrawGizmos()
+        protected override bool Update()
         {
-
+            return true;
         }
     }
 }

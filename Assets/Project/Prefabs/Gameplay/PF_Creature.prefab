@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1809254756998236648}
   - component: {fileID: 5108346331041859384}
-  m_Layer: 10
+  m_Layer: 20
   m_Name: PF_Creature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30,7 +30,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 34097733405933765}
+  - {fileID: 2928263879976859038}
+  - {fileID: 2776025351336989125}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5108346331041859384
@@ -45,22 +46,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13139cbf984db794a93348acba74b824, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::CreatureController
-  data:
-    DataId: 
-    NameKey: 
-    DescKey: 
-    Faction: 
-    Hp: 0
-    Damage: 0
+  spriter: {fileID: 5466476860050821414}
+  groundChecker: {fileID: 2184244583942635650}
+  context:
+    CurrentHp: 1
+    Atk: 1
     DetectRange: 0
+    IsDead: 0
     AttackRange: 0
     AttackSpeed: 0
     MoveSpeed: 0
     AIType: 0
-    SpritePf: {fileID: 0}
-    CreaturePf: {fileID: 0}
-  spriter: {fileID: 0}
---- !u!1 &8129819452764731733
+    Sprite: {fileID: 0}
+--- !u!1 &4332321687466904799
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -68,22 +66,76 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 34097733405933765}
-  - component: {fileID: 7481076587661530369}
+  - component: {fileID: 2776025351336989125}
+  - component: {fileID: 2184244583942635650}
   m_Layer: 10
-  m_Name: Selection
+  m_Name: GroundChecker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &34097733405933765
+  m_IsActive: 1
+--- !u!4 &2776025351336989125
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8129819452764731733}
+  m_GameObject: {fileID: 4332321687466904799}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.03125, y: -0.24, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1809254756998236648}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2184244583942635650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4332321687466904799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5199eebf579554e4196f55881ab63041, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.FootPivotGenerator
+  targetRenderer: {fileID: 5466476860050821414}
+  alphaThreshold: 0.1
+  bottomSampleHeight: 1
+  spriteLocalPosition: {x: -0.03125, y: -0.25}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 8192
+  checkSize: {x: 0.0625, y: 0.0625}
+  hasFootPivot: 1
+--- !u!1 &7173048168623611036
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2928263879976859038}
+  - component: {fileID: 5466476860050821414}
+  - component: {fileID: 7704175489737682508}
+  m_Layer: 10
+  m_Name: Sprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2928263879976859038
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7173048168623611036}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -92,14 +144,14 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1809254756998236648}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &7481076587661530369
+--- !u!212 &5466476860050821414
 SpriteRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8129819452764731733}
+  m_GameObject: {fileID: 7173048168623611036}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -141,13 +193,35 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 586176187890799734, guid: 2e629c770b1647641ab645f898750d1b, type: 3}
-  m_Color: {r: 0.6666667, g: 1, b: 0.27450982, a: 0.78431374}
+  m_Sprite: {fileID: 2008508514574474053, guid: 71d5c814d230e7c459d3d2a78b6c3080, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.8888889, y: 0.4722222}
+  m_Size: {x: 0.625, y: 0.6875}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!95 &7704175489737682508
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7173048168623611036}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

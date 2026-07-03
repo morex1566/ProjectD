@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using DOTweenSettings = DG.Tweening.Core.DOTweenSettings;
 
 namespace TRPG.Runtime
@@ -18,40 +18,7 @@ namespace TRPG.Runtime
             GetInstance();
 
             Settings = ResourceManager.GetResource<DOTweenSettings>(UnityConstant.Addressable.Label.Core);
-            if (Settings == null)
-            {
-                DOTween.Init();
-                return;
-            }
-
-            DOTween.Init(Settings.defaultRecyclable, Settings.useSafeMode, Settings.logBehaviour);
-            ApplySettings();
-        }
-
-        /// <summary>
-        /// DOTweenSettings 에셋 값을 런타임 DOTween 정적 설정으로 복사합니다.
-        /// </summary>
-        private static void ApplySettings()
-        {
-            DOTween.safeModeLogBehaviour = Settings.safeModeOptions.logBehaviour;
-            DOTween.nestedTweenFailureBehaviour = Settings.safeModeOptions.nestedTweenFailureBehaviour;
-            DOTween.timeScale = Settings.timeScale;
-            DOTween.unscaledTimeScale = Settings.unscaledTimeScale;
-            DOTween.useSmoothDeltaTime = Settings.useSmoothDeltaTime;
-            DOTween.maxSmoothUnscaledTime = Settings.maxSmoothUnscaledTime;
-            DOTween.showUnityEditorReport = Settings.showUnityEditorReport;
-            DOTween.drawGizmos = Settings.drawGizmos;
-            DOTween.defaultUpdateType = Settings.defaultUpdateType;
-            DOTween.defaultTimeScaleIndependent = Settings.defaultTimeScaleIndependent;
-            DOTween.defaultAutoPlay = Settings.defaultAutoPlay;
-            DOTween.defaultAutoKill = Settings.defaultAutoKill;
-            DOTween.defaultLoopType = Settings.defaultLoopType;
-            DOTween.defaultRecyclable = Settings.defaultRecyclable;
-            DOTween.defaultEaseType = Settings.defaultEaseType;
-            DOTween.defaultEaseOvershootOrAmplitude = Settings.defaultEaseOvershootOrAmplitude;
-            DOTween.defaultEasePeriod = Settings.defaultEasePeriod;
-            DOTween.debugMode = Settings.debugMode;
-            DOTween.debugStoreTargetId = Settings.debugStoreTargetId;
+            DOTween.Init();
         }
     }
 }

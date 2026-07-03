@@ -16,69 +16,29 @@ namespace TRPG.Runtime
         /// </summary>
         public List<CreatureData> Entities;
 
-        private Dictionary<string, CreatureData> entityMap;
+        private readonly Dictionary<string, CreatureData> entityMap = new Dictionary<string, CreatureData>();
 
         public IReadOnlyDictionary<string, CreatureData> EntityMap => entityMap;
 
-        /// <summary>
-        /// DataId에 해당하는 CreatureData를 반환합니다.
-        /// </summary>
-        public CreatureData GetCreatureData(string dataId)
+        public void OnEnable()
         {
-            if (entityMap == null)
-            {
-                Init();
-            }
-
-            return entityMap[dataId];
-        }
-
-        /// <summary>
-        /// 엑셀에서 로드된 CreatureData 목록을 DataId 조회용 Dictionary로 재구성합니다.
-        /// </summary>
-        private void Init()
-        {
-            entityMap = new();
-
-            if (Entities == null)
-            {
-                Debug.LogWarning($"{name}: Entities is null.");
-                return;
-            }
+            entityMap.Clear();
 
             foreach (CreatureData entity in Entities)
             {
-                // 엑셀 비었음?
-                if (entity == null)
-                {
-                    Debug.LogWarning($"{name}: Entities contains null.");
-                    continue;
-                }
+                if (entity == null || string.IsNullOrEmpty(entity.DataId)) continue;
 
-                // 아이디가 비었는지?
-                if (string.IsNullOrWhiteSpace(entity.DataId))
-                {
-                    Debug.LogWarning($"{name}: CreatureData has empty DataId. Entity name: {entity.NameKey}");
-                    continue;
-                }
-
-                // 이미 등록됨?
-                if (entityMap.ContainsKey(entity.DataId))
-                {
-                    Debug.LogError($"{name}: Duplicate CreatureData DataId detected: {entity.DataId}");
-                    continue;
-                }
-
-                entityMap.Add(entity.DataId, entity);
+                // DataId가 중복되면 엑셀에서 뒤에 있는 데이터를 최종 값으로 사용합니다.
+                entityMap[entity.DataId] = entity;
             }
         }
 
         /// <summary>
-        /// ScriptableObject가 로드될 때 조회 캐시를 갱신합니다.
+        /// DataId로 CreatureData를 조회합니다.
         /// </summary>
-        private void OnEnable()
+        public bool TryGetEntity(string dataId, out CreatureData entity)
         {
-            Init();
+            return entityMap.TryGetValue(dataId, out entity);
         }
     }
 }

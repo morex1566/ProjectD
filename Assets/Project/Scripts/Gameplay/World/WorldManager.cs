@@ -31,6 +31,30 @@ namespace TRPG.Runtime
             return GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera)?.GetComponent<WorldCameraController>();
         }
 
+        public static WorldGridController GetWorldGridController()
+        {
+            WorldGridController gridController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridController>();
+
+            if (gridController == null)
+            {
+                return null;
+            }
+
+            return gridController;
+        }
+
+        public static WorldGridContext GetWorldGridContext()
+        {
+            WorldGridContext gridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridContext>();
+
+            if (gridContext == null)
+            {
+                return null;
+            }
+
+            return gridContext;
+        }
+
         public static WorldTilemapContext GetWorldTilemapContext(WorldTilemapType worldTilemapType)
         {
             WorldGridContext gridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridContext>();
@@ -46,6 +70,30 @@ namespace TRPG.Runtime
             }
 
             return tilemapContext;
+        }
+
+        public static Vector3Int WorldToCell(Vector3 worldPos)
+        {
+            WorldGridContext gridContext = GetWorldGridContext();
+
+            if (gridContext == null)
+            {
+                return Vector3Int.zero;
+            }
+
+            return gridContext.Grid.WorldToCell(worldPos);
+        }
+
+        public static Vector3 CellToWorld(Vector3Int cellPos)
+        {
+            WorldGridContext gridContext = GetWorldGridContext();
+
+            if (gridContext == null)
+            {
+                return Vector3.zero;
+            }
+
+            return gridContext.Grid.CellToWorld(cellPos);
         }
     }
 }

@@ -17,5 +17,7 @@ namespace TRPG.Runtime
         [SerializeField] public float Gravity;
 
         [SerializeField] public TileBase TileBase;
+
+        public static Vector3 DefaultGravity = new Vector3(0f, -10f, 0f);
     }
 }

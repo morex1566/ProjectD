@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1573807f418ce341884e4ede7912622, type: 3}
+  m_Name: SO_CreatureSheet
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureSheet
+  Entities:
+  - DataId: creature_dwarf_001
+    NameKey: creature_dwarf_001_name
+    DescKey: creature_dwarf_001_desc
+    Faction: Human
+    Hp: 10
+    Damage: 2
+    DetectRange: 2
+    AttackRange: 1
+    AttackSpeed: 2
+    MoveSpeed: 3
+    AIType: Ground

@@ -34,6 +34,9 @@ namespace TRPG.Runtime
         public IReadOnlyDictionary<WorldTilemapType, WorldTilemapContext> TilemapContextMap => tilemapContextMap;
 
 
+        public Grid Grid => grid;
+
+
         /// <summary>
         /// 타일맵 추가된거거나 사라지는 경우
         /// </summary>
@@ -164,6 +167,20 @@ namespace TRPG.Runtime
         public bool IsInBounds(int x, int y)
         {
             return TryGetTile(x, y, out _);
+        }
+
+        public bool TryGetTile(WorldTilemapType tilemapType, Vector3 worldPos, out WorldTile tile)
+        {
+            tile = default;
+
+            Vector3Int cellPos = grid.WorldToCell(worldPos);
+
+            if (TryGetTilemapContext(tilemapType, out WorldTilemapContext tilemapContext) == false)
+            {
+                return false;
+            }
+
+            return tilemapContext.TryGetTile(cellPos.x, cellPos.y, out tile);
         }
 
         ///<summary>

@@ -62,10 +62,11 @@ namespace TRPG.Runtime
         /// </summary>
         protected virtual void OnEnable()
         {
-            if (!InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext)) return;
-
-            inputMappingContext.Player.LeftClick.performed += OnLeftClickStarted;
-            inputMappingContext.Player.LeftClick.canceled += OnLeftClickCanceled;
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
+            {
+                inputMappingContext.Player.LeftClick.performed -= OnLeftClickStarted;
+                inputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;
+            }
         }
 
         /// <summary>
@@ -73,7 +74,7 @@ namespace TRPG.Runtime
         /// </summary>
         protected virtual void OnDisable()
         {
-            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext))
+            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
             {
                 inputMappingContext.Player.LeftClick.performed -= OnLeftClickStarted;
                 inputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;

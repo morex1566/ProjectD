@@ -1,10 +1,9 @@
-{
+﻿{
     "name": "DOTweenPro.EditorScripts",
     "rootNamespace": "",
     "references": [
         "DOTween.Modules",
-        "DOTweenPro.Scripts",
-        "Unity.Addressables.Editor"
+        "DOTweenPro.Scripts"
     ],
     "includePlatforms": [
         "Editor"

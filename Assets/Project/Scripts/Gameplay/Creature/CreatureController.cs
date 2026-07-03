@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 #endif
 using UnityEngine;
@@ -6,53 +7,61 @@ using UnityEngine;
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// CreatureContext AI의 이동/행동 타입입니다.
-    /// </summary>
-    public enum CreatureAIType
-    {
-        Ground
-    }
-
-    /// <summary>
     /// Creature의 런타임 상태, 선택 상태, Job 큐를 관리하는 월드 컴포넌트입니다.
     /// </summary>
     public class CreatureController : MonoBehaviour, ISelectable
     {
-        [SerializeField] private CreatureData data = null;
+        [SerializeField, ReadOnly] private SpriteRenderer spriter = null;
 
-        [SerializeField] private SpriteRenderer spriter = null;
+        [SerializeField, ReadOnly] private GroundChecker groundChecker = null;
+
+        [SerializeField] private CreatureContext context = null;
 
         private CreatureJobQueue jobQueue = null;
 
-        private CreatureContext context = null;
+        private CreatureStateMachine stateMahcine = null;
 
-
-
-        /// <summary>
-        /// 현재 이 생명체가 조종받는 대상
-        /// </summary>
-        public GameObject Owner { get; private set; } = null;
 
         public bool CanSelect { get; set; } = true;
+
 
         public bool IsSelected { get; set; } = false;
 
         public Bounds SelectionBounds => spriter.bounds;
 
-        public string DataId => data.DataId;
+        public GameObject SelectedInst => gameObject;
 
         public int InstanceId => GetInstanceID();
 
         public SpriteRenderer Spriter => spriter;
 
+        public GroundChecker GroundChecker => groundChecker;
 
+        public CreatureJobQueue JobQueue => jobQueue;
+
+        public CreatureContext Context => context;
+
+        public CreatureStateMachine StateMahcine => stateMahcine;
+
+
+
+        private void OnValidate()
+        {
+            Init();
+        }
+
+        private void Awake()
+        {
+            Init();
+        }
 
         /// <summary>
         /// 매 프레임 현재 큐의 CreatureJob을 실행합니다.
         /// </summary>
         private void Update()
         {
-            jobQueue.Execute();
+            jobQueue.Update();
+            stateMahcine.Update();
         }
 
         /// <summary>
@@ -82,22 +91,12 @@ namespace TRPG.Runtime
         /// <summary>
         /// CreatureData를 런타임 상태로 변환하고 표시용 스프라이트 프리팹을 연결합니다.
         /// </summary>
-        public void Init(CreatureData creatureData)
+        public void Init()
         {
-            data = creatureData;
-            jobQueue = new CreatureJobQueue();
-            context = new CreatureContext(data);
-
-            ClearSprite();
-            SetSprite();
-        }
-
-        /// <summary>
-        /// 사용자가 조작하는 상태인지?
-        /// </summary>
-        public void SetOwner(GameObject owner)
-        {
-            this.Owner = owner;
+            spriter = GetComponentInChildren<SpriteRenderer>();
+            groundChecker = GetComponentInChildren<GroundChecker>();
+            jobQueue = new CreatureJobQueue(this);
+            stateMahcine = new CreatureStateMachine(this);
         }
 
         /// <summary>
@@ -114,45 +113,6 @@ namespace TRPG.Runtime
         public void SetSelected(bool isSelected)
         {
             IsSelected = isSelected;
-            ShowSelectionIndicator(isSelected);
-        }
-
-
-
-        /// <summary>
-        /// 선택 표시 오브젝트를 켜거나 끕니다.
-        /// </summary>
-        private void ShowSelectionIndicator(bool isVisible)
-        {
-            //if (selectionIndicator == null) return;
-
-            //selectionIndicator.SetActive(isVisible);
-        }
-
-        /// <summary>
-        /// 이전에 붙어 있던 외부 스프라이트 프리팹 인스턴스를 제거합니다.
-        /// </summary>
-        private void ClearSprite()
-        {
-            if (spriter == null) return;
-
-            if (spriter.gameObject == gameObject) return;
-
-            Destroy(spriter.gameObject);
-            spriter = null;
-        }
-
-        /// <summary>
-        /// CreatureData에 지정된 스프라이트 프리팹을 생성하고 SpriteRenderer를 캐싱합니다.
-        /// </summary>
-        private void SetSprite()
-        {
-            GameObject spriteObj = Instantiate(data.SpritePf, transform);
-            spriteObj.transform.localPosition = Vector3.zero;
-            spriteObj.transform.localRotation = Quaternion.identity;
-            spriteObj.transform.localScale = Vector3.one;
-
-            spriter = spriteObj.GetComponentInChildren<SpriteRenderer>();
         }
     }
 }

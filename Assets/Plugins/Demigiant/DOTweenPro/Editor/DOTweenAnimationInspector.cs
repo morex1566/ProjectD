@@ -10,8 +10,6 @@ using DG.DOTweenEditor.UI;
 using DG.Tweening;
 using DG.Tweening.Core;
 using UnityEditor;
-using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using DOTweenSettings = DG.Tweening.Core.DOTweenSettings;
 
@@ -186,6 +184,7 @@ namespace DG.DOTweenEditor
         {
             _src = target as DOTweenAnimation;
             _settings = DOTweenSettingsProvider.GetSettings();
+            if (_src == null) return;
 
             onStartProperty = base.serializedObject.FindProperty("onStart");
             onPlayProperty = base.serializedObject.FindProperty("onPlay");
@@ -212,6 +211,13 @@ namespace DG.DOTweenEditor
 
         override public void OnInspectorGUI()
         {
+            if (_src == null) return;
+            if (_settings == null) _settings = DOTweenSettingsProvider.GetSettings();
+            if (_settings == null) {
+                EditorGUILayout.HelpBox("DOTween settings asset not found.", MessageType.Warning);
+                return;
+            }
+
         	base.OnInspectorGUI();
 
             GUILayout.Space(3);
@@ -755,6 +761,8 @@ namespace DG.DOTweenEditor
 
         static void OnReset(DOTweenAnimation src)
         {
+            if (src == null) return;
+
             DOTweenSettings settings = DOTweenSettingsProvider.GetSettings();
             if (settings == null) return;
 
@@ -767,29 +775,12 @@ namespace DG.DOTweenEditor
 
     static class DOTweenSettingsProvider
     {
-        private const string DOTweenSettingsAddress = "SO_DOTweenSettings";
+        private const string DOTweenSettingsPath = "Assets/Project/Datas/Gameplay/SO_DOTweenSettings.asset";
 
         public static DOTweenSettings GetSettings()
         {
-            AddressableAssetSettings addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
-            if (addressableSettings == null) return DOTweenUtilityWindow.GetDOTweenSettings();
-
-            foreach (AddressableAssetGroup group in addressableSettings.groups)
-            {
-                if (group == null) continue;
-
-                foreach (AddressableAssetEntry entry in group.entries)
-                {
-                    if (entry == null) continue;
-                    if (entry.address != DOTweenSettingsAddress) continue;
-
-                    string assetPath = AssetDatabase.GUIDToAssetPath(entry.guid);
-                    DOTweenSettings settings = AssetDatabase.LoadAssetAtPath<DOTweenSettings>(assetPath);
-                    return settings != null ? settings : DOTweenUtilityWindow.GetDOTweenSettings();
-                }
-            }
-
-            return DOTweenUtilityWindow.GetDOTweenSettings();
+            DOTweenSettings settings = AssetDatabase.LoadAssetAtPath<DOTweenSettings>(DOTweenSettingsPath);
+            return settings != null ? settings : DOTweenUtilityWindow.GetDOTweenSettings();
         }
     }
 }

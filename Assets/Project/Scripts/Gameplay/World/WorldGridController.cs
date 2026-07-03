@@ -25,8 +25,6 @@ namespace TRPG.Runtime
         [SerializeField] private Vector2Int size = Vector2Int.zero;
 
 
-
-
         private void OnValidate()
         {
             Init();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -8,7 +9,7 @@ namespace TRPG.Runtime
     /// Unity 인스펙터에서 편집 가능한 Dictionary 래퍼입니다.
     ///</summary>
     [Serializable]
-    public class SerializableDictionary<TKey, TValue> : ISerializationCallbackReceiver
+    public class SerializableDictionary<TKey, TValue> : ISerializationCallbackReceiver, IEnumerable<KeyValuePair<TKey, TValue>>
     {
         ///<summary>
         /// 인스펙터에서 실제로 편집되는 Key-Value 목록입니다.
@@ -57,6 +58,11 @@ namespace TRPG.Runtime
         /// 저장된 Key-Value 개수입니다.
         ///</summary>
         public int Count => entries.Count;
+
+        ///<summary>
+        /// 읽기 전용 Dictionary를 반환합니다.
+        ///</summary>
+        public IReadOnlyDictionary<TKey, TValue> ReadOnlyDictionary => dictionary;
 
         ///<summary>
         /// Unity가 직렬화하기 전에 호출합니다.
@@ -222,6 +228,47 @@ namespace TRPG.Runtime
                 // Dictionary는 Key 중복이 불가능하므로 중복 Key는 뒤쪽 값으로 덮어씁니다.
                 dictionary[entry.Key] = entry.Value;
             }
+        }
+
+        ///<summary>
+        /// 저장된 모든 Key 목록을 반환합니다.
+        ///</summary>
+        public IEnumerable<TKey> Keys
+        {
+            get
+            {
+                SyncDictionaryFromEntries();
+                return dictionary.Keys;
+            }
+        }
+
+        ///<summary>
+        /// 저장된 모든 Value 목록을 반환합니다.
+        ///</summary>
+        public IEnumerable<TValue> Values
+        {
+            get
+            {
+                SyncDictionaryFromEntries();
+                return dictionary.Values;
+            }
+        }
+
+        ///<summary>
+        /// Key-Value 쌍을 순회할 수 있는 Enumerator를 반환합니다.
+        ///</summary>
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            SyncDictionaryFromEntries();
+            return dictionary.GetEnumerator();
+        }
+
+        ///<summary>
+        /// 비제네릭 Enumerator를 반환합니다.
+        ///</summary>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

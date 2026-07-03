@@ -18,21 +18,21 @@ TagManager:
   - WorldUI
   - CameraUI
   - 
-  - Creature
-  - Enemy
-  - Ally
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
   - WorldGrid
   - WorldTilemapDefault
   - WorldTilemapBackground
   - WorldTilemapGround
   - WorldTilemapUI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - WorldCreature
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 

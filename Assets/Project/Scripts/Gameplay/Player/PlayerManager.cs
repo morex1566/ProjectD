@@ -42,7 +42,7 @@ namespace TRPG.Runtime
             manager.commandSystems.Clear();
             manager.commandSystems.Add(PlayerCommandSystemType.Idle, manager.currentCommandSystem);
             manager.commandSystems.Add(PlayerCommandSystemType.Creature, new CreatureCommandSystem(manager.creatureSelector));
-            manager.commandSystems.Add(PlayerCommandSystemType.Construction, new ConstructionCommandSystem(manager.worldTileSelector));
+            manager.commandSystems.Add(PlayerCommandSystemType.Mining, new MiningCommandSystem(manager.worldTileSelector));
             manager.currentCommandSystem.Enter();
         }
 

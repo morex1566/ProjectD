@@ -9,7 +9,16 @@ namespace TRPG.Runtime
     /// </summary>
     public class CreatureJobQueue 
     {
+        private CreatureController owner = null;
+
         private readonly Queue<CreatureJob> queue = new();
+
+
+        public CreatureJobQueue(CreatureController owner)
+        {
+            this.owner = owner;
+        }
+
 
         /// <summary>
         /// 새 CreatureJob을 실행 대기 큐 끝에 추가합니다.
@@ -39,7 +48,7 @@ namespace TRPG.Runtime
         /// 현재 맨 앞 Job 하나만 실행한다.
         /// 매 Update에서 호출하면 된다.
         /// </summary>
-        public void Execute()
+        public void Update()
         {
             while (queue.TryPeek(out CreatureJob job))
             {
@@ -49,12 +58,7 @@ namespace TRPG.Runtime
                     continue;
                 }
 
-                job.Execute();
-
-                if (job.IsDone)
-                {
-                    queue.Dequeue();
-                }
+                job.Evaluate();
 
                 return;
             }

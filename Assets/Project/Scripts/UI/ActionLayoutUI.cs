@@ -10,31 +10,40 @@ namespace TRPG.Runtime
     {
         [SerializeField] private Button idleButton;
 
-        [SerializeField] private Button constructionButton;
+        [SerializeField] private Button creatureButton;
+
+        [SerializeField] private Button miningButton;
 
 
 
         private void OnEnable()
         {
             idleButton.onClick.AddListener(OnIdleButtonClicked);
-            constructionButton.onClick.AddListener(OnConstructionButtonClicked);
+            creatureButton.onClick.AddListener (OnCreatureButtonClicked);
+            miningButton.onClick.AddListener(OnMiningButtonClicked);
         }
 
         private void OnDisable()
         {
             idleButton.onClick.RemoveListener(OnIdleButtonClicked);
-            constructionButton.onClick.RemoveListener(OnConstructionButtonClicked);
+            creatureButton.onClick.RemoveListener(OnCreatureButtonClicked);
+            miningButton.onClick.RemoveListener(OnMiningButtonClicked);
         }
 
 
         private void OnIdleButtonClicked()
         {
+            PlayerManager.SetCommandSystemType(PlayerCommandSystemType.Idle);
+        }
+
+        private void OnCreatureButtonClicked()
+        {
             PlayerManager.SetCommandSystemType(PlayerCommandSystemType.Creature);
         }
 
-        private void OnConstructionButtonClicked()
+        private void OnMiningButtonClicked()
         {
-            PlayerManager.SetCommandSystemType(PlayerCommandSystemType.Construction);
+            PlayerManager.SetCommandSystemType(PlayerCommandSystemType.Mining);
         }
     }
 }
