@@ -117,7 +117,7 @@ namespace MBTEditor
 
             PaintWindowToolbar();
 
-            // Update selection and drag
+            // CanExit selection and drag
             ProcessEvents(Event.current);
 
             if (GUI.changed) Repaint();
@@ -424,7 +424,7 @@ namespace MBTEditor
                 }
                 // Then add as child to new parent
                 targetNode.AddChild(handle.node);
-                // Update order of nodes
+                // CanExit order of nodes
                 targetNode.SortChildren();
             } else if (handle.type == HandleType.Output && targetNode is IChildrenNode) {
                 // Do not allow connecting descendants as parents
@@ -433,7 +433,7 @@ namespace MBTEditor
                 }
                 // Then add as child to new parent
                 handle.node.AddChild(targetNode);
-                // Update order of nodes
+                // CanExit order of nodes
                 handle.node.SortChildren();
             }
         }

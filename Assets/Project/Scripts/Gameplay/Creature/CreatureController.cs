@@ -19,8 +19,6 @@ namespace TRPG.Runtime
 
         private CreatureJobQueue jobQueue = null;
 
-        private CreatureStateMachine stateMahcine = null;
-
 
         public bool CanSelect { get; set; } = true;
 
@@ -41,9 +39,6 @@ namespace TRPG.Runtime
 
         public CreatureContext Context => context;
 
-        public CreatureStateMachine StateMahcine => stateMahcine;
-
-
 
         private void OnValidate()
         {
@@ -61,7 +56,6 @@ namespace TRPG.Runtime
         private void Update()
         {
             jobQueue.Update();
-            stateMahcine.Update();
         }
 
         /// <summary>
@@ -83,7 +77,6 @@ namespace TRPG.Runtime
 
             // jobqueue and statemachine
             jobQueue?.DrawGizmos();
-            stateMahcine?.DrawGizmos();
 
 //#if UNITY_EDITOR
 //            // Scene View에 텍스트 표시
@@ -105,7 +98,6 @@ namespace TRPG.Runtime
             spriter = GetComponentInChildren<SpriteRenderer>();
             groundChecker = GetComponentInChildren<GroundChecker>();
             jobQueue ??= new CreatureJobQueue(this);
-            stateMahcine ??= new CreatureStateMachine(this);
             context ??= new CreatureContext();
         }
 

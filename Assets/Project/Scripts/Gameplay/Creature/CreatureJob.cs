@@ -19,7 +19,10 @@ namespace TRPG.Runtime
 
         public bool IsDone => isDone;
 
-
+        /// <summary>
+        /// 완료 조건을 생성
+        /// </summary>
+        /// <param name="controller"></param>
         protected CreatureJob(CreatureController controller)
         {
             this.controller = controller;
@@ -33,7 +36,7 @@ namespace TRPG.Runtime
         {
             if (isStarted == false)
             {
-                isStarted = Start();
+                isStarted = CanStart();
             }
 
             if (isStarted == false)
@@ -41,7 +44,7 @@ namespace TRPG.Runtime
                 return false;
             }
 
-            isDone = Update();
+            isDone = CanExit();
 
             return isDone;
         }
@@ -49,12 +52,12 @@ namespace TRPG.Runtime
         /// <summary>
         /// 이 잡이 실행될 수 있는지?
         /// </summary>
-        protected abstract bool Start();
+        protected abstract bool CanStart();
 
         /// <summary>
         /// 이 잡이 끝났는지?
         /// </summary>
-        protected abstract bool Update();
+        protected abstract bool CanExit();
 
         public virtual void DrawGizmos() { }
     }
@@ -63,8 +66,6 @@ namespace TRPG.Runtime
     {
         private readonly Vector3Int targetCellPos;
 
-        private readonly float stopDistance = 0.05f;
-
         private List<AStarNode> path;
 
         private int pathIndex = 1;
@@ -72,73 +73,36 @@ namespace TRPG.Runtime
         public CreatureMoveJob(CreatureController controller, Vector3Int targetCellPos) : base(controller)
         {
             this.targetCellPos = targetCellPos;
-        }
-
-        protected override bool Start()
-        {
-            // 죽으면 못움직이지...
-            if (controller.StateMahcine.CurrentStates.ContainsKey(CreatureStateType.Dead) == true)
-            {
-                return false;
-            }
 
             // 길찾기
             Vector3Int worldCellPos = WorldManager.WorldToCell(controller.transform.position);
             path = AStarPathfinder.FindPath(worldCellPos, targetCellPos);
+        }
+
+        protected override bool CanStart()
+        {
+            // 죽으면 못움직이지...
+            if (controller.Context.State.HasFlag(CreatureStateType.Dead) == true)
+            {
+                return false;
+            }
+
+            // 이미 도착한거 아님?
+            if (path.Count <= 0)
+            {
+                return true;
+            }
 
             return true;
         }
 
-        protected override bool Update()
+        protected override bool CanExit()
         {
-            WorldGridContext gridContext = WorldManager.GetWorldGridContext();
-            if (gridContext == null)
+            // 이미 도착한거 아님?
+            if (path.Count <= 0)
             {
                 return true;
             }
-
-            if (path == null || path.Count == 0)
-            {
-                return true;
-            }
-
-            if (pathIndex >= path.Count)
-            {
-                return true;
-            }
-
-            AStarNode nextNode = path[pathIndex];
-            Vector3Int nextCellPos = new Vector3Int(nextNode.X, nextNode.Y, 0);
-            Vector3 nextWorldPos = gridContext.Grid.GetCellCenterWorld(nextCellPos);
-
-            float currentX = controller.transform.position.x;
-            float targetX = nextWorldPos.x;
-            float distanceX = targetX - currentX;
-
-            // Node에 도착
-            if (Mathf.Abs(distanceX) <= stopDistance)
-            {
-                pathIndex++;
-                return pathIndex >= path.Count;
-            }
-
-            // 이번 프레임에 목표 x까지 갈 수 있으면 스냅, 멀면 방향대로 이동
-            // distanceX가 양수면 목표가 오른쪽에 있다는 뜻이라 directionX = 1
-            // distanceX가 음수면 목표가 왼쪽에 있다는 뜻이라 directionX = -1
-            float directionX = Mathf.Sign(distanceX);
-            float moveDistance = controller.Context.MoveSpeed * Time.deltaTime;
-
-            if (Mathf.Abs(distanceX) <= moveDistance)
-            {
-                Vector3 position = controller.transform.position;
-                position.x = targetX;
-                controller.transform.position = position;
-
-                pathIndex++;
-                return pathIndex >= path.Count;
-            }
-
-            controller.transform.position += Vector3.right * directionX * moveDistance;
 
             return false;
         }

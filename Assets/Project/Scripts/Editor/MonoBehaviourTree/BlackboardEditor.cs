@@ -96,7 +96,7 @@ namespace MBTEditor
 
         public override void OnInspectorGUI()
         {
-            // Update repaint timer
+            // CanExit repaint timer
             lastRepaint = EditorApplication.timeSinceStartup;
             // Init styles
             if (popupStyle == null) {
@@ -133,7 +133,7 @@ namespace MBTEditor
             // DrawDefaultInspector();
             // EditorGUILayout.Space();
 
-            // serializedObject.Update();
+            // serializedObject.CanExit();
             // EditorGUI.BeginChangeCheck();
             showVariables = EditorGUILayout.BeginFoldoutHeaderGroup(showVariables, "Variables");
             if(showVariables){

@@ -1,38 +1,27 @@
-using System;
+using MBT;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 
 namespace TRPG.Runtime
 {
-    [Flags]
-    public enum CreatureStateType
-    {
-        None = 0,
-        Idle = 1 << 0,
-        Move = 1 << 1,
-        Dead = 1 << 2,
-    }
-
     /// <summary>
-    /// 작업을 제외한 상시 돌아야 하는 동작을 여기서 정의
+    /// 월드에서 크리쳐에게 상시 적용시키는 동작들 (ex. gravity)
     /// </summary>
-    public abstract class CreatureState 
+    [AddComponentMenu("")]
+    [MBTNode(name = "Creature/Service - CreatureWorldApplyService")]
+    public class CreatureWorldApplyService : Service
     {
-        protected CreatureController controller;
+        [SerializeField, ReadOnly] private CreatureController controller = null;
 
-        public CreatureState(CreatureController controller)
+        public override void OnEnter()
         {
-            this.controller = controller;
+            controller = GetComponentInParent<CreatureController>();
+
+            base.OnEnter();
         }
 
-        public virtual void Update()
+        public override void Task()
         {
             MoveByGravity();
-        }
-
-        public virtual void DrawGizmos()
-        {
-
         }
 
         private void MoveByGravity()
@@ -66,37 +55,6 @@ namespace TRPG.Runtime
             }
 
             controller.transform.position += gravity;
-        }
-    }
-
-    public class IdleState : CreatureState
-    {
-        public IdleState(CreatureController controller) : base(controller)
-        {
-        }
-
-        public override void Update()
-        {
-            base.Update();
-        }
-    }
-
-    public class MoveState : CreatureState
-    {
-        public MoveState(CreatureController controller) : base(controller)
-        {
-        }
-
-        public override void Update()
-        {
-            base.Update();
-        }
-    }
-
-    public class DeadState : CreatureState
-    {
-        public DeadState(CreatureController controller) : base(controller)
-        {
         }
     }
 }

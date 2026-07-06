@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MBT
 {
     [AddComponentMenu("")]
-    [MBTNode(name = "Root", order = 200)]
+    [MBTNode(name = "Root/Base", order = 200)]
     public class Root : Node, IParentNode
     {
         public override void AddChild(Node node)

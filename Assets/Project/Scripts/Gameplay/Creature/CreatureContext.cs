@@ -13,6 +13,16 @@ namespace TRPG.Runtime
         Air
     }
 
+    [Flags]
+    public enum CreatureStateType
+    {
+        None = 0,
+        Idle = 1 << 0,
+        Move = 1 << 1,
+        Mining = 1 << 2,
+        Dead = 1 << 3
+    }
+
     /// <summary>
     /// CreatureData를 복사해서 생성되는 전투 중 상태값입니다.
     /// </summary>

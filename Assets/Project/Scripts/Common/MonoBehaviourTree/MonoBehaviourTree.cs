@@ -109,7 +109,7 @@ namespace MBT
         }
 
         /// <summary>
-        /// Update tree state.
+        /// CanExit tree state.
         /// </summary>
         public void Tick()
         {
