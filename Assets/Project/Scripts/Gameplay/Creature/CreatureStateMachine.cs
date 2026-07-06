@@ -33,5 +33,18 @@ namespace TRPG.Runtime
                 state.Update();
             }
         }
+
+        public void DrawGizmos()
+        {
+            foreach (CreatureState state in currentStates.Values)
+            {
+                if (state == null)
+                {
+                    continue;
+                }
+
+                state.DrawGizmos();
+            }
+        }
     }
 }

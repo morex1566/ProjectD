@@ -64,8 +64,8 @@ namespace TRPG.Runtime
         {
             if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
             {
-                inputMappingContext.Player.LeftClick.performed -= OnLeftClickStarted;
-                inputMappingContext.Player.LeftClick.canceled -= OnLeftClickCanceled;
+                inputMappingContext.Player.LeftClick.performed += OnLeftClickStarted;
+                inputMappingContext.Player.LeftClick.canceled += OnLeftClickCanceled;
             }
         }
 

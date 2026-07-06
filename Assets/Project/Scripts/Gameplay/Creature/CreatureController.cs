@@ -76,14 +76,23 @@ namespace TRPG.Runtime
                 Gizmos.DrawWireCube(SelectionBounds.center, SelectionBounds.size);
             }
 
+            if (Application.isPlaying == false)
+            {
+                return;
+            }
+
+            // jobqueue and statemachine
+            jobQueue?.DrawGizmos();
+            stateMahcine?.DrawGizmos();
+
 //#if UNITY_EDITOR
 //            // Scene View에 텍스트 표시
 //            Vector3 labelPos = transform.position + Vector3.up * 0.75f;
 //            string label = $"InstanceId: {InstanceId}\n" + $"DataId: {DataId}";
 //            Handles.Label(labelPos, label);
 
-//            jobQueue.DrawGizmos();
-//#endif
+            //            jobQueue.DrawGizmos();
+            //#endif
         }
 
 
@@ -95,8 +104,9 @@ namespace TRPG.Runtime
         {
             spriter = GetComponentInChildren<SpriteRenderer>();
             groundChecker = GetComponentInChildren<GroundChecker>();
-            jobQueue = new CreatureJobQueue(this);
-            stateMahcine = new CreatureStateMachine(this);
+            jobQueue ??= new CreatureJobQueue(this);
+            stateMahcine ??= new CreatureStateMachine(this);
+            context ??= new CreatureContext();
         }
 
         /// <summary>

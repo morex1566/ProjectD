@@ -30,6 +30,11 @@ namespace TRPG.Runtime
             MoveByGravity();
         }
 
+        public virtual void DrawGizmos()
+        {
+
+        }
+
         private void MoveByGravity()
         {
             WorldGridContext gridContext = WorldManager.GetWorldGridContext();
@@ -38,23 +43,29 @@ namespace TRPG.Runtime
                 return;
             }
 
+            float maxFallDistance = gridContext.Grid.cellSize.y * 0.5f;
             Vector3 gravity = WorldTile.DefaultGravity * Time.deltaTime;
-            Vector3 nextGroundCheckerWorldPos = controller.GroundChecker.transform.position + gravity;
-            Vector3Int nextGroundCellPos = gridContext.Grid.WorldToCell(nextGroundCheckerWorldPos);
 
-            // 아래는 이제 이동할 수 없는 곳인가?
-            if (gridContext.TryGetTile(WorldTilemapType.WorldTilemapGround, nextGroundCheckerWorldPos, out _) == true)
+            if (Mathf.Abs(gravity.y) > maxFallDistance)
             {
-                Vector3 groundCellCenterWorld = gridContext.Grid.GetCellCenterWorld(nextGroundCellPos);
+                gravity.y = -maxFallDistance;
+            }
+
+            Vector3 nextFootWorldPos = controller.GroundChecker.transform.position + gravity;
+
+            if (gridContext.TryGetTile(WorldTilemapType.WorldTilemapGround, nextFootWorldPos, out _) == true)
+            {
+                Vector3Int groundCellPos = gridContext.Grid.WorldToCell(nextFootWorldPos);
+                Vector3 groundCellCenterWorld = gridContext.Grid.GetCellCenterWorld(groundCellPos);
+
                 float groundTopY = groundCellCenterWorld.y + gridContext.Grid.cellSize.y * 0.5f;
-                float snapDeltaY = controller.GroundChecker.transform.position.y - groundTopY;
+                float snapDeltaY = groundTopY - controller.GroundChecker.transform.position.y;
 
-                controller.transform.position += Vector3.down * snapDeltaY;
+                controller.transform.position += Vector3.up * snapDeltaY;
+                return;
             }
-            else
-            {
-                controller.transform.position += gravity;
-            }
+
+            controller.transform.position += gravity;
         }
     }
 

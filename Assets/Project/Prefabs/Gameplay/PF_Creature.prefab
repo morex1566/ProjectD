@@ -51,13 +51,12 @@ MonoBehaviour:
   context:
     CurrentHp: 1
     Atk: 1
-    DetectRange: 0
-    IsDead: 0
-    AttackRange: 0
-    AttackSpeed: 0
-    MoveSpeed: 0
+    DetectRange: 1
+    AttackRange: 1
+    AttackSpeed: 1
+    MoveSpeed: 1
     AIType: 0
-    Sprite: {fileID: 0}
+    State: 0
 --- !u!1 &4332321687466904799
 GameObject:
   m_ObjectHideFlags: 0
@@ -84,7 +83,7 @@ Transform:
   m_GameObject: {fileID: 4332321687466904799}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.03125, y: -0.24, z: 0}
+  m_LocalPosition: {x: -0.0625, y: -0.5625, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -105,11 +104,11 @@ MonoBehaviour:
   targetRenderer: {fileID: 5466476860050821414}
   alphaThreshold: 0.1
   bottomSampleHeight: 1
-  spriteLocalPosition: {x: -0.03125, y: -0.25}
+  spriteLocalPosition: {x: -0.0625, y: -0.5}
   groundMask:
     serializedVersion: 2
     m_Bits: 8192
-  checkSize: {x: 0.0625, y: 0.0625}
+  checkSize: {x: 0.125, y: 0.125}
   hasFootPivot: 1
 --- !u!1 &7173048168623611036
 GameObject:

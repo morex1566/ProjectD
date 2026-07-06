@@ -19,17 +19,17 @@ namespace TRPG.Runtime
     [Serializable]
     public class CreatureContext
     {
-        public float CurrentHp;
+        public float CurrentHp = 1;
 
-        public float Atk;
+        public float Atk = 1;
 
-        public float DetectRange;
+        public float DetectRange = 1;
 
-        public float AttackRange;
+        public float AttackRange = 1;
 
-        public float AttackSpeed;
+        public float AttackSpeed = 1;
 
-        public float MoveSpeed;
+        public float MoveSpeed = 1;
 
         public CreatureAIType AIType = CreatureAIType.None;
 

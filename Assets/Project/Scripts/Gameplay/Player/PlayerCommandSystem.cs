@@ -68,7 +68,7 @@ namespace TRPG.Runtime
 
             if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
             {
-                inputMappingContext.Player.LeftClick.performed += OnLeftClickPerformed;
+                inputMappingContext.Player.RightClick.performed += OnLeftClickPerformed;
             }
 
             creatureSelector.enabled = true;
@@ -80,7 +80,7 @@ namespace TRPG.Runtime
 
             if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
             {
-                inputMappingContext.Player.LeftClick.performed -= OnLeftClickPerformed;
+                inputMappingContext.Player.RightClick.performed -= OnLeftClickPerformed;
             }
 
             creatureSelector.enabled = false;
@@ -110,6 +110,8 @@ namespace TRPG.Runtime
                 {
                     return;
                 }
+
+                // 이미 이전에 있던 명령?
 
                 controller.JobQueue.Enqueue(new CreatureMoveJob(controller, targetCellPos));
             }
