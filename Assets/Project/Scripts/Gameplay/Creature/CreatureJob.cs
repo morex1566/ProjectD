@@ -145,4 +145,21 @@ namespace TRPG.Runtime
             throw new System.NotImplementedException();
         }
     }
+
+    public class CreatureAttackJob : CreatureJob
+    {
+        public CreatureAttackJob(CreatureController controller) : base(controller)
+        {
+        }
+
+        protected override bool CanExit()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override bool CanStart()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 }

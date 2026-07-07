@@ -1148,6 +1148,45 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Test",
+            "id": "d7a71419-703a-45ca-b61b-465c5925ff12",
+            "actions": [
+                {
+                    "name": "Num1Pressed",
+                    "type": "Button",
+                    "id": "8f63892e-6cb0-4d1b-9e0b-07956b9d4a4f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d479c5c2-700a-40ff-8a48-bbb60c326a32",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Num1Pressed",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6db685d6-c997-45c4-8c75-a534da894cab",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Num1Pressed",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

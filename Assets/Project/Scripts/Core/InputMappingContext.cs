@@ -1236,6 +1236,45 @@ namespace TRPG.Runtime
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Test"",
+            ""id"": ""d7a71419-703a-45ca-b61b-465c5925ff12"",
+            ""actions"": [
+                {
+                    ""name"": ""Num1Pressed"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f63892e-6cb0-4d1b-9e0b-07956b9d4a4f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""d479c5c2-700a-40ff-8a48-bbb60c326a32"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Num1Pressed"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6db685d6-c997-45c4-8c75-a534da894cab"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Num1Pressed"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1328,12 +1367,16 @@ namespace TRPG.Runtime
             m_UI_ScrollWheel = m_UI.FindAction("ScrollWheel", throwIfNotFound: true);
             m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
             m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+            // Test
+            m_Test = asset.FindActionMap("Test", throwIfNotFound: true);
+            m_Test_Num1Pressed = m_Test.FindAction("Num1Pressed", throwIfNotFound: true);
         }
 
         ~@InputMappingContext()
         {
             UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, InputMappingContext.Player.Disable() has not been called.");
             UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputMappingContext.UI.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Test.enabled, "This will cause a leak and performance issues, InputMappingContext.Test.Disable() has not been called.");
         }
 
         /// <summary>
@@ -1828,6 +1871,102 @@ namespace TRPG.Runtime
         /// Provides a new <see cref="UIActions" /> instance referencing this action map.
         /// </summary>
         public UIActions @UI => new UIActions(this);
+
+        // Test
+        private readonly InputActionMap m_Test;
+        private List<ITestActions> m_TestActionsCallbackInterfaces = new List<ITestActions>();
+        private readonly InputAction m_Test_Num1Pressed;
+        /// <summary>
+        /// Provides access to input actions defined in input action map "Test".
+        /// </summary>
+        public struct TestActions
+        {
+            private @InputMappingContext m_Wrapper;
+
+            /// <summary>
+            /// Construct a new instance of the input action map wrapper class.
+            /// </summary>
+            public TestActions(@InputMappingContext wrapper) { m_Wrapper = wrapper; }
+            /// <summary>
+            /// Provides access to the underlying input action "Test/Num1Pressed".
+            /// </summary>
+            public InputAction @Num1Pressed => m_Wrapper.m_Test_Num1Pressed;
+            /// <summary>
+            /// Provides access to the underlying input action map instance.
+            /// </summary>
+            public InputActionMap Get() { return m_Wrapper.m_Test; }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+            public void Enable() { Get().Enable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+            public void Disable() { Get().Disable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+            public bool enabled => Get().enabled;
+            /// <summary>
+            /// Implicitly converts an <see ref="TestActions" /> to an <see ref="InputActionMap" /> instance.
+            /// </summary>
+            public static implicit operator InputActionMap(TestActions set) { return set.Get(); }
+            /// <summary>
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <param name="instance">Callback instance.</param>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+            /// </remarks>
+            /// <seealso cref="TestActions" />
+            public void AddCallbacks(ITestActions instance)
+            {
+                if (instance == null || m_Wrapper.m_TestActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_TestActionsCallbackInterfaces.Add(instance);
+                @Num1Pressed.started += instance.OnNum1Pressed;
+                @Num1Pressed.performed += instance.OnNum1Pressed;
+                @Num1Pressed.canceled += instance.OnNum1Pressed;
+            }
+
+            /// <summary>
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <remarks>
+            /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+            /// </remarks>
+            /// <seealso cref="TestActions" />
+            private void UnregisterCallbacks(ITestActions instance)
+            {
+                @Num1Pressed.started -= instance.OnNum1Pressed;
+                @Num1Pressed.performed -= instance.OnNum1Pressed;
+                @Num1Pressed.canceled -= instance.OnNum1Pressed;
+            }
+
+            /// <summary>
+            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="TestActions.UnregisterCallbacks(ITestActions)" />.
+            /// </summary>
+            /// <seealso cref="TestActions.UnregisterCallbacks(ITestActions)" />
+            public void RemoveCallbacks(ITestActions instance)
+            {
+                if (m_Wrapper.m_TestActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            /// <summary>
+            /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+            /// </remarks>
+            /// <seealso cref="TestActions.AddCallbacks(ITestActions)" />
+            /// <seealso cref="TestActions.RemoveCallbacks(ITestActions)" />
+            /// <seealso cref="TestActions.UnregisterCallbacks(ITestActions)" />
+            public void SetCallbacks(ITestActions instance)
+            {
+                foreach (var item in m_Wrapper.m_TestActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_TestActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        /// <summary>
+        /// Provides a new <see cref="TestActions" /> instance referencing this action map.
+        /// </summary>
+        public TestActions @Test => new TestActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         /// <summary>
         /// Provides access to the input control scheme.
@@ -2069,6 +2208,21 @@ namespace TRPG.Runtime
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+        }
+        /// <summary>
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Test" which allows adding and removing callbacks.
+        /// </summary>
+        /// <seealso cref="TestActions.AddCallbacks(ITestActions)" />
+        /// <seealso cref="TestActions.RemoveCallbacks(ITestActions)" />
+        public interface ITestActions
+        {
+            /// <summary>
+            /// Method invoked when associated input action "Num1Pressed" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnNum1Pressed(InputAction.CallbackContext context);
         }
     }
 }

@@ -24,6 +24,8 @@ namespace TRPG.Runtime
 
         [SerializeField] private Vector2Int size = Vector2Int.zero;
 
+        [SerializeField] private Vector3Int pivot = Vector3Int.zero;
+
 
         private void OnValidate()
         {
@@ -75,11 +77,11 @@ namespace TRPG.Runtime
 
             tilemapContext.Clear();
 
-            for (int y = 0; y < size.x; y++)
+            for (int y = 0; y < size.y; y++)
             {
-                for (int x = 0; x < size.y; x++)
+                for (int x = 0; x < size.x; x++)
                 {
-                    Draw(WorldTilemapType.WorldTilemapGround, new Vector3Int(x, y));
+                    Draw(WorldTilemapType.WorldTilemapGround, new Vector3Int(x + pivot.x, y + pivot.y));
                 }
             }
         }

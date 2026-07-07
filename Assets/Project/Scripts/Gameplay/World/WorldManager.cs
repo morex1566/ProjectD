@@ -34,17 +34,23 @@ namespace TRPG.Runtime
         /// <summary>
         /// Creature 프리팹을 월드에 생성하고 GameObject InstanceID 기준으로 등록합니다.
         /// </summary>
-        public static CreatureController Spawn(CreatureController creaturePf, Vector3 worldPos)
+        public static CreatureController SpawnCreature(GameObject creaturePf, Vector3 worldPos)
         {
             if (creaturePf == null)
             {
-                Debug.LogWarning("Spawn failed. Creature prefab is null.");
+                Debug.LogWarning("SpawnCreature failed. Creature prefab is null.");
+                return null;
+            }
+
+            if (creaturePf.GetComponent<CreatureController>() == null)
+            {
+                Debug.LogWarning("SpawnCreature failed. Prefab is not creature.");
                 return null;
             }
 
             WorldManager manager = GetInstance();
             Transform parent = manager.worldRoot != null ? manager.worldRoot.transform : manager.transform;
-            CreatureController creature = Instantiate(creaturePf, worldPos, Quaternion.identity, parent);
+            CreatureController creature = Instantiate(creaturePf, worldPos, Quaternion.identity, parent).GetComponent<CreatureController>();
 
             RegisterCreature(creature);
             return creature;
@@ -53,7 +59,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 등록된 Creature를 GameObject InstanceID 기준으로 제거합니다.
         /// </summary>
-        public static bool Despawn(int gameObjectInstanceId)
+        public static bool DespawnCreature(int gameObjectInstanceId)
         {
             WorldManager manager = GetInstance();
 
@@ -75,14 +81,14 @@ namespace TRPG.Runtime
         /// <summary>
         /// 등록된 Creature를 제거합니다.
         /// </summary>
-        public static bool Despawn(CreatureController creature)
+        public static bool DespawnCreature(CreatureController creature)
         {
             if (creature == null)
             {
                 return false;
             }
 
-            return Despawn(creature.gameObject.GetInstanceID());
+            return DespawnCreature(creature.gameObject.GetInstanceID());
         }
 
         /// <summary>

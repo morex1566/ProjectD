@@ -29,7 +29,7 @@ namespace TRPG.Runtime
 
         public GameObject SelectedInst => gameObject;
 
-        public int InstanceId => GetInstanceID();
+        public int InstanceId => gameObject.GetInstanceID();
 
         public SpriteRenderer Spriter => spriter;
 
