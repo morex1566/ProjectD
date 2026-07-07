@@ -93,6 +93,7 @@ namespace TRPG.Runtime
         {
             spriter = GetComponentInChildren<SpriteRenderer>();
             jobQueue ??= new CreatureJobQueue(this);
+            JobQueue.Enqueue(new CreatureWanderJob(this));
             context ??= new CreatureContext();
         }
 
@@ -110,6 +111,12 @@ namespace TRPG.Runtime
         public void SetSelected(bool isSelected)
         {
             IsSelected = isSelected;
+        }
+
+
+        public bool IsDead()
+        {
+            return context.CurrentHp <= 0f;
         }
     }
 }

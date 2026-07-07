@@ -22,11 +22,6 @@ namespace TRPG.Runtime
         /// </summary>
         private WorldGridController worldGridController = null;
 
-        /// <summary>
-        /// 반복적인 태그 검색 없이 월드 그리드 상태를 재사용하기 위한 런타임 캐시입니다.
-        /// </summary>
-        private WorldGridContext worldGridContext = null;
-
         [SerializeField, ReadOnly] private Dictionary<int, CreatureController> creatures = new();
 
 
@@ -50,7 +45,6 @@ namespace TRPG.Runtime
             manager.worldRoot = new GameObject("World");
             manager.worldCameraController = null;
             manager.worldGridController = null;
-            manager.worldGridContext = null;
             manager.creatures.Clear();
         }
 
@@ -133,22 +127,21 @@ namespace TRPG.Runtime
         /// </summary>
         private void ApplyWorldForcesToCreature()
         {
-            WorldGridContext gridContext = GetWorldGridContext();
-            if (gridContext == null)
+            if (GetWorldGridController() == null)
             {
                 return;
             }
 
             foreach (KeyValuePair<int, CreatureController> pair in creatures)
             {
-                ApplyGravityToCreature(pair.Value, gridContext);
+                ApplyGravityToCreature(pair.Value);
             }
         }
 
         /// <summary>
         /// Creature의 발 위치를 기준으로 중력 이동과 지면 스냅을 적용합니다.
         /// </summary>
-        private void ApplyGravityToCreature(CreatureController creature, WorldGridContext gridContext)
+        private void ApplyGravityToCreature(CreatureController creature)
         {
             creature.transform.position += WorldTile.DefaultGravity * Time.deltaTime;
         }
@@ -177,25 +170,19 @@ namespace TRPG.Runtime
 
         public static WorldGridContext GetWorldGridContext()
         {
-            WorldManager manager = GetInstance();
-            if (manager.worldGridContext == null)
-            {
-                manager.worldGridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridContext>();
-            }
-
-            return manager.worldGridContext;
+            return GetWorldGridController()?.Context;
         }
 
         public static WorldTilemapContext GetWorldTilemapContext(WorldTilemapType worldTilemapType)
         {
-            WorldGridContext gridContext = GetWorldGridContext();
+            WorldGridController gridController = GetWorldGridController();
 
-            if (gridContext == null)
+            if (gridController == null)
             {
                 return null;
             }
 
-            if (gridContext.TilemapContextMap.TryGetValue(worldTilemapType, out WorldTilemapContext tilemapContext) == false)
+            if (gridController.TryGetTilemapContext(worldTilemapType, out WorldTilemapContext tilemapContext) == false)
             {
                 return null;
             }
@@ -203,28 +190,45 @@ namespace TRPG.Runtime
             return tilemapContext;
         }
 
+        public static WorldTilemapController GetWorldTilemapController(WorldTilemapType worldTilemapType)
+        {
+            WorldGridController gridController = GetWorldGridController();
+
+            if (gridController == null)
+            {
+                return null;
+            }
+
+            if (gridController.TryGetTilemapController(worldTilemapType, out WorldTilemapController tilemapController) == false)
+            {
+                return null;
+            }
+
+            return tilemapController;
+        }
+
         public static Vector3Int WorldToCell(Vector3 worldPosition)
         {
-            WorldGridContext gridContext = GetWorldGridContext();
+            WorldGridController gridController = GetWorldGridController();
 
-            if (gridContext == null)
+            if (gridController == null || gridController.Grid == null)
             {
                 return Vector3Int.zero;
             }
 
-            return gridContext.Grid.WorldToCell(worldPosition);
+            return gridController.Grid.WorldToCell(worldPosition);
         }
 
         public static Vector3 CellToWorld(Vector3Int cellPos)
         {
-            WorldGridContext gridContext = GetWorldGridContext();
+            WorldGridController gridController = GetWorldGridController();
 
-            if (gridContext == null)
+            if (gridController == null || gridController.Grid == null)
             {
                 return Vector3.zero;
             }
 
-            return gridContext.Grid.CellToWorld(cellPos);
+            return gridController.Grid.CellToWorld(cellPos);
         }
     }
 }

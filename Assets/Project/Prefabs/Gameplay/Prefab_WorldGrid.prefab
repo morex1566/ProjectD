@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7491423020794455166}
   - component: {fileID: 2638994553970251304}
-  - component: {fileID: 1752784067799025704}
   - component: {fileID: 7690866558165233099}
   m_Layer: 20
   m_Name: Prefab_WorldGrid
@@ -46,19 +45,6 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
---- !u!114 &1752784067799025704
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8466830091487982026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67b2003078f82d54b9a7d9b202b4e0e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldGridContext
-  tilemapContexts: []
 --- !u!114 &7690866558165233099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,5 +57,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dad2fc13bf2b36c4cb48703bbaeee237, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldGridController
-  context: {fileID: 1752784067799025704}
-  brush: {fileID: 0}
+  context: {}
+  grid: {fileID: 2638994553970251304}
+  tilemapControllers: []
+  groundBrush: {fileID: 0}
+  size: {x: 0, y: 0}
+  pivot: {x: 0, y: 0, z: 0}

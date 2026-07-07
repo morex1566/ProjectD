@@ -162,4 +162,38 @@ namespace TRPG.Runtime
             throw new System.NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// 크리쳐의 기본이 되는 작업
+    /// </summary>
+    public class CreatureWanderJob : CreatureJob
+    {
+        public override int Priority =>  10;
+
+        public CreatureWanderJob(CreatureController controller) : base(controller)
+        {
+
+        }
+
+        protected override bool CanExit()
+        {
+            if (controller.IsDead() == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override bool CanStart()
+        {
+            // 죽으면 못움직이지...
+            if (controller.IsDead() == true)
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
 }

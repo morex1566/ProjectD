@@ -47,7 +47,7 @@ namespace TRPG.Runtime
             Vector3 endWorldPosition = ScreenEx.ScreenToWorldPosition(cam, endScreenPos);
 
             // 셀 좌표
-            Tilemap tilemap = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
+            Tilemap tilemap = WorldManager.GetWorldTilemapController(WorldTilemapType.WorldTilemapGround).Tilemap;
             Vector3Int startCellPos = tilemap.WorldToCell(startWorldPosition);
             Vector3Int endCellPos = tilemap.WorldToCell(endWorldPosition);
             Vector3Int minCellPos = Vector3Int.Min(startCellPos, endCellPos);
@@ -91,7 +91,7 @@ namespace TRPG.Runtime
         protected override void Select(Camera cam, Vector2 mouseWorldPosition)
         {
             // 셀 좌표
-            Tilemap tilemap = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
+            Tilemap tilemap = WorldManager.GetWorldTilemapController(WorldTilemapType.WorldTilemapGround).Tilemap;
             Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPosition);
 
             // 실제 타일이 있는 셀만 선택합니다.
@@ -130,9 +130,9 @@ namespace TRPG.Runtime
         /// </summary>
         private void SetSelectUI(Vector3Int cellPos, TileBase selectTileBase)
         {
-            WorldTilemapContext tilemapContext = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapUI);
+            WorldTilemapController tilemapController = WorldManager.GetWorldTilemapController(WorldTilemapType.WorldTilemapUI);
 
-            if (tilemapContext == null) return;
+            if (tilemapController == null) return;
 
             if (selectTileBase == null) return;
 
@@ -144,16 +144,16 @@ namespace TRPG.Runtime
                 TileBase = selectTileBase
             };
 
-            tilemapContext.SetTile(worldTile);
+            tilemapController.SetTile(worldTile);
         }
 
         private void RemoveSelectUI(Vector3Int cellPos)
         {
-            WorldTilemapContext tilemapContext = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapUI);
+            WorldTilemapController tilemapController = WorldManager.GetWorldTilemapController(WorldTilemapType.WorldTilemapUI);
 
-            if (tilemapContext == null) return;
+            if (tilemapController == null) return;
 
-            tilemapContext.RemoveTile(cellPos);
+            tilemapController.RemoveTile(cellPos);
         }
     }
 }
