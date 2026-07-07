@@ -25,7 +25,7 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private WorldGridContext owner;
 
-        [SerializeField, ReadOnly] private SerializableDictionary<Vector3Int, WorldTile> mapTiles = new();
+        [SerializeField, ReadOnly] private Dictionary<Vector3Int, WorldTile> mapTiles = new();
 
 
 
@@ -56,6 +56,7 @@ namespace TRPG.Runtime
         {
             tilemapRenderer = GetComponent<TilemapRenderer>();
             tilemap = GetComponent<Tilemap>();
+            RebuildMapTilesFromTilemap();
 
 #if UNITY_EDITOR
             EditorApplication.delayCall -= SetTilemapTypeDelayed;
@@ -94,7 +95,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void SetTile(WorldTile tile)
         {
-            mapTiles.SetValue(tile.Pos, tile);
+            mapTiles[tile.Pos] = tile;
             tilemap.SetTile(tile.Pos, tile.TileBase);
         }
 
@@ -127,6 +128,35 @@ namespace TRPG.Runtime
         {
             mapTiles.Clear();
             tilemap.ClearAllTiles();
+        }
+
+        /// <summary>
+        /// Unity Tilemap에 배치된 타일을 런타임 지면 판정용 Dictionary로 복원합니다.
+        /// </summary>
+        private void RebuildMapTilesFromTilemap()
+        {
+            mapTiles.Clear();
+
+            if (tilemap == null)
+            {
+                return;
+            }
+
+            BoundsInt bounds = tilemap.cellBounds;
+            foreach (Vector3Int cellPos in bounds.allPositionsWithin)
+            {
+                TileBase tileBase = tilemap.GetTile(cellPos);
+                if (tileBase == null)
+                {
+                    continue;
+                }
+
+                mapTiles[cellPos] = new WorldTile
+                {
+                    Pos = cellPos,
+                    TileBase = tileBase,
+                };
+            }
         }
 
 #if UNITY_EDITOR

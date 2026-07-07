@@ -12,10 +12,21 @@ namespace TRPG.Runtime
 
         private GameObject worldRoot = null;
 
-        [SerializeField, ReadOnly] private SerializableDictionary<int, CreatureController> creatures = new();
+        /// <summary>
+        /// 반복적인 태그 검색 없이 월드 그리드 상태를 재사용하기 위한 런타임 캐시입니다.
+        /// </summary>
+        private WorldGridContext worldGridContext = null;
+
+        [SerializeField, ReadOnly] private Dictionary<int, CreatureController> creatures = new();
 
 
-        public static IReadOnlyDictionary<int, CreatureController> Creatures => GetInstance().creatures.ReadOnlyDictionary;
+        public static IReadOnlyDictionary<int, CreatureController> Creatures => GetInstance().creatures;
+
+
+        private void Update()
+        {
+            ApplyCreatureWorldForces();
+        }
 
 
 
@@ -28,6 +39,7 @@ namespace TRPG.Runtime
             Settings = ResourceManager.GetResource<WorldManagerSettingsData>(UnityConstant.Addressable.Label.Core);
 
             manager.worldRoot = new GameObject("World");
+            manager.worldGridContext = null;
             manager.creatures.Clear();
         }
 
@@ -102,7 +114,60 @@ namespace TRPG.Runtime
             }
 
             WorldManager manager = GetInstance();
-            manager.creatures.SetValue(creature.gameObject.GetInstanceID(), creature);
+            manager.creatures[creature.gameObject.GetInstanceID()] = creature;
+        }
+
+        /// <summary>
+        /// 월드가 등록된 Creature에게 매 프레임 적용할 힘을 처리합니다.
+        /// </summary>
+        private void ApplyCreatureWorldForces()
+        {
+            WorldGridContext gridContext = GetWorldGridContext();
+            if (gridContext == null)
+            {
+                return;
+            }
+
+            foreach (KeyValuePair<int, CreatureController> pair in creatures)
+            {
+                ApplyCreatureGravity(pair.Value, gridContext);
+            }
+        }
+
+        /// <summary>
+        /// Creature의 발 위치를 기준으로 중력 이동과 지면 스냅을 적용합니다.
+        /// </summary>
+        private void ApplyCreatureGravity(CreatureController creature, WorldGridContext gridContext)
+        {
+            if (creature == null || creature.GroundChecker == null)
+            {
+                return;
+            }
+
+            float maxFallDistance = gridContext.Grid.cellSize.y * 0.5f;
+            Vector3 gravity = WorldTile.DefaultGravity * Time.deltaTime;
+
+            if (Mathf.Abs(gravity.y) > maxFallDistance)
+            {
+                gravity.y = -maxFallDistance;
+            }
+
+            Vector3 footWorldPos = creature.GroundChecker.transform.position;
+            Vector3 nextFootWorldPos = footWorldPos + gravity;
+
+            if (gridContext.TryGetTile(WorldTilemapType.WorldTilemapGround, nextFootWorldPos, out _) == true)
+            {
+                Vector3Int groundCellPos = gridContext.Grid.WorldToCell(nextFootWorldPos);
+                Vector3 groundCellCenterWorld = gridContext.Grid.GetCellCenterWorld(groundCellPos);
+
+                float groundTopY = groundCellCenterWorld.y + gridContext.Grid.cellSize.y * 0.5f;
+                float snapDeltaY = groundTopY - footWorldPos.y;
+
+                creature.transform.position += Vector3.up * snapDeltaY;
+                return;
+            }
+
+            creature.transform.position += gravity;
         }
 
         public static WorldCameraController GetWorldCameraController()
@@ -124,19 +189,18 @@ namespace TRPG.Runtime
 
         public static WorldGridContext GetWorldGridContext()
         {
-            WorldGridContext gridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridContext>();
-
-            if (gridContext == null)
+            WorldManager manager = GetInstance();
+            if (manager.worldGridContext == null)
             {
-                return null;
+                manager.worldGridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridContext>();
             }
 
-            return gridContext;
+            return manager.worldGridContext;
         }
 
         public static WorldTilemapContext GetWorldTilemapContext(WorldTilemapType worldTilemapType)
         {
-            WorldGridContext gridContext = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridContext>();
+            WorldGridContext gridContext = GetWorldGridContext();
 
             if (gridContext == null)
             {

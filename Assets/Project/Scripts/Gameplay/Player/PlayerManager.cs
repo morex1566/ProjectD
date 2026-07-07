@@ -16,7 +16,7 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private WorldTileSelector worldTileSelector;
 
-        [SerializeField, ReadOnly] private SerializableDictionary<PlayerCommandSystemType, PlayerCommandSystem> commandSystems = new();
+        [SerializeField, ReadOnly] private Dictionary<PlayerCommandSystemType, PlayerCommandSystem> commandSystems = new();
 
         [SerializeField, ReadOnly] private PlayerCommandSystem currentCommandSystem;
 

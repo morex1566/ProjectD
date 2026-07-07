@@ -5,8 +5,8 @@ using System.Collections.Generic;
 namespace TRPG.Runtime
 {
     [AddComponentMenu("")]
-    [MBTNode(name = "Creature/Leaf - MoveCreature")]
-    public class MoveCreature : Leaf
+    [MBTNode(name = "Creature/Leaf - DoMove")]
+    public class DoMove : Leaf
     {
         private const float ArriveDistance = 0.01f;
         private const float ArriveSqrDistance = ArriveDistance * ArriveDistance;

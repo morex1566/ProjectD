@@ -13,11 +13,10 @@ GameObject:
   - component: {fileID: 1629447218527677483}
   - component: {fileID: 8685236102436771784}
   - component: {fileID: 952308521891495300}
-  - component: {fileID: 3330441172571397320}
-  - component: {fileID: 5284972176336565861}
   - component: {fileID: 5052479038497951884}
   - component: {fileID: 7068349396413464170}
-  - component: {fileID: 4588452101105012969}
+  - component: {fileID: 1960071792074684045}
+  - component: {fileID: 3072067322244090560}
   m_Layer: 20
   m_Name: MBT
   m_TagString: Untagged
@@ -79,9 +78,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b25af8627659c6949b60949c3aa8d91d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::MBT.MonoBehaviourTree
-  selectedEditorNode: {fileID: 0}
+  selectedEditorNode: {fileID: 3072067322244090560}
   repeatOnFinish: 1
-  maxExecutionsPerTick: 1000
+  maxExecutionsPerTick: 10
   parent: {fileID: 0}
 --- !u!114 &952308521891495300
 MonoBehaviour:
@@ -104,65 +103,10 @@ MonoBehaviour:
     height: 44
   parent: {fileID: 0}
   children:
-  - {fileID: 3330441172571397320}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
---- !u!114 &3330441172571397320
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 430740f79d654f269470063f79e26f9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureWorldApplyService
-  title: Service - CreatureWorldApplyService
-  rect:
-    serializedVersion: 2
-    x: 400
-    y: 360
-    width: 160
-    height: 73
-  parent: {fileID: 952308521891495300}
-  children:
-  - {fileID: 5284972176336565861}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  interval: 1
-  randomDeviation: 0
-  callOnEnter: 1
-  controller: {fileID: 0}
---- !u!114 &5284972176336565861
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c78c7da6b00e1b46bad07949050f82f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::MBT.Sequence
-  title: Sequence
-  rect:
-    serializedVersion: 2
-    x: 400
-    y: 480
-    width: 160
-    height: 44
-  parent: {fileID: 3330441172571397320}
-  children:
   - {fileID: 5052479038497951884}
   behaviourTree: {fileID: 0}
   runtimePriority: 0
   breakpoint: 0
-  random: 0
 --- !u!114 &5052479038497951884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,13 +122,13 @@ MonoBehaviour:
   title: Condition - HasJob
   rect:
     serializedVersion: 2
-    x: 280
-    y: 580
+    x: 394.4
+    y: 476.80002
     width: 160
     height: 44
-  parent: {fileID: 5284972176336565861}
+  parent: {fileID: 952308521891495300}
   children:
-  - {fileID: 7068349396413464170}
+  - {fileID: 1960071792074684045}
   behaviourTree: {fileID: 0}
   runtimePriority: 0
   breakpoint: 0
@@ -204,18 +148,44 @@ MonoBehaviour:
   title: Condition - IsMoveJob
   rect:
     serializedVersion: 2
-    x: 160
-    y: 680
+    x: 220
+    y: 660
     width: 160
     height: 44
-  parent: {fileID: 5052479038497951884}
+  parent: {fileID: 1960071792074684045}
   children:
-  - {fileID: 4588452101105012969}
+  - {fileID: 3072067322244090560}
   behaviourTree: {fileID: 0}
   runtimePriority: 0
   breakpoint: 0
   controller: {fileID: 5108346331041859384}
---- !u!114 &4588452101105012969
+--- !u!114 &1960071792074684045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074258963442194482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08540605df275034fafc8e05c6704214, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::MBT.Selector
+  title: Selector
+  rect:
+    serializedVersion: 2
+    x: 280
+    y: 560
+    width: 160
+    height: 44
+  parent: {fileID: 5052479038497951884}
+  children:
+  - {fileID: 7068349396413464170}
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  random: 0
+--- !u!114 &3072067322244090560
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -226,11 +196,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fc4179e3f7f96a45b7d53f13b72da99, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.MoveCreature
-  title: Leaf - MoveCreature
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoMove
+  title: Leaf - DoMove
   rect:
     serializedVersion: 2
-    x: 100
+    x: 120
     y: 760
     width: 160
     height: 44
