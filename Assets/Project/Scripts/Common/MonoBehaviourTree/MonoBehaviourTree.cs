@@ -269,7 +269,7 @@ namespace MBT
 
         internal void GetStack(ref Node[] stack)
         {
-            // Resize array when size is too small
+            // Resize array when groundSize is too small
             if (executionStack.Count > stack.Length)
             {
                 // Node should not change priority and position during runtime

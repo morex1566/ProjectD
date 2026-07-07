@@ -15,6 +15,11 @@ namespace TRPG.Runtime
 
         private float nextPickTime = 0f;
 
+        private void Awake()
+        {
+            controller = GetComponentInParent<CreatureController>();
+        }
+
         public override NodeResult Execute()
         {
             // 이미 이동 Job이 있으면 새 Wander 목적지를 만들지 않습니다.
@@ -38,8 +43,6 @@ namespace TRPG.Runtime
             result = Vector3Int.zero;
 
             Vector3Int currentCellPos = WorldManager.WorldToCell(controller.transform.position);
-            
-            
 
             //for (int i = 0; i < maxPickCount; i++)
             //{

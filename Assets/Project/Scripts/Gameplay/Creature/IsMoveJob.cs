@@ -10,11 +10,9 @@ namespace TRPG.Runtime
     {
         [SerializeField, ReadOnly] private CreatureController controller = null;
 
-        public override void OnEnter()
+        private void Awake()
         {
             controller = GetComponentInParent<CreatureController>();
-
-            base.OnEnter();
         }
 
         public override bool Check()

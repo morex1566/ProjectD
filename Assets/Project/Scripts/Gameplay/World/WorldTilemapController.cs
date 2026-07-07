@@ -79,9 +79,9 @@ namespace TRPG.Runtime
             }
 
             context.TilemapType = tilemapType;
-
             ApplyLayerByTilemapType(tilemapType);
             AddComponentsByTilemapType(tilemapType);
+            gridController.Rebuild();
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void SetTile(WorldTile tile)
         {
-            context.MapTiles[tile.Pos] = tile;
+            gridController.Context.SetTile(context.TilemapType, tile);
             tilemap.SetTile(tile.Pos, tile.TileBase);
         }
 
@@ -98,7 +98,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void RemoveTile(Vector3Int cellPos)
         {
-            context.MapTiles.Remove(cellPos);
+            gridController.Context.RemoveTile(context.TilemapType, cellPos);
             tilemap.SetTile(cellPos, null);
         }
 
@@ -107,7 +107,7 @@ namespace TRPG.Runtime
         /// </summary>
         public bool IsInBounds(int x, int y)
         {
-            return context.MapTiles.ContainsKey(new Vector3Int(x, y, 0));
+            return gridController.Context.ContainsTile(context.TilemapType, new Vector3Int(x, y, 0));
         }
 
         /// <summary>
@@ -115,12 +115,12 @@ namespace TRPG.Runtime
         /// </summary>
         public bool TryGetTile(int x, int y, out WorldTile tile)
         {
-            return context.MapTiles.TryGetValue(new Vector3Int(x, y, 0), out tile);
+            return gridController.Context.TryGetTile(context.TilemapType, new Vector3Int(x, y, 0), out tile);
         }
 
         public void Clear()
         {
-            context.MapTiles.Clear();
+            gridController.Context.ClearTiles(context.TilemapType);
             tilemap.ClearAllTiles();
         }
 
@@ -157,7 +157,7 @@ namespace TRPG.Runtime
                 case WorldTilemapType.WorldTilemapDefault:
                     break;
 
-                case WorldTilemapType.WorldTilemapBackground:
+                case WorldTilemapType.WorldTilemapAir:
                     break;
 
                 case WorldTilemapType.WorldTilemapGround:

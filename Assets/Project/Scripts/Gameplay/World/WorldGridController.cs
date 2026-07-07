@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -23,6 +25,8 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private Dictionary<WorldTilemapType, WorldTilemapController> tilemapControllerMap = new();
 
+        [SerializeField] private WorldGridContext context = new();
+
         [SerializeField] private AStarPathfinder pathfinder = new();
 
 
@@ -30,12 +34,23 @@ namespace TRPG.Runtime
 
         [SerializeField] private WorldTilemapBrush groundBrush = null;
 
-        [SerializeField] private Vector2Int size = Vector2Int.zero;
+        [SerializeField] private Vector2Int groundSize = Vector2Int.zero;
 
-        [SerializeField] private Vector3Int pivot = Vector3Int.zero;
+        [SerializeField] private Vector3Int groundPivot = Vector3Int.zero;
+
+
+        [Header("Air")]
+
+        [SerializeField] private WorldTilemapBrush airBrush = null;
+
+        [SerializeField] private Vector2Int airSize = Vector2Int.zero;
+
+        [SerializeField] private Vector3Int airPivot = Vector3Int.zero;
 
 
         public Grid Grid => grid;
+
+        public WorldGridContext Context => context;
 
 
         /// <summary>
@@ -46,13 +61,13 @@ namespace TRPG.Runtime
             Init();
         }
 
-        private void OnValidate()
-        {
-            Init();
-        }
-
         private void Awake()
         {
+            if (Application.isPlaying == false)
+            {
+                return;
+            }
+
             Init();
         }
 
@@ -95,16 +110,16 @@ namespace TRPG.Runtime
         public void CreateTilemap()
         {
             GameObject tilemapInst = new GameObject(nameof(Tilemap));
-            tilemapInst.transform.SetParent(transform);
-
             tilemapInst.AddComponent<Tilemap>();
             tilemapInst.AddComponent<TilemapRenderer>();
+            tilemapInst.transform.SetParent(transform);
 
             WorldTilemapController tilemapController = tilemapInst.AddComponent<WorldTilemapController>();
-
             tilemapController.Init(false);
             tilemapController.SetGridController(this);
             tilemapController.SetTilemapType(WorldTilemapType.WorldTilemapDefault);
+
+            tilemapControllers.Add(tilemapController);
         }
 
         /// <summary>
@@ -112,10 +127,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void Rebuild()
         {
-            CollectChildTilemapControllers();
-
             tilemapControllers.RemoveAll(tilemapController => tilemapController == null);
-            RemoveDuplicateTilemapControllers();
             tilemapControllerMap.Clear();
 
             foreach (WorldTilemapController tilemapController in tilemapControllers)
@@ -135,27 +147,6 @@ namespace TRPG.Runtime
 
                 tilemapControllerMap[tilemapController.Context.TilemapType] = tilemapController;
             }
-        }
-
-        /// <summary>
-        /// 지정한 Tilemap 레이어의 런타임 컨텍스트를 반환합니다.
-        /// </summary>
-        public bool TryGetTilemapContext(WorldTilemapType tilemapType, out WorldTilemapContext tilemapContext)
-        {
-            tilemapContext = null;
-
-            if (tilemapType == WorldTilemapType.None)
-            {
-                return false;
-            }
-
-            if (tilemapControllerMap.TryGetValue(tilemapType, out WorldTilemapController tilemapController) == false)
-            {
-                return false;
-            }
-
-            tilemapContext = tilemapController.Context;
-            return tilemapContext != null;
         }
 
         /// <summary>
@@ -184,14 +175,6 @@ namespace TRPG.Runtime
             }
 
             return tilemapController.IsInBounds(x, y);
-        }
-
-        /// <summary>
-        /// Ground 레이어를 우선으로 좌표 데이터가 있는지 확인합니다.
-        /// </summary>
-        public bool IsInBounds(int x, int y)
-        {
-            return TryGetTile(x, y, out _);
         }
 
         public bool TryGetTile(WorldTilemapType tilemapType, Vector3 worldPosition, out WorldTile tile)
@@ -223,50 +206,45 @@ namespace TRPG.Runtime
             return tilemapController.TryGetTile(x, y, out tile);
         }
 
-        /// <summary>
-        /// Ground 레이어를 우선으로 특정 위치의 타일 데이터를 반환합니다.
-        /// </summary>
-        public bool TryGetTile(int x, int y, out WorldTile tile)
+        public bool TryGetRandomTile(WorldTilemapType tilemapType, Predicate<WorldTile> predicate, out WorldTile tile)
         {
-            if (TryGetTile(WorldTilemapType.WorldTilemapGround, x, y, out tile))
-            {
-                return true;
-            }
-
-            foreach (KeyValuePair<WorldTilemapType, WorldTilemapController> pair in tilemapControllerMap)
-            {
-                if (pair.Key == WorldTilemapType.WorldTilemapGround)
-                {
-                    continue;
-                }
-
-                if (pair.Value == null)
-                {
-                    continue;
-                }
-
-                WorldTilemapController tilemapController = pair.Value;
-                if (tilemapController.TryGetTile(x, y, out tile))
-                {
-                    return true;
-                }
-            }
-
             tile = default;
-            return false;
+
+            // 타일 가져오기
+            if (context.MapTiles.TryGetValue(tilemapType, out var tiles) == false)
+            {
+                return false;
+            }
+
+            List<WorldTile> candidates = new();
+            foreach (WorldTile candidate in tiles.Values)
+            {
+                if (predicate == null || predicate(candidate))
+                {
+                    candidates.Add(candidate);
+                }
+            }
+
+            if (candidates.Count <= 0)
+            {
+                return false;
+            }
+
+            tile = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+            return true;
         }
 
         /// <summary>
         /// 현재 브러시에서 랜덤 타일을 뽑아 지정 좌표에 그립니다.
         /// </summary>
-        public void Draw(WorldTilemapType tilemapType, Vector3Int cellPos)
+        public void Draw(WorldTilemapBrush brush, WorldTilemapType tilemapType, Vector3Int cellPos)
         {
-            if (groundBrush == null)
+            if (brush == null)
             {
                 return;
             }
 
-            if (groundBrush.TryGetRandomTile(out WorldTile tile) == false)
+            if (brush.TryGetRandomTile(out WorldTile tile) == false)
             {
                 return;
             }
@@ -291,44 +269,31 @@ namespace TRPG.Runtime
 
             tilemapController.Clear();
 
-            for (int y = 0; y < size.y; y++)
+            for (int y = 0; y < groundSize.y; y++)
             {
-                for (int x = 0; x < size.x; x++)
+                for (int x = 0; x < groundSize.x; x++)
                 {
-                    Draw(WorldTilemapType.WorldTilemapGround, new Vector3Int(x + pivot.x, y + pivot.y));
+                    Draw(groundBrush, WorldTilemapType.WorldTilemapGround, new Vector3Int(x + groundPivot.x, y + groundPivot.y));
                 }
             }
         }
 
-        private void CollectChildTilemapControllers()
+        [ContextMenu(nameof(DrawAir))]
+        public void DrawAir()
         {
-            Tilemap[] childTilemaps = GetComponentsInChildren<Tilemap>(true);
-            foreach (Tilemap childTilemap in childTilemaps)
+            if (TryGetTilemapController(WorldTilemapType.WorldTilemapAir, out WorldTilemapController tilemapController) == false)
             {
-                if (childTilemap.TryGetComponent(out WorldTilemapController tilemapController) == false)
-                {
-                    tilemapController = childTilemap.gameObject.AddComponent<WorldTilemapController>();
-                }
-
-                if (tilemapControllers.Contains(tilemapController))
-                {
-                    continue;
-                }
-
-                tilemapControllers.Add(tilemapController);
+                Debug.LogError($"require {WorldTilemapType.WorldTilemapAir}");
+                return;
             }
-        }
 
-        private void RemoveDuplicateTilemapControllers()
-        {
-            HashSet<WorldTilemapController> uniqueTilemapControllers = new();
+            tilemapController.Clear();
 
-            for (int i = tilemapControllers.Count - 1; i >= 0; i--)
+            for (int y = 0; y < airSize.y; y++)
             {
-                WorldTilemapController tilemapController = tilemapControllers[i];
-                if (uniqueTilemapControllers.Add(tilemapController) == false)
+                for (int x = 0; x < airSize.x; x++)
                 {
-                    tilemapControllers.RemoveAt(i);
+                    Draw(airBrush, WorldTilemapType.WorldTilemapAir, new Vector3Int(x + airPivot.x, y + airPivot.y));
                 }
             }
         }

@@ -20,7 +20,7 @@ TagManager:
   - 
   - WorldGrid
   - WorldTilemapDefault
-  - WorldTilemapBackground
+  - WorldTilemapAir
   - WorldTilemapGround
   - WorldTilemapUI
   - 

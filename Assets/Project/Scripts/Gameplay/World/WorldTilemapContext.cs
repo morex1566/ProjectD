@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -12,15 +11,11 @@ namespace TRPG.Runtime
     {
         [SerializeField] private WorldTilemapType tilemapType = WorldTilemapType.WorldTilemapDefault;
 
-        [SerializeField, ReadOnly] private Dictionary<Vector3Int, WorldTile> mapTiles = new();
-
 
         public WorldTilemapType TilemapType
         {
             get => tilemapType;
             set => tilemapType = value;
         }
-
-        public Dictionary<Vector3Int, WorldTile> MapTiles => mapTiles;
     }
 }

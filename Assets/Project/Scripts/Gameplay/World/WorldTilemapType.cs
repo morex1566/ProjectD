@@ -6,7 +6,7 @@ namespace TRPG.Runtime
     {
         None = 0,
         WorldTilemapDefault = 1 << 0,
-        WorldTilemapBackground = 1 << 1,
+        WorldTilemapAir = 1 << 1,
         WorldTilemapGround = 1 << 2,
         WorldTilemapUI = 1 << 3,
     }
