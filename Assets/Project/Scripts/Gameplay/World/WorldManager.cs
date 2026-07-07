@@ -117,7 +117,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// Creature를 GameObject InstanceID 기준으로 등록합니다.
         /// </summary>
-        private static void RegisterCreature(CreatureController creature)
+        public static void RegisterCreature(CreatureController creature)
         {
             if (creature == null)
             {

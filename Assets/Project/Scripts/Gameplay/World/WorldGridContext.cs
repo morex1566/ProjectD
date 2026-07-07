@@ -94,7 +94,7 @@ namespace TRPG.Runtime
                 tilemapInst.AddComponent<Tilemap>();
                 tilemapInst.AddComponent<TilemapRenderer>();
                 WorldTilemapContext tilemapContextComp = tilemapInst.AddComponent<WorldTilemapContext>();
-                tilemapContextComp.SetOwner(this);
+                tilemapContextComp.SetGridContext(this);
                 tilemapContextComp.SetTilemapType(WorldTilemapType.WorldTilemapDefault);
                 tilemapContextComp.Init();
 
@@ -120,7 +120,7 @@ namespace TRPG.Runtime
                     continue;
                 }
 
-                tilemapContext.SetOwner(this);
+                tilemapContext.SetGridContext(this);
 
                 // None은 실제 Tilemap 타입이 아니므로 제외합니다.
                 if (tilemapContext.TilemapType == WorldTilemapType.None)

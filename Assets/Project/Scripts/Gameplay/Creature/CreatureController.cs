@@ -46,6 +46,11 @@ namespace TRPG.Runtime
             Init();
         }
 
+        private void Start()
+        {
+            WorldManager.RegisterCreature(this);
+        }
+
         /// <summary>
         /// 매 프레임 현재 큐의 CreatureJob을 실행합니다.
         /// </summary>

@@ -42,5 +42,39 @@ namespace TRPG.Runtime
 
             return null;
         }
+
+        ///<summary>
+        /// GameObject에 지정한 컴포넌트가 있으면 반환하고, 없으면 추가해서 반환합니다.
+        ///</summary>
+        public static T GetOrAddComponent<T>(this GameObject gameObject) where T : Component
+        {
+            if (gameObject == null)
+            {
+                return null;
+            }
+
+            // 이미 붙어있는 컴포넌트가 있으면 그대로 사용합니다.
+            if (gameObject.TryGetComponent(out T component))
+            {
+                return component;
+            }
+
+            // 없으면 새로 추가해서 반환합니다.
+            return gameObject.AddComponent<T>();
+        }
+
+        ///<summary>
+        /// Component가 붙어있는 GameObject에서 지정한 컴포넌트를 가져오거나 추가합니다.
+        ///</summary>
+        public static T GetOrAddComponent<T>(this Component component) where T : Component
+        {
+            if (component == null)
+            {
+                return null;
+            }
+
+            // Component 기준으로도 바로 호출할 수 있게 GameObject 확장 메서드로 넘깁니다.
+            return component.gameObject.GetOrAddComponent<T>();
+        }
     }
 }

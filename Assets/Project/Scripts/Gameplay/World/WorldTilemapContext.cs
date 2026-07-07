@@ -23,7 +23,7 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private Tilemap tilemap;
 
-        [SerializeField, ReadOnly] private WorldGridContext owner;
+        [SerializeField, ReadOnly] private WorldGridContext gridContext;
 
         [SerializeField, ReadOnly] private Dictionary<Vector3Int, WorldTile> mapTiles = new();
 
@@ -64,11 +64,14 @@ namespace TRPG.Runtime
 #endif
         }
 
-        public void SetOwner(WorldGridContext owner)
+        public void SetGridContext(WorldGridContext owner)
         {
-            this.owner = owner;
+            this.gridContext = owner;
         }
 
+        ///<summary>
+        /// Tilemap 타입을 변경하고 타입별 설정을 적용합니다.
+        ///</summary>
         public void SetTilemapType(WorldTilemapType tilemapType)
         {
             if (this == null)
@@ -77,17 +80,93 @@ namespace TRPG.Runtime
             }
 
             this.tilemapType = tilemapType;
+
+            ApplyLayerByTilemapType(tilemapType);
+            AddComponentsByTilemapType(tilemapType);
+            RebuildGridContext();
+        }
+
+        ///<summary>
+        /// Tilemap 타입 이름과 같은 Unity Layer를 찾아 적용합니다.
+        ///</summary>
+        private void ApplyLayerByTilemapType(WorldTilemapType tilemapType)
+        {
             int layer = LayerMask.NameToLayer(tilemapType.ToString());
-            if (layer >= 0)
+
+            if (layer < 0)
             {
-                gameObject.layer = layer;
-                tilemapRenderer.sortingOrder = layer;
+                return;
             }
 
-            if (owner != null)
+            gameObject.layer = layer;
+
+            if (tilemapRenderer != null)
             {
-                owner.Rebuild();
+                tilemapRenderer.sortingOrder = layer;
             }
+        }
+
+        ///<summary>
+        /// Tilemap 타입에 따라 필요한 컴포넌트를 구성합니다.
+        ///</summary>
+        private void AddComponentsByTilemapType(WorldTilemapType tilemapType)
+        {
+            switch (tilemapType)
+            {
+                case WorldTilemapType.None:
+                    break;
+
+                case WorldTilemapType.WorldTilemapDefault:
+                    break;
+
+                case WorldTilemapType.WorldTilemapBackground:
+                    break;
+
+                case WorldTilemapType.WorldTilemapGround:
+
+                    if (gameObject.TryGetComponent<Rigidbody2D>(out _) == false)
+                    {
+                        Rigidbody2D rigid = gameObject.AddComponent<Rigidbody2D>();
+                        {
+                            rigid.bodyType = RigidbodyType2D.Static;
+                            rigid.simulated = true;
+                        }
+                    }
+
+                    if (gameObject.TryGetComponent<TilemapCollider2D>(out _) == false)
+                    {
+                        TilemapCollider2D tilemapCollider = gameObject.AddComponent<TilemapCollider2D>();
+                        {
+                            tilemapCollider.compositeOperation = Collider2D.CompositeOperation.Merge;
+                        }
+                    }
+
+                    if (gameObject.TryGetComponent<CompositeCollider2D>(out _) == false)
+                    {
+                        CompositeCollider2D compositeCollider = gameObject.AddComponent<CompositeCollider2D>();
+                        {
+                            compositeCollider.offsetDistance = 0.005f;
+                        }
+                    }
+                    break;
+
+                case WorldTilemapType.WorldTilemapUI:
+                    break;
+            }
+        }
+
+
+        ///<summary>
+        /// owner가 존재하면 Tilemap 구성을 다시 빌드합니다.
+        ///</summary>
+        private void RebuildGridContext()
+        {
+            if (gridContext == null)
+            {
+                return;
+            }
+
+            gridContext.Rebuild();
         }
 
         /// <summary>
