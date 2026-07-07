@@ -58,8 +58,6 @@ namespace TRPG.Runtime
         /// 이 잡이 끝났는지?
         /// </summary>
         protected abstract bool CanExit();
-
-        public virtual void DrawGizmos() { }
     }
 
     public class CreatureMoveJob : CreatureJob
@@ -70,6 +68,11 @@ namespace TRPG.Runtime
 
         private int pathIndex = 1;
 
+        public IReadOnlyList<AStarNode> Path => path;
+
+        public int PathIndex => pathIndex;
+
+
         public CreatureMoveJob(CreatureController controller, Vector3Int targetCellPos) : base(controller)
         {
             this.targetCellPos = targetCellPos;
@@ -77,6 +80,15 @@ namespace TRPG.Runtime
             // 길찾기
             Vector3Int worldCellPos = WorldManager.WorldToCell(controller.transform.position);
             path = AStarPathfinder.FindPath(worldCellPos, targetCellPos);
+        }
+
+
+        /// <summary>
+        /// 이동 실행 노드가 현재 진행 중인 경로 인덱스를 Job에 동기화합니다.
+        /// </summary>
+        public void SetPathIndex(int pathIndex)
+        {
+            this.pathIndex = pathIndex;
         }
 
         protected override bool CanStart()
@@ -88,7 +100,7 @@ namespace TRPG.Runtime
             }
 
             // 이미 도착한거 아님?
-            if (path.Count <= 0)
+            if (path == null || path.Count <= 0)
             {
                 return true;
             }
@@ -99,66 +111,38 @@ namespace TRPG.Runtime
         protected override bool CanExit()
         {
             // 이미 도착한거 아님?
-            if (path.Count <= 0)
+            if (path == null || path.Count <= 0)
             {
                 return true;
             }
 
             return false;
         }
+    }
 
-        public override void DrawGizmos()
+    public class CreatureMiningJob : CreatureJob
+    {
+        [SerializeField] private List<Vector3Int> targetCellPoss;
+
+        public CreatureMiningJob(CreatureController controller, List<Vector3Int> targetCellPoss) : base(controller)
         {
-            WorldGridContext gridContext = WorldManager.GetWorldGridContext();
-            if (gridContext == null)
-            {
-                return;
-            }
-
-            if (path == null || path.Count == 0)
-            {
-                return;
-            }
-
-            if (pathIndex >= path.Count)
-            {
-                return;
-            }
-
-            Color previousColor = Gizmos.color;
-
-            // 현재 위치에서 남은 경로 노드까지 이어지는 이동 경로를 표시합니다.
-            Gizmos.color = Color.cyan;
-            Vector3 previousWorldPos = controller.transform.position;
-
-            for (int i = pathIndex; i < path.Count; i++)
-            {
-                Vector3 nodeWorldPos = GetNodeWorldPos(gridContext, path[i]);
-                Gizmos.DrawLine(previousWorldPos, nodeWorldPos);
-
-                previousWorldPos = nodeWorldPos;
-            }
-
-            // 각 경로 노드 위치를 확인할 수 있도록 작은 마커를 표시합니다.
-            float markerSize = Mathf.Min(gridContext.Grid.cellSize.x, gridContext.Grid.cellSize.y) * 0.25f;
-            Vector3 markerScale = Vector3.one * markerSize;
-
-            for (int i = pathIndex; i < path.Count; i++)
-            {
-                Vector3 nodeWorldPos = GetNodeWorldPos(gridContext, path[i]);
-                Gizmos.DrawWireCube(nodeWorldPos, markerScale);
-            }
-
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(GetNodeWorldPos(gridContext, path[path.Count - 1]), markerScale);
-
-            Gizmos.color = previousColor;
+            this.targetCellPoss = new List<Vector3Int>(targetCellPoss);
         }
 
-        private Vector3 GetNodeWorldPos(WorldGridContext gridContext, AStarNode node)
+        protected override bool CanExit()
         {
-            Vector3Int cellPos = new Vector3Int(node.X, node.Y, 0);
-            return gridContext.Grid.GetCellCenterWorld(cellPos);
+            // 죽으면 못움직이지...
+            if (controller.Context.State.HasFlag(CreatureStateType.Dead) == true)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        protected override bool CanStart()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

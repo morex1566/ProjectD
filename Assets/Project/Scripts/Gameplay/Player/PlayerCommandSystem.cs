@@ -112,7 +112,12 @@ namespace TRPG.Runtime
                 }
 
                 // 이미 이전에 있던 명령?
+                if (controller.JobQueue.TryFind<CreatureMoveJob>(out CreatureMoveJob prevJob) == true)
+                {
+                    controller.JobQueue.Remove(prevJob);
+                }
 
+                // 새 이동 명령 추가
                 controller.JobQueue.Enqueue(new CreatureMoveJob(controller, targetCellPos));
             }
         }
@@ -157,10 +162,10 @@ namespace TRPG.Runtime
 
         public void OnLeftClickPerformed(InputAction.CallbackContext context)
         {
-            Debug.Log("Test");
+            CommandMining();
         }
 
-        public void EnqueueJob()
+        public void CommandMining()
         {
 
         }

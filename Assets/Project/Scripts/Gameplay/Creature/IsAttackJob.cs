@@ -4,9 +4,11 @@ using UnityEngine;
 namespace TRPG.Runtime
 {
     [AddComponentMenu("")]
-    [MBTNode(name = "Creature/Condition - CanMining")]
-    public class CanMining : Condition
+    [MBTNode(name = "Creature/Condition - IsAttackJob")]
+    public class IsAttackJob : Condition
     {
+        private const string AttackJobTypeName = "CreatureAttackJob";
+
         [SerializeField, ReadOnly] private CreatureController controller = null;
 
         public override void OnEnter()
@@ -18,7 +20,7 @@ namespace TRPG.Runtime
 
         public override bool Check()
         {
-            return controller.Context.State.HasFlag(CreatureStateType.Dead) == false;
+            return controller.JobQueue.TryPeek(out CreatureJob job) == true && job.GetType().Name == AttackJobTypeName;
         }
     }
 }

@@ -292,6 +292,15 @@ namespace MBT
             return rootNode;
         }
 
+        private void OnDrawGizmos()
+        {
+            Node[] nodes = GetComponents<Node>();
+            for (int i = 0; i < nodes.Length; i++)
+            {
+                nodes[i].DrawGizmos();
+            }
+        }
+
         public MonoBehaviourTree GetMasterTree()
         {
             if (parent == null)

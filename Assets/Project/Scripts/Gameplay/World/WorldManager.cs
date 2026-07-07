@@ -12,6 +12,10 @@ namespace TRPG.Runtime
 
         private GameObject worldRoot = null;
 
+        [SerializeField, ReadOnly] private SerializableDictionary<int, CreatureController> creatures = new();
+
+
+        public static IReadOnlyDictionary<int, CreatureController> Creatures => GetInstance().creatures.ReadOnlyDictionary;
 
 
 
@@ -24,6 +28,75 @@ namespace TRPG.Runtime
             Settings = ResourceManager.GetResource<WorldManagerSettingsData>(UnityConstant.Addressable.Label.Core);
 
             manager.worldRoot = new GameObject("World");
+            manager.creatures.Clear();
+        }
+
+        /// <summary>
+        /// Creature 프리팹을 월드에 생성하고 GameObject InstanceID 기준으로 등록합니다.
+        /// </summary>
+        public static CreatureController Spawn(CreatureController creaturePf, Vector3 worldPos)
+        {
+            if (creaturePf == null)
+            {
+                Debug.LogWarning("Spawn failed. Creature prefab is null.");
+                return null;
+            }
+
+            WorldManager manager = GetInstance();
+            Transform parent = manager.worldRoot != null ? manager.worldRoot.transform : manager.transform;
+            CreatureController creature = Instantiate(creaturePf, worldPos, Quaternion.identity, parent);
+
+            RegisterCreature(creature);
+            return creature;
+        }
+
+        /// <summary>
+        /// 등록된 Creature를 GameObject InstanceID 기준으로 제거합니다.
+        /// </summary>
+        public static bool Despawn(int gameObjectInstanceId)
+        {
+            WorldManager manager = GetInstance();
+
+            if (manager.creatures.TryGetValue(gameObjectInstanceId, out CreatureController creature) == false)
+            {
+                return false;
+            }
+
+            manager.creatures.Remove(gameObjectInstanceId);
+
+            if (creature != null)
+            {
+                UnityEngine.Object.Destroy(creature.gameObject);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 등록된 Creature를 제거합니다.
+        /// </summary>
+        public static bool Despawn(CreatureController creature)
+        {
+            if (creature == null)
+            {
+                return false;
+            }
+
+            return Despawn(creature.gameObject.GetInstanceID());
+        }
+
+        /// <summary>
+        /// Creature를 GameObject InstanceID 기준으로 등록합니다.
+        /// </summary>
+        private static void RegisterCreature(CreatureController creature)
+        {
+            if (creature == null)
+            {
+                return;
+            }
+
+            WorldManager manager = GetInstance();
+            manager.creatures.SetValue(creature.gameObject.GetInstanceID(), creature);
         }
 
         public static WorldCameraController GetWorldCameraController()

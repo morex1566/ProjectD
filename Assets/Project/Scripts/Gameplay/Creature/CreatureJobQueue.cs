@@ -47,6 +47,9 @@ namespace TRPG.Runtime
         private readonly List<JobEntry> jobs = new();
 
 
+        public int Count => jobs.Count;
+
+
         public CreatureJobQueue(CreatureController controller)
         {
             this.controller = controller;
@@ -65,10 +68,29 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// 큐 앞쪽의 CreatureJob을 제거하지 않고 확인합니다.
+        /// </summary>
+        public bool TryPeek(out CreatureJob job)
+        {
+            Sort();
+
+            if (jobs.Count <= 0)
+            {
+                job = null;
+                return false;
+            }
+
+            job = jobs[0].Job;
+            return true;
+        }
+
+        /// <summary>
         /// 큐 앞쪽의 CreatureJob을 꺼냅니다.
         /// </summary>
         public bool TryDequeue(out CreatureJob job)
         {
+            Sort();
+
             if (jobs.Count <= 0)
             {
                 job = null;
@@ -162,17 +184,6 @@ namespace TRPG.Runtime
 
                 job.Evaluate();
                 return;
-            }
-        }
-
-        ///<summary>
-        /// Job의 기즈모를 그립니다.
-        ///</summary>
-        public void DrawGizmos()
-        {
-            foreach (JobEntry entry in jobs)
-            {
-                entry.Job.DrawGizmos();
             }
         }
 

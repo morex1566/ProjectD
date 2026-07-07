@@ -75,16 +75,11 @@ namespace TRPG.Runtime
                 return;
             }
 
-            // jobqueue and statemachine
-            jobQueue?.DrawGizmos();
-
 //#if UNITY_EDITOR
 //            // Scene View에 텍스트 표시
 //            Vector3 labelPos = transform.position + Vector3.up * 0.75f;
 //            string label = $"InstanceId: {InstanceId}\n" + $"DataId: {DataId}";
 //            Handles.Label(labelPos, label);
-
-            //            jobQueue.DrawGizmos();
             //#endif
         }
 

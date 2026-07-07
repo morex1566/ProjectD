@@ -49,6 +49,7 @@ namespace MBT
         public virtual void OnDisallowInterrupt() {}
 
         public virtual void OnBehaviourTreeAbort() {}
+        public virtual void DrawGizmos() {}
 
         public abstract void AddChild(Node node);
         public abstract void RemoveChild(Node node);

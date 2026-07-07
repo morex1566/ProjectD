@@ -11,9 +11,9 @@ namespace TRPG.Runtime
 
         public override void OnEnter()
         {
-            base.OnEnter();
-
             controller = GetComponentInParent<CreatureController>();
+
+            base.OnEnter();
         }
 
         public override bool Check()

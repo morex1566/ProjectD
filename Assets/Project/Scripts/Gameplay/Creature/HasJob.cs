@@ -4,8 +4,8 @@ using UnityEngine;
 namespace TRPG.Runtime
 {
     [AddComponentMenu("")]
-    [MBTNode(name = "Creature/Condition - CanMining")]
-    public class CanMining : Condition
+    [MBTNode(name = "Creature/Condition - HasJob")]
+    public class HasJob : Condition
     {
         [SerializeField, ReadOnly] private CreatureController controller = null;
 
@@ -18,7 +18,7 @@ namespace TRPG.Runtime
 
         public override bool Check()
         {
-            return controller.Context.State.HasFlag(CreatureStateType.Dead) == false;
+            return controller.JobQueue.Count > 0;
         }
     }
 }
