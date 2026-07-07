@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2472645014668278517}
   - component: {fileID: 5903688302557553995}
   m_Layer: 0
-  m_Name: Prefab_UI_Palette
+  m_Name: PF_UI_Palette
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

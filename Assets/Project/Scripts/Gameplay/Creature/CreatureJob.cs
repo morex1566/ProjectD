@@ -94,7 +94,7 @@ namespace TRPG.Runtime
         protected override bool CanStart()
         {
             // 죽으면 못움직이지...
-            if (controller.Context.State.HasFlag(CreatureStateType.Dead) == true)
+            if (controller.IsDead() == true)
             {
                 return false;
             }
@@ -132,7 +132,7 @@ namespace TRPG.Runtime
         protected override bool CanExit()
         {
             // 죽으면 못움직이지...
-            if (controller.Context.State.HasFlag(CreatureStateType.Dead) == true)
+            if (controller.IsDead() == true)
             {
                 return false;
             }
@@ -168,7 +168,7 @@ namespace TRPG.Runtime
     /// </summary>
     public class CreatureWanderJob : CreatureJob
     {
-        public override int Priority =>  10;
+        public override int Priority => 1000;
 
         public CreatureWanderJob(CreatureController controller) : base(controller)
         {

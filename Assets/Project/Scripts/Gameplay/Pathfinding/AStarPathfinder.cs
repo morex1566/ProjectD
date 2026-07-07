@@ -7,7 +7,8 @@ namespace TRPG.Runtime
     /// <summary>
     /// 현재 MapController의 타일 배열로 AStarGrid를 만들고 전역 경로 탐색 진입점을 제공합니다.
     /// </summary>
-    public class AStarPathfinder : MonoBehaviour
+    [Serializable]
+    public class AStarPathfinder
     {
         [SerializeField] private int width = 10;
 
@@ -20,20 +21,9 @@ namespace TRPG.Runtime
 
         public static AStarGrid AStarGrid => astarGrid;
 
-        /// <summary>
-        /// 같은 GameObject의 MapController에서 길찾기 그리드를 초기화합니다.
-        /// </summary>
-        private void Start()
+        public void Generate(Func<int, int, bool> isWalkablePredicate)
         {
-            // Map의 타일 타입에 맞춰서 그리드 생성
-            var gridController = GetComponent<WorldGridController>();
-            Generate();
-        }
-
-        [ContextMenu(nameof(Generate))]
-        public void Generate()
-        {
-            astarGrid = new AStarGrid(width, height);
+            astarGrid = new AStarGrid(width, height, isWalkablePredicate);
         }
 
         /// <summary>

@@ -18,7 +18,7 @@ namespace TRPG.Runtime
 
         public override bool Check()
         {
-            return controller.Context.State.HasFlag(CreatureStateType.Dead) == false;
+            return controller.IsDead() == false;
         }
     }
 }

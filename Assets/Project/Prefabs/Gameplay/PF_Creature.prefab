@@ -24,6 +24,9 @@ GameObject:
   - component: {fileID: 9045869362826930830}
   - component: {fileID: 6557722604311140347}
   - component: {fileID: 642086300753570549}
+  - component: {fileID: 3726305926532434944}
+  - component: {fileID: 8360580786613123072}
+  - component: {fileID: 4941434796956829696}
   m_Layer: 20
   m_Name: MBT
   m_TagString: Untagged
@@ -190,6 +193,7 @@ MonoBehaviour:
   - {fileID: 7068349396413464170}
   - {fileID: 7010324707637821743}
   - {fileID: 3569748581147698581}
+  - {fileID: 3726305926532434944}
   behaviourTree: {fileID: 0}
   runtimePriority: 0
   breakpoint: 0
@@ -394,6 +398,82 @@ MonoBehaviour:
     width: 160
     height: 44
   parent: {fileID: 6557722604311140347}
+  children: []
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+--- !u!114 &3726305926532434944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074258963442194482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aa5718b85be4ac4f8de6db593724dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.IsWanderJob
+  title: Condition - IsWanderJob
+  rect:
+    serializedVersion: 2
+    x: 560
+    y: 720
+    width: 160
+    height: 44
+  parent: {fileID: 1960071792074684045}
+  children:
+  - {fileID: 8360580786613123072}
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  controller: {fileID: 0}
+--- !u!114 &8360580786613123072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074258963442194482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59e1163989704498a44d4aac1bb078bb, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CanWander
+  title: Condition - CanWander
+  rect:
+    serializedVersion: 2
+    x: 560
+    y: 820
+    width: 160
+    height: 44
+  parent: {fileID: 3726305926532434944}
+  children:
+  - {fileID: 4941434796956829696}
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  controller: {fileID: 0}
+--- !u!114 &4941434796956829696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074258963442194482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 986b2e205bd8a944ea8e0663675c39ed, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoWander
+  title: Leaf - DoWander
+  rect:
+    serializedVersion: 2
+    x: 560
+    y: 900
+    width: 160
+    height: 44
+  parent: {fileID: 8360580786613123072}
   children: []
   behaviourTree: {fileID: 0}
   runtimePriority: 0

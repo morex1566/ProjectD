@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -18,7 +19,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// WorldTileType 배열을 기반으로 이동 가능한 AStarNode 그리드를 생성합니다.
         /// </summary>
-        public AStarGrid(int width, int height)
+        public AStarGrid(int width, int height, Func<int, int, bool> isWalkablePredicate)
         {
             Width = width;
             Height = height;
@@ -28,7 +29,7 @@ namespace TRPG.Runtime
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    nodes[x, y] = new AStarNode(x, y, true);
+                    nodes[x, y] = new AStarNode(x, y, isWalkablePredicate.Invoke(x, y));
                 }
             }
         }

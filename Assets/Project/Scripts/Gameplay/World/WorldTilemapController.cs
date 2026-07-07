@@ -50,13 +50,9 @@ namespace TRPG.Runtime
 
         public void Init(bool scheduleEditorApply = true)
         {
-            context ??= new WorldTilemapContext();
-            gridController ??= GetComponentInParent<WorldGridController>();
-
+            gridController = GetComponentInParent<WorldGridController>();
             tilemapRenderer = GetComponent<TilemapRenderer>();
             tilemap = GetComponent<Tilemap>();
-
-            RebuildMapTilesFromTilemap();
 
 #if UNITY_EDITOR
             if (scheduleEditorApply)
@@ -86,7 +82,6 @@ namespace TRPG.Runtime
 
             ApplyLayerByTilemapType(tilemapType);
             AddComponentsByTilemapType(tilemapType);
-            RebuildGridContext();
         }
 
         /// <summary>
@@ -127,35 +122,6 @@ namespace TRPG.Runtime
         {
             context.MapTiles.Clear();
             tilemap.ClearAllTiles();
-        }
-
-        /// <summary>
-        /// Unity Tilemap에 배치된 타일을 런타임 타일 데이터로 복원합니다.
-        /// </summary>
-        public void RebuildMapTilesFromTilemap()
-        {
-            context.MapTiles.Clear();
-
-            if (tilemap == null)
-            {
-                return;
-            }
-
-            BoundsInt bounds = tilemap.cellBounds;
-            foreach (Vector3Int cellPos in bounds.allPositionsWithin)
-            {
-                TileBase tileBase = tilemap.GetTile(cellPos);
-                if (tileBase == null)
-                {
-                    continue;
-                }
-
-                context.MapTiles[cellPos] = new WorldTile
-                {
-                    Pos = cellPos,
-                    TileBase = tileBase,
-                };
-            }
         }
 
         /// <summary>
@@ -225,19 +191,6 @@ namespace TRPG.Runtime
                 case WorldTilemapType.WorldTilemapUI:
                     break;
             }
-        }
-
-        /// <summary>
-        /// 소유 Grid가 존재하면 Tilemap 조회 캐시를 다시 빌드합니다.
-        /// </summary>
-        private void RebuildGridContext()
-        {
-            if (gridController == null)
-            {
-                return;
-            }
-
-            gridController.Rebuild();
         }
 
 #if UNITY_EDITOR

@@ -17,13 +17,13 @@ namespace TRPG.Runtime
     {
         [Header(nameof(WorldGridController))]
 
-        [SerializeField] private WorldGridContext context = new();
-
         [SerializeField, ReadOnly] private Grid grid = null;
 
         [SerializeField, ReadOnly] private List<WorldTilemapController> tilemapControllers = new();
 
         [SerializeField, ReadOnly] private Dictionary<WorldTilemapType, WorldTilemapController> tilemapControllerMap = new();
+
+        [SerializeField] private AStarPathfinder pathfinder = new();
 
 
         [Header("Ground")]
@@ -34,8 +34,6 @@ namespace TRPG.Runtime
 
         [SerializeField] private Vector3Int pivot = Vector3Int.zero;
 
-
-        public WorldGridContext Context => context;
 
         public Grid Grid => grid;
 
@@ -58,16 +56,26 @@ namespace TRPG.Runtime
             Init();
         }
 
+        private void Start()
+        {
+            if (Application.isPlaying == false)
+            {
+                return;
+            }
+
+            // Ground인 부분을 이동할 수 없는 타일로 조건식+
+            pathfinder.Generate(SetWorldWalkablePredicate);
+        }
+
         private void OnDestroy()
         {
 #if UNITY_EDITOR
-            EditorApplication.delayCall -= RebuildDelayed;
+            EditorApplication.delayCall -= Rebuild;
 #endif
         }
 
         private void Init()
         {
-            context ??= new WorldGridContext();
             grid = GetComponent<Grid>();
 
             if (Application.isPlaying)
@@ -77,8 +85,8 @@ namespace TRPG.Runtime
             else
             {
 #if UNITY_EDITOR
-                EditorApplication.delayCall -= RebuildDelayed;
-                EditorApplication.delayCall += RebuildDelayed;
+                EditorApplication.delayCall -= Rebuild;
+                EditorApplication.delayCall += Rebuild;
 #endif
             }
         }
@@ -97,10 +105,6 @@ namespace TRPG.Runtime
             tilemapController.Init(false);
             tilemapController.SetGridController(this);
             tilemapController.SetTilemapType(WorldTilemapType.WorldTilemapDefault);
-
-            tilemapControllers.Add(tilemapController);
-
-            Rebuild();
         }
 
         /// <summary>
@@ -111,6 +115,7 @@ namespace TRPG.Runtime
             CollectChildTilemapControllers();
 
             tilemapControllers.RemoveAll(tilemapController => tilemapController == null);
+            RemoveDuplicateTilemapControllers();
             tilemapControllerMap.Clear();
 
             foreach (WorldTilemapController tilemapController in tilemapControllers)
@@ -314,16 +319,36 @@ namespace TRPG.Runtime
             }
         }
 
-#if UNITY_EDITOR
-        private void RebuildDelayed()
+        private void RemoveDuplicateTilemapControllers()
         {
-            if (this == null)
+            HashSet<WorldTilemapController> uniqueTilemapControllers = new();
+
+            for (int i = tilemapControllers.Count - 1; i >= 0; i--)
             {
-                return;
+                WorldTilemapController tilemapController = tilemapControllers[i];
+                if (uniqueTilemapControllers.Add(tilemapController) == false)
+                {
+                    tilemapControllers.RemoveAt(i);
+                }
+            }
+        }
+
+        private bool SetWorldWalkablePredicate(int x, int y)
+        {
+            // 그라운드 타일맵 자체가 없다면 걍 다 이동가능한 곳
+            if (TryGetTilemapController(WorldTilemapType.WorldTilemapGround, out WorldTilemapController groundTilemap) == false)
+            {
+                return true;
             }
 
-            Rebuild();
+            // 땅타일이 없으면 이동 가능
+            if (groundTilemap.TryGetTile(x, y, out _) == false)
+            {
+                return true;
+            }
+
+            // 땅타일이 있으면 이동 불가능
+            return false;
         }
-#endif
     }
 }

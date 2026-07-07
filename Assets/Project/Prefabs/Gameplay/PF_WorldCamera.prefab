@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8159157605105856393}
   - component: {fileID: 8413876597104047414}
   m_Layer: 0
-  m_Name: Prefab_WorldCamera
+  m_Name: PF_WorldCamera
   m_TagString: WorldCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

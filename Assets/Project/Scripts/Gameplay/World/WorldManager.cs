@@ -168,28 +168,6 @@ namespace TRPG.Runtime
             return manager.worldGridController;
         }
 
-        public static WorldGridContext GetWorldGridContext()
-        {
-            return GetWorldGridController()?.Context;
-        }
-
-        public static WorldTilemapContext GetWorldTilemapContext(WorldTilemapType worldTilemapType)
-        {
-            WorldGridController gridController = GetWorldGridController();
-
-            if (gridController == null)
-            {
-                return null;
-            }
-
-            if (gridController.TryGetTilemapContext(worldTilemapType, out WorldTilemapContext tilemapContext) == false)
-            {
-                return null;
-            }
-
-            return tilemapContext;
-        }
-
         public static WorldTilemapController GetWorldTilemapController(WorldTilemapType worldTilemapType)
         {
             WorldGridController gridController = GetWorldGridController();
