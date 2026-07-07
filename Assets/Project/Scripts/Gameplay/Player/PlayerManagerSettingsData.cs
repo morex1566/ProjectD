@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TRPG.Runtime
 {
@@ -11,6 +12,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 플레이어 선택 기능을 담당하는 프리팹입니다.
         /// </summary>
-        public GameObject SelectorPf;
+        [FormerlySerializedAs("SelectorPf")]
+        public GameObject SelectorPrefab;
     }
 }

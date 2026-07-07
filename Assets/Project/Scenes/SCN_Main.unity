@@ -676,7 +676,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9042492019523494467, guid: 51b16e32e965af64eb843d470cac3165, type: 3}
       propertyPath: m_Name
-      value: PF_WorldCamera
+      value: Prefab_WorldCamera
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -831,7 +831,7 @@ GameObject:
   - component: {fileID: 1999060473}
   - component: {fileID: 1999060474}
   m_Layer: 5
-  m_Name: PF_UI_ActionLayout
+  m_Name: Prefab_UI_ActionLayout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

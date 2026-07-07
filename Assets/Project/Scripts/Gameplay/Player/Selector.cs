@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace TRPG.Runtime
@@ -19,7 +20,8 @@ namespace TRPG.Runtime
         /// <summary>
         /// 드래그 선택 영역을 표시할 UI 프리팹입니다.
         /// </summary>
-        [SerializeField] private RectTransform selectionBoxPf = null;
+        [FormerlySerializedAs("selectionBoxPf")]
+        [SerializeField] private RectTransform selectionBoxPrefab = null;
 
         private Camera cam;
 
@@ -163,9 +165,9 @@ namespace TRPG.Runtime
             }
             else
             {
-                if (!MouseEx.TryGetWorldPos(cam, pointerScreenPos, out Vector3 pointerWorldPos)) return;
+                if (!MouseEx.TryGetWorldPosition(cam, pointerScreenPos, out Vector3 pointerWorldPosition)) return;
 
-                Select(cam, pointerWorldPos);
+                Select(cam, pointerWorldPosition);
             }
         }
 
@@ -177,7 +179,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 단일 클릭 선택 결과를 자식 선택기에서 처리합니다.
         /// </summary>
-        protected abstract void Select(Camera cam, Vector2 mouseWorldPos);
+        protected abstract void Select(Camera cam, Vector2 mouseWorldPosition);
 
         /// <summary>
         /// 현재 선택된 대상과 표시 상태를 자식 선택기에서 정리합니다.
@@ -195,7 +197,7 @@ namespace TRPG.Runtime
         private void CreateSelectionBox()
         {
             if (selectionBox != null) return;
-            if (selectionBoxPf == null) return;
+            if (selectionBoxPrefab == null) return;
 
             GameObject canvasObj = new GameObject("SelectionBoxCanvas", typeof(RectTransform), typeof(Canvas));
             canvasObj.transform.SetParent(transform, false);
@@ -205,7 +207,7 @@ namespace TRPG.Runtime
             canvas.sortingOrder = 1000;
 
             selectionBoxCanvasRect = canvasObj.GetComponent<RectTransform>();
-            selectionBox = Instantiate(selectionBoxPf, selectionBoxCanvasRect);
+            selectionBox = Instantiate(selectionBoxPrefab, selectionBoxCanvasRect);
             selectionBox.anchorMin = new Vector2(0.5f, 0.5f);
             selectionBox.anchorMax = new Vector2(0.5f, 0.5f);
             selectionBox.pivot = new Vector2(0.5f, 0.5f);

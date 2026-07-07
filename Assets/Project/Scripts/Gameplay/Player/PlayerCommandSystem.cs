@@ -104,8 +104,8 @@ namespace TRPG.Runtime
 
                 // 클릭 지점이 길찾기 가능한 좌표?
                 Camera cam = WorldManager.GetWorldCameraController()?.Cam;
-                Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(cam);
-                Vector3Int targetCellPos = WorldManager.WorldToCell(mouseWorldPos);
+                Vector3 mouseWorldPosition = MouseEx.GetMouseWorldPosition(cam);
+                Vector3Int targetCellPos = WorldManager.WorldToCell(mouseWorldPosition);
                 if (AStarPathfinder.AStarGrid.IsInBound(targetCellPos) == false)
                 {
                     return;

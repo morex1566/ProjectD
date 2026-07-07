@@ -43,13 +43,13 @@ namespace TRPG.Runtime
             Rect selectionBoxScreenRect = ScreenEx.CreateScreenRect(startScreenPos, endScreenPos);
 
             // 선택박스 월드 좌표
-            Vector3 startWorldPos = ScreenEx.ScreenToWorldPos(cam, startScreenPos);
-            Vector3 endWorldPos = ScreenEx.ScreenToWorldPos(cam, endScreenPos);
+            Vector3 startWorldPosition = ScreenEx.ScreenToWorldPosition(cam, startScreenPos);
+            Vector3 endWorldPosition = ScreenEx.ScreenToWorldPosition(cam, endScreenPos);
 
             // 셀 좌표
             Tilemap tilemap = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
-            Vector3Int startCellPos = tilemap.WorldToCell(startWorldPos);
-            Vector3Int endCellPos = tilemap.WorldToCell(endWorldPos);
+            Vector3Int startCellPos = tilemap.WorldToCell(startWorldPosition);
+            Vector3Int endCellPos = tilemap.WorldToCell(endWorldPosition);
             Vector3Int minCellPos = Vector3Int.Min(startCellPos, endCellPos);
             Vector3Int maxCellPos = Vector3Int.Max(startCellPos, endCellPos);
 
@@ -72,8 +72,8 @@ namespace TRPG.Runtime
                     }
 
                     // 셀 중앙점이 드래그 Rect 안에 들어온 타일만 선택합니다.
-                    Vector3 cellCenterWorldPos = tilemap.GetCellCenterWorld(cellPos);
-                    Vector2 cellCenterScreenPos = cam.WorldToScreenPoint(cellCenterWorldPos);
+                    Vector3 cellCenterWorldPosition = tilemap.GetCellCenterWorld(cellPos);
+                    Vector2 cellCenterScreenPos = cam.WorldToScreenPoint(cellCenterWorldPosition);
                     if (!selectionBoxScreenRect.Contains(cellCenterScreenPos))
                     {
                         continue;
@@ -88,11 +88,11 @@ namespace TRPG.Runtime
         /// <summary>
         /// 클릭한 월드 좌표가 포함된 타일 셀을 공사 대상으로 선택합니다.
         /// </summary>
-        protected override void Select(Camera cam, Vector2 mouseWorldPos)
+        protected override void Select(Camera cam, Vector2 mouseWorldPosition)
         {
             // 셀 좌표
             Tilemap tilemap = WorldManager.GetWorldTilemapContext(WorldTilemapType.WorldTilemapGround).Tilemap;
-            Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPos);
+            Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPosition);
 
             // 실제 타일이 있는 셀만 선택합니다.
             if (!tilemap.HasTile(mouseCellPos)) return;

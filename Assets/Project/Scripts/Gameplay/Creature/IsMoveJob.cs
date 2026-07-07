@@ -63,14 +63,14 @@ namespace TRPG.Runtime
 
             // 현재 위치에서 남은 경로 노드까지 이어지는 이동 경로를 표시합니다.
             Gizmos.color = Color.cyan;
-            Vector3 previousWorldPos = controller.transform.position;
+            Vector3 previousWorldPosition = controller.transform.position;
 
             for (int i = pathIndex; i < path.Count; i++)
             {
-                Vector3 nodeWorldPos = GetNodeWorldPos(gridContext, path[i]);
-                Gizmos.DrawLine(previousWorldPos, nodeWorldPos);
+                Vector3 nodeWorldPosition = GetNodeWorldPosition(gridContext, path[i]);
+                Gizmos.DrawLine(previousWorldPosition, nodeWorldPosition);
 
-                previousWorldPos = nodeWorldPos;
+                previousWorldPosition = nodeWorldPosition;
             }
 
             // 각 경로 노드 위치를 확인할 수 있도록 작은 마커를 표시합니다.
@@ -79,17 +79,17 @@ namespace TRPG.Runtime
 
             for (int i = pathIndex; i < path.Count; i++)
             {
-                Vector3 nodeWorldPos = GetNodeWorldPos(gridContext, path[i]);
-                Gizmos.DrawWireCube(nodeWorldPos, markerScale);
+                Vector3 nodeWorldPosition = GetNodeWorldPosition(gridContext, path[i]);
+                Gizmos.DrawWireCube(nodeWorldPosition, markerScale);
             }
 
             Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(GetNodeWorldPos(gridContext, path[path.Count - 1]), markerScale);
+            Gizmos.DrawWireCube(GetNodeWorldPosition(gridContext, path[path.Count - 1]), markerScale);
 
             Gizmos.color = previousColor;
         }
 
-        private Vector3 GetNodeWorldPos(WorldGridContext gridContext, AStarNode node)
+        private Vector3 GetNodeWorldPosition(WorldGridContext gridContext, AStarNode node)
         {
             Vector3Int cellPos = new Vector3Int(node.X, node.Y, 0);
             return gridContext.Grid.GetCellCenterWorld(cellPos);

@@ -169,11 +169,11 @@ namespace TRPG.Runtime
             return TryGetTile(x, y, out _);
         }
 
-        public bool TryGetTile(WorldTilemapType tilemapType, Vector3 worldPos, out WorldTile tile)
+        public bool TryGetTile(WorldTilemapType tilemapType, Vector3 worldPosition, out WorldTile tile)
         {
             tile = default;
 
-            Vector3Int cellPos = grid.WorldToCell(worldPos);
+            Vector3Int cellPos = grid.WorldToCell(worldPosition);
 
             if (TryGetTilemapContext(tilemapType, out WorldTilemapContext tilemapContext) == false)
             {

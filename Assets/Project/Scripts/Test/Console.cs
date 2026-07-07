@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace TRPG.Runtime
 {
@@ -11,7 +12,8 @@ namespace TRPG.Runtime
     {
         [Header(nameof(IsNumberOnePressed))]
 
-        [SerializeField] private GameObject creaturePf;
+        [FormerlySerializedAs("creaturePf")]
+        [SerializeField] private GameObject creaturePrefab;
 
         private void OnEnable()
         {
@@ -31,14 +33,14 @@ namespace TRPG.Runtime
 
         private void SpawnCreature()
         {
-            if (creaturePf == null)
+            if (creaturePrefab == null)
             {
                 return;
             }
 
             Camera cam = WorldManager.GetWorldCameraController().Cam;
-            Vector3 mouseWorldPos = MouseEx.GetMouseWorldPos(cam);
-            WorldManager.SpawnCreature(creaturePf, mouseWorldPos);
+            Vector3 mouseWorldPosition = MouseEx.GetMouseWorldPosition(cam);
+            WorldManager.SpawnCreature(creaturePrefab, mouseWorldPosition);
         }
 
         /// <summary>

@@ -33,7 +33,7 @@ namespace TRPG.Runtime
 
             Settings = ResourceManager.GetResource<PlayerManagerSettingsData>(UnityConstant.Addressable.Label.Core);
 
-            GameObject selectorInst = Instantiate(Settings.SelectorPf, manager.transform);
+            GameObject selectorInst = Instantiate(Settings.SelectorPrefab, manager.transform);
             manager.creatureSelector = selectorInst.GetComponent<CreatureSelector>();
             manager.worldTileSelector = selectorInst.GetComponent<WorldTileSelector>();
 

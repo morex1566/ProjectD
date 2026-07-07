@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TRPG.Runtime
 {
@@ -21,31 +22,37 @@ namespace TRPG.Runtime
         /// <summary>
         /// 타이틀 메시지 UI 프리팹입니다.
         /// </summary>
-        public GameObject titleMessagePf;
+        [FormerlySerializedAs("titleMessagePf")]
+        public GameObject titleMessagePrefab;
 
         /// <summary>
         /// 대화 UI 프리팹입니다.
         /// </summary>
-        public GameObject dialougeUIPf;
+        [FormerlySerializedAs("dialougeUIPf")]
+        public GameObject dialougeUIPrefab;
 
         /// <summary>
         /// 패널 UI 프리팹입니다.
         /// </summary>
-        public GameObject panelUIPf;
+        [FormerlySerializedAs("panelUIPf")]
+        public GameObject panelUIPrefab;
 
         /// <summary>
         /// 대화 진행 UI 프리팹입니다.
         /// </summary>
-        public GameObject conversationUIPf;
+        [FormerlySerializedAs("conversationUIPf")]
+        public GameObject conversationUIPrefab;
 
         /// <summary>
         /// 턴 UI 프리팹입니다.
         /// </summary>
-        public GameObject turnUIPf;
+        [FormerlySerializedAs("turnUIPf")]
+        public GameObject turnUIPrefab;
 
         /// <summary>
         /// 턴 상태 UI 프리팹입니다.
         /// </summary>
-        public GameObject turnStateUIPf;
+        [FormerlySerializedAs("turnStateUIPf")]
+        public GameObject turnStateUIPrefab;
     }
 }

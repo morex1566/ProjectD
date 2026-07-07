@@ -13,8 +13,6 @@ namespace TRPG.Runtime
     {
         [SerializeField, ReadOnly] private SpriteRenderer spriter = null;
 
-        [SerializeField, ReadOnly] private GroundChecker groundChecker = null;
-
         [SerializeField] private CreatureContext context = null;
 
         private CreatureJobQueue jobQueue = null;
@@ -32,8 +30,6 @@ namespace TRPG.Runtime
         public int InstanceId => gameObject.GetInstanceID();
 
         public SpriteRenderer Spriter => spriter;
-
-        public GroundChecker GroundChecker => groundChecker;
 
         public CreatureJobQueue JobQueue => jobQueue;
 
@@ -91,7 +87,6 @@ namespace TRPG.Runtime
         public void Init()
         {
             spriter = GetComponentInChildren<SpriteRenderer>();
-            groundChecker = GetComponentInChildren<GroundChecker>();
             jobQueue ??= new CreatureJobQueue(this);
             context ??= new CreatureContext();
         }

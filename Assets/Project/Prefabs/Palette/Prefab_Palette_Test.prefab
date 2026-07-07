@@ -214,7 +214,7 @@ GameObject:
   - component: {fileID: 3155487838913656592}
   - component: {fileID: 1030134827646976081}
   m_Layer: 0
-  m_Name: PF_Palette_Test
+  m_Name: Prefab_Palette_Test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

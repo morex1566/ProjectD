@@ -11,33 +11,33 @@ namespace TRPG.Runtime
         /// <summary>
         /// 현재 마우스 화면 좌표에 대한 월드 좌표를 가져옵니다.
         /// </summary>
-        public static Vector3 GetMouseWorldPos(Camera camera)
+        public static Vector3 GetMouseWorldPosition(Camera camera)
         {
-            TryGetMouseWorldPos(camera, out Vector3 worldPos);
+            TryGetMouseWorldPosition(camera, out Vector3 worldPosition);
 
-            return worldPos;
+            return worldPosition;
         }
 
         /// <summary>
         /// 현재 포인터 화면 좌표에 대한 z=0 평면의 월드 좌표를 가져옵니다.
         /// </summary>
-        public static bool TryGetMouseWorldPos(Camera camera, out Vector3 worldPos)
+        public static bool TryGetMouseWorldPosition(Camera camera, out Vector3 worldPosition)
         {
-            worldPos = default;
+            worldPosition = default;
 
             if (Pointer.current == null) return false;
 
             Vector2 screenPosition = Pointer.current.position.ReadValue();
 
-            return TryGetWorldPos(camera, screenPosition, out worldPos);
+            return TryGetWorldPosition(camera, screenPosition, out worldPosition);
         }
 
         /// <summary>
         /// 지정된 화면 좌표에 대한 z=0 평면의 월드 좌표를 가져옵니다.
         /// </summary>
-        public static bool TryGetWorldPos(Camera camera, Vector2 screenPosition, out Vector3 worldPos)
+        public static bool TryGetWorldPosition(Camera camera, Vector2 screenPosition, out Vector3 worldPosition)
         {
-            worldPos = default;
+            worldPosition = default;
 
             if (camera == null) return false;
 
@@ -51,8 +51,8 @@ namespace TRPG.Runtime
 
             if (!worldPlane.Raycast(ray, out float distance)) return false;
 
-            worldPos = ray.GetPoint(distance);
-            worldPos.z = 0f;
+            worldPosition = ray.GetPoint(distance);
+            worldPosition.z = 0f;
 
             return true;
         }

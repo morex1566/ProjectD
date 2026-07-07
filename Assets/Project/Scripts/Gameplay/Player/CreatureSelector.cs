@@ -58,7 +58,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 클릭 위치를 포함하는 선택 가능 오브젝트 중 카메라에 가장 가까운 대상을 선택합니다.
         /// </summary>
-        protected override void Select(Camera cam, Vector2 mouseWorldPos)
+        protected override void Select(Camera cam, Vector2 mouseWorldPosition)
         {
             Clear();
 
@@ -76,7 +76,7 @@ namespace TRPG.Runtime
                 if (!selectable.CanSelect) continue;
 
                 // 대상이 클릭 가능한 위치였음?
-                if (!selectable.Contains(mouseWorldPos)) continue;
+                if (!selectable.Contains(mouseWorldPosition)) continue;
 
                 // 선택
                 // 1. 가장 가까운 대상

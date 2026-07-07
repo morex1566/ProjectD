@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d272424de64c508d07eaac04f0e9a4, type: 3}
   m_Name: SO_PlayerManagerSettings
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.PlayerManagerSettingsData
-  SelectorPf: {fileID: 1695718276028346589, guid: 123a10618a299144eb73806cba138cf4, type: 3}
-  DigSystemPf: {fileID: 6288426118403367558, guid: fcc31759d336778418cc2057480c17f6, type: 3}
+  SelectorPrefab: {fileID: 1695718276028346589, guid: 123a10618a299144eb73806cba138cf4, type: 3}
+  DigSystemPrefab: {fileID: 6288426118403367558, guid: fcc31759d336778418cc2057480c17f6, type: 3}

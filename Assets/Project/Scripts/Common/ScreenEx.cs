@@ -12,7 +12,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 화면 좌표를 월드 좌표로 변환합니다.
         /// </summary>
-        public static Vector3 ScreenToWorldPos(Camera camera, Vector2 screenPos, float worldZ = 0f)
+        public static Vector3 ScreenToWorldPosition(Camera camera, Vector2 screenPos, float worldZ = 0f)
         {
             // 카메라가 없으면 변환 불가
             if (camera == null)
@@ -24,12 +24,12 @@ namespace TRPG.Runtime
             float distance = worldZ - camera.transform.position.z;
 
             // ScreenToWorldPoint는 z에 카메라로부터의 거리가 필요함
-            Vector3 worldPos = camera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, distance));
+            Vector3 worldPosition = camera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, distance));
 
             // 2D에서는 보통 z를 고정
-            worldPos.z = worldZ;
+            worldPosition.z = worldZ;
 
-            return worldPos;
+            return worldPosition;
         }
 
         /// <summary>

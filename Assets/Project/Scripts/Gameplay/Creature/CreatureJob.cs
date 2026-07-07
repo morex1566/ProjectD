@@ -111,7 +111,7 @@ namespace TRPG.Runtime
         protected override bool CanExit()
         {
             // 이미 도착한거 아님?
-            if (path == null || path.Count <= 0)
+            if (path == null || path.Count <= 0 || pathIndex >= path.Count)
             {
                 return true;
             }

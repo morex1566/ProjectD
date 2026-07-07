@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1752784067799025704}
   - component: {fileID: 7690866558165233099}
   m_Layer: 20
-  m_Name: PF_WorldGrid
+  m_Name: Prefab_WorldGrid
   m_TagString: WorldGrid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
