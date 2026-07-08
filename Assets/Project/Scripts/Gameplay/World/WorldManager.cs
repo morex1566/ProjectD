@@ -49,6 +49,25 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// Creature 프리팹을 생성한 뒤 DataId에 해당하는 CreatureData로 컨텍스트를 로드합니다.
+        /// </summary>
+        public static CreatureController SpawnCreature(GameObject creaturePrefab, string dataId, Vector3 worldPosition)
+        {
+            if (TryGetCreatureData(dataId, out CreatureData data) == false)
+            {
+                return null;
+            }
+
+            CreatureController creature = SpawnCreature(creaturePrefab, worldPosition);
+            if (creature != null)
+            {
+                creature.LoadContext(data);
+            }
+
+            return creature;
+        }
+
+        /// <summary>
         /// Creature 프리팹을 월드에 생성하고 GameObject InstanceID 기준으로 등록합니다.
         /// </summary>
         public static CreatureController SpawnCreature(GameObject creaturePrefab, Vector3 worldPosition)
@@ -69,7 +88,7 @@ namespace TRPG.Runtime
             Transform parent = manager.worldRoot != null ? manager.worldRoot.transform : manager.transform;
             CreatureController creature = Instantiate(creaturePrefab, worldPosition, Quaternion.identity, parent).GetComponent<CreatureController>();
 
-            RegisterCreature(creature);
+            manager.creatures[creature.gameObject.GetInstanceID()] = creature;
             return creature;
         }
 
@@ -109,17 +128,19 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// Creature를 GameObject InstanceID 기준으로 등록합니다.
+        /// 월드 설정에 연결된 CreatureSheet에서 CreatureData를 조회합니다.
         /// </summary>
-        public static void RegisterCreature(CreatureController creature)
+        public static bool TryGetCreatureData(string dataId, out CreatureData data)
         {
-            if (creature == null)
+            data = null;
+
+            if (Settings == null || Settings.CreatureDataSheet == null)
             {
-                return;
+                Debug.LogWarning("TryGetCreatureData failed. CreatureDataSheet is not assigned.");
+                return false;
             }
 
-            WorldManager manager = GetInstance();
-            manager.creatures[creature.gameObject.GetInstanceID()] = creature;
+            return Settings.CreatureDataSheet.TryGetEntity(dataId, out data);
         }
 
         /// <summary>

@@ -11,14 +11,24 @@ namespace TRPG.Runtime
 
         [SerializeField, ReadOnly] private CreatureController controller = null;
 
+        private void OnValidate()
+        {
+            CacheComponents();
+        }
+
         private void Awake()
         {
-            controller = GetComponentInParent<CreatureController>();
+            CacheComponents();
         }
 
         public override bool Check()
         {
             return controller.JobQueue.TryPeek(out CreatureJob job) == true && job.GetType().Name == AttackJobTypeName;
+        }
+
+        private void CacheComponents()
+        {
+            controller = GetComponentInParent<CreatureController>();
         }
     }
 }

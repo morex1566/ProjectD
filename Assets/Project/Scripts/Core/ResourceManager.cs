@@ -84,7 +84,7 @@ namespace TRPG.Runtime
             }
             catch
             {
-                Debug.LogError($"Load Error: {label}");
+                Debug.LogError($"TryLoad Error: {label}");
 
                 // 일부만 로드된 상태에서 실패해도 이미 등록한 handle은 모두 해제합니다.
                 Unload(label);

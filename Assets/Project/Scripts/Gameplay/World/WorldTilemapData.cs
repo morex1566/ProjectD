@@ -9,7 +9,7 @@ namespace TRPG.Runtime
     {
         [SerializeField] private SerializableDictionary<Vector3Int, WorldTile> mapTiles = new();
 
-        public Dictionary<Vector3Int, WorldTile> MapTiles => mapTiles.ToDictionary();
+        public SerializableDictionary<Vector3Int, WorldTile> MapTiles => mapTiles;
 
 
 
@@ -18,7 +18,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void SetTile(WorldTile tile)
         {
-            mapTiles.SetValue(tile.Pos, tile);
+            mapTiles.Set(tile.Pos, tile);
         }
 
         /// <summary>

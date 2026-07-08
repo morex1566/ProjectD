@@ -20,5 +20,8 @@ namespace TRPG.Runtime
         public float AttackSpeed;
         public float MoveSpeed;
         public string AIType;
+
+        public Sprite Sprite;
+        public GameObject BehaviourTreePrefab;
     }
 }

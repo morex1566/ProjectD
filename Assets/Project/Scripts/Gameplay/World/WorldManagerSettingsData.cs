@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace TRPG.Runtime
 {
@@ -9,6 +8,9 @@ namespace TRPG.Runtime
     [CreateAssetMenu(fileName = "SO_WorldManagerSettings", menuName = "Scriptable Objects/Settings/World Manager")]
     public class WorldManagerSettingsData : ScriptableObject
     {
-
+        /// <summary>
+        /// DataId로 CreatureData를 조회할 시트입니다.
+        /// </summary>
+        public CreatureSheet CreatureDataSheet;
     }
 }

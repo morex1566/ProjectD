@@ -27,6 +27,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - Core
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c79fbe8208c71542ad8a4fea3fe4504
+    m_Address: SO_CreatureSheet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8473cb7ddb28ba7438a668f8d55c8343
     m_Address: SO_DOTweenSettings
     m_ReadOnly: 0

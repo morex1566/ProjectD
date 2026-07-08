@@ -16,9 +16,14 @@ namespace TRPG.Runtime
         private CreatureMoveJob currentMoveJob = null;
         private IReadOnlyList<AStarNode> path = null;
 
+        private void OnValidate()
+        {
+            CacheComponents();
+        }
+
         private void Awake()
         {
-            controller = GetComponentInParent<CreatureController>();
+            CacheComponents();
         }
 
         public override NodeResult Execute()
@@ -41,6 +46,11 @@ namespace TRPG.Runtime
         public override void DrawGizmos()
         {
             
+        }
+
+        private void CacheComponents()
+        {
+            controller = GetComponentInParent<CreatureController>();
         }
     }
 }

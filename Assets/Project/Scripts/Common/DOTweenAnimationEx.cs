@@ -51,7 +51,7 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// DOTweenAnimation의 Tween을 생성한 뒤 id 유무에 맞춰 재시작합니다.
+        /// DOTweenAnimation의 Tween을 생성한 뒤 idData 유무에 맞춰 재시작합니다.
         /// </summary>
         public static void Restart(DOTweenAnimation animation)
         {

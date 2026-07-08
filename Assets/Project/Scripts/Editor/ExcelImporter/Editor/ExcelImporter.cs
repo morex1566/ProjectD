@@ -373,11 +373,28 @@ public class ExcelImporter : AssetPostprocessor
 			sheetCount++;
 		}
 
+		InvokeOnCreateIfExists(asset);
+
 		if(info.Attribute.LogOnImport)
 		{
 			Debug.Log(string.Format("Imported {0} sheets form {1}.", sheetCount, excelPath));
 		}
 
 		EditorUtility.SetDirty(asset);
+	}
+
+	/// <summary>
+	/// 엑셀 값 반영 이후 에셋별 후처리 메서드를 호출합니다.
+	/// </summary>
+	static void InvokeOnCreateIfExists(UnityEngine.Object asset)
+	{
+		MethodInfo onCreateMethod = asset.GetType().GetMethod(
+			"OnCreate",
+			BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+		);
+
+		if (onCreateMethod == null || onCreateMethod.GetParameters().Length != 0) return;
+
+		onCreateMethod.Invoke(asset, null);
 	}
 }

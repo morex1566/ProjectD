@@ -10,9 +10,14 @@ namespace TRPG.Runtime
     {
         [SerializeField, ReadOnly] private CreatureController controller = null;
 
+        private void OnValidate()
+        {
+            CacheComponents();
+        }
+
         private void Awake()
         {
-            controller = GetComponentInParent<CreatureController>();
+            CacheComponents();
         }
 
         public override bool Check()
@@ -22,7 +27,11 @@ namespace TRPG.Runtime
 
         public override void DrawGizmos()
         {
-            controller ??= GetComponentInParent<CreatureController>();
+            if (controller == null)
+            {
+                CacheComponents();
+            }
+
             if (controller == null)
             {
                 return;
@@ -91,6 +100,11 @@ namespace TRPG.Runtime
         {
             Vector3Int cellPos = new Vector3Int(node.X, node.Y, 0);
             return gridController.Grid.GetCellCenterWorld(cellPos);
+        }
+
+        private void CacheComponents()
+        {
+            controller = GetComponentInParent<CreatureController>();
         }
     }
 }

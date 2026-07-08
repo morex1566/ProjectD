@@ -10,16 +10,19 @@ namespace TRPG.Runtime
     /// </summary>
     public class Console : MonoBehaviour
     {
-        [Header(nameof(IsNumberOnePressed))]
-
         [FormerlySerializedAs("creaturePf")]
         [SerializeField] private GameObject creaturePrefab;
+
+        [SerializeField] private CreatureIdData num1CreatureIdData = null;
+
+        [SerializeField] private CreatureIdData num2CreatureIdData = null;
 
         private void OnEnable()
         {
             if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
             {
                 inputMappingContext.Test.Num1Pressed.performed += IsNumberOnePressed;
+                inputMappingContext.Test.Num2Pressed.performed += IsNumberTwoPressed;
             }
         }
 
@@ -28,27 +31,41 @@ namespace TRPG.Runtime
             if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
             {
                 inputMappingContext.Test.Num1Pressed.performed -= IsNumberOnePressed;
+                inputMappingContext.Test.Num2Pressed.performed -= IsNumberTwoPressed;
             }
         }
 
-        private void SpawnCreature()
+        private void SpawnCreature(CreatureIdData creatureIdData)
         {
             if (creaturePrefab == null)
             {
                 return;
             }
 
+            if (creatureIdData == null || string.IsNullOrEmpty(creatureIdData.Id) == true)
+            {
+                return;
+            }
+
             Camera cam = WorldManager.GetWorldCameraController().Cam;
             Vector3 mouseWorldPosition = MouseEx.GetMouseWorldPosition(cam);
-            WorldManager.SpawnCreature(creaturePrefab, mouseWorldPosition);
+            WorldManager.SpawnCreature(creaturePrefab, creatureIdData.Id, mouseWorldPosition);
         }
 
         /// <summary>
-        /// 키보드 상단 1 또는 넘패드 1 입력 여부를 반환합니다.
+        /// 키보드 1 입력 여부를 반환합니다.
         /// </summary>
         private void IsNumberOnePressed(InputAction.CallbackContext context)
         {
-            SpawnCreature();
+            SpawnCreature(num1CreatureIdData);
+        }
+
+        /// <summary>
+        /// 키보드 2 입력 여부를 반환합니다.
+        /// </summary>
+        private void IsNumberTwoPressed(InputAction.CallbackContext context)
+        {
+            SpawnCreature(num2CreatureIdData);
         }
     }
 }

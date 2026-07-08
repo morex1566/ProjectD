@@ -1161,6 +1161,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Num2Pressed",
+                    "type": "Button",
+                    "id": "8c26d727-4616-4c35-82a3-b6048148d3e5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1183,6 +1192,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Num1Pressed",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5a066791-2216-49c2-b18e-b3cf1eba0507",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Num2Pressed",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

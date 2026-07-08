@@ -33,7 +33,11 @@ namespace TRPG.Runtime
 
         private void OnValidate()
         {
-            Init();
+            CacheComponents();
+
+#if UNITY_EDITOR
+            ScheduleEditorApply();
+#endif
         }
 
         private void Awake()
@@ -50,15 +54,12 @@ namespace TRPG.Runtime
 
         public void Init(bool scheduleEditorApply = true)
         {
-            gridController = GetComponentInParent<WorldGridController>();
-            tilemapRenderer = GetComponent<TilemapRenderer>();
-            tilemap = GetComponent<Tilemap>();
+            CacheComponents();
 
 #if UNITY_EDITOR
             if (scheduleEditorApply)
             {
-                EditorApplication.delayCall -= SetTilemapTypeDelayed;
-                EditorApplication.delayCall += SetTilemapTypeDelayed;
+                ScheduleEditorApply();
             }
 #endif
         }
@@ -193,7 +194,20 @@ namespace TRPG.Runtime
             }
         }
 
+        private void CacheComponents()
+        {
+            gridController = GetComponentInParent<WorldGridController>();
+            tilemapRenderer = GetComponent<TilemapRenderer>();
+            tilemap = GetComponent<Tilemap>();
+        }
+
 #if UNITY_EDITOR
+        private void ScheduleEditorApply()
+        {
+            EditorApplication.delayCall -= SetTilemapTypeDelayed;
+            EditorApplication.delayCall += SetTilemapTypeDelayed;
+        }
+
         private void SetTilemapTypeDelayed()
         {
             if (this == null)

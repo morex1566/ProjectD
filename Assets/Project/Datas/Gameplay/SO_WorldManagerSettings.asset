@@ -12,19 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70df97e9aae845a9a9a0179375846461, type: 3}
   m_Name: SO_WorldManagerSettings
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldManagerSettingsData
-  Gravities:
-    entries:
-    - Key: 1
-      Value: 0
-    - Key: 2
-      Value: 0
-    - Key: 4
-      Value: 9.8
-    - Key: 0
-      Value: 9.8
-  CreatureDataSheetRef:
-    m_AssetGUID: 9224db4d178973f4b8e1c994f2fac449
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_SubObjectGUID: 
-    m_EditorAssetChanged: 0
+  CreatureDataSheet: {fileID: 11400000, guid: 3c79fbe8208c71542ad8a4fea3fe4504, type: 2}

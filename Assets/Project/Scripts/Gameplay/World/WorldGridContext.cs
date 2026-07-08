@@ -10,15 +10,15 @@ namespace TRPG.Runtime
     [Serializable]
     public class WorldGridContext
     {
-        [SerializeField, ReadOnly] private Dictionary<WorldTilemapType, Dictionary<Vector3Int, WorldTile>> mapTiles = new();
+        [SerializeField, ReadOnly] private SerializableDictionary<WorldTilemapType, SerializableDictionary<Vector3Int, WorldTile>> mapTiles = new();
 
 
-        public Dictionary<WorldTilemapType, Dictionary<Vector3Int, WorldTile>> MapTiles => mapTiles;
+        public SerializableDictionary<WorldTilemapType, SerializableDictionary<Vector3Int, WorldTile>> MapTiles => mapTiles;
 
 
         public void SetTile(WorldTilemapType tilemapType, WorldTile tile)
         {
-            GetMapTiles(tilemapType)[tile.Pos] = tile;
+            GetMapTiles(tilemapType).Set(tile.Pos, tile);
         }
 
         public bool RemoveTile(WorldTilemapType tilemapType, Vector3Int cellPos)
@@ -41,12 +41,13 @@ namespace TRPG.Runtime
             GetMapTiles(tilemapType).Clear();
         }
 
-        private Dictionary<Vector3Int, WorldTile> GetMapTiles(WorldTilemapType tilemapType)
+        private SerializableDictionary<Vector3Int, WorldTile> GetMapTiles(WorldTilemapType tilemapType)
         {
-            if (mapTiles.TryGetValue(tilemapType, out Dictionary<Vector3Int, WorldTile> tiles) == false)
+            if (mapTiles.TryGetValue(tilemapType, out SerializableDictionary<Vector3Int, WorldTile> tiles) == false || tiles == null)
             {
-                tiles = new Dictionary<Vector3Int, WorldTile>();
-                mapTiles[tilemapType] = tiles;
+                tiles = new SerializableDictionary<Vector3Int, WorldTile>();
+                tiles.ShowEntriesInInspector = false;
+                mapTiles.Set(tilemapType, tiles);
             }
 
             return tiles;

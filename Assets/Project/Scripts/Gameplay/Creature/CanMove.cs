@@ -9,9 +9,14 @@ namespace TRPG.Runtime
     {
         [SerializeField, ReadOnly] private CreatureController controller = null;
 
+        private void OnValidate()
+        {
+            CacheComponents();
+        }
+
         private void Awake()
         {
-            controller = GetComponentInParent<CreatureController>();
+            CacheComponents();
         }
 
         public override bool Check()
@@ -22,6 +27,11 @@ namespace TRPG.Runtime
             }
 
             return controller.Context.MoveSpeed > 0f;
+        }
+
+        private void CacheComponents()
+        {
+            controller = GetComponentInParent<CreatureController>();
         }
     }
 }

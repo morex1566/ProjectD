@@ -19,7 +19,11 @@ namespace TRPG.Editor
         {
             EditorGUI.BeginProperty(position, label, property);
 
-            if (IsArrayOrList(property))
+            if (IsSerializableDictionary(property))
+            {
+                DrawReadOnlySerializableDictionary(position, property, label);
+            }
+            else if (IsArrayOrList(property))
             {
                 DrawReadOnlyArray(position, property, label);
             }
@@ -36,6 +40,8 @@ namespace TRPG.Editor
         /// </summary>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            if (IsSerializableDictionary(property)) return EditorGUIUtility.singleLineHeight;
+
             if (IsArrayOrList(property)) return GetArrayHeight(property);
 
             return EditorGUI.GetPropertyHeight(property, label, true);
@@ -50,6 +56,14 @@ namespace TRPG.Editor
         }
 
         /// <summary>
+        /// SerializableDictionary인지 확인합니다.
+        /// </summary>
+        private static bool IsSerializableDictionary(SerializedProperty property)
+        {
+            return property.FindPropertyRelative("entries") != null;
+        }
+
+        /// <summary>
         /// 단일 프로퍼티를 비활성 상태로 그립니다.
         /// </summary>
         private static void DrawReadOnlyProperty(Rect position, SerializedProperty property, GUIContent label)
@@ -57,6 +71,60 @@ namespace TRPG.Editor
             EditorGUI.BeginDisabledGroup(true);
             EditorGUI.PropertyField(position, property, label, true);
             EditorGUI.EndDisabledGroup();
+        }
+
+        /// <summary>
+        /// 읽기 전용 SerializableDictionary는 Entry 전체 대신 저장 개수만 표시합니다.
+        /// </summary>
+        private static void DrawReadOnlySerializableDictionary(Rect position, SerializedProperty property, GUIContent label)
+        {
+            SerializedProperty entries = property.FindPropertyRelative("entries");
+            EditorGUI.LabelField(position, label, new GUIContent(BuildDictionaryCountText(entries)));
+        }
+
+        /// <summary>
+        /// SerializableDictionary의 저장 개수 표시 문자열을 만듭니다.
+        /// </summary>
+        private static string BuildDictionaryCountText(SerializedProperty entries)
+        {
+            if (entries == null)
+            {
+                return "Count: 0";
+            }
+
+            int nestedCount = CountNestedDictionaryValues(entries);
+            if (nestedCount >= 0)
+            {
+                return $"Count: {entries.arraySize} / Nested: {nestedCount}";
+            }
+
+            return $"Count: {entries.arraySize}";
+        }
+
+        /// <summary>
+        /// Value가 SerializableDictionary인 경우 내부 Entry 개수를 합산합니다.
+        /// </summary>
+        private static int CountNestedDictionaryValues(SerializedProperty entries)
+        {
+            int totalCount = 0;
+            bool hasNestedDictionary = false;
+
+            for (int i = 0; i < entries.arraySize; i++)
+            {
+                SerializedProperty entry = entries.GetArrayElementAtIndex(i);
+                SerializedProperty value = entry.FindPropertyRelative("Value");
+                SerializedProperty nestedEntries = value?.FindPropertyRelative("entries");
+
+                if (nestedEntries == null)
+                {
+                    continue;
+                }
+
+                hasNestedDictionary = true;
+                totalCount += nestedEntries.arraySize;
+            }
+
+            return hasNestedDictionary ? totalCount : -1;
         }
 
         /// <summary>

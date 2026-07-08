@@ -78,7 +78,7 @@ namespace TRPG.Runtime
                 return;
             }
 
-            // Ground인 부분을 이동할 수 없는 타일로 조건식+
+            // Air 영역을 A* 탐색 범위로 사용하고, Ground 타일이 있는 셀은 이동 불가로 처리합니다.
             pathfinder.Generate(SetWorldWalkablePredicate);
         }
 
@@ -91,7 +91,7 @@ namespace TRPG.Runtime
 
         private void Init()
         {
-            grid = GetComponent<Grid>();
+            CacheComponents();
 
             if (Application.isPlaying)
             {
@@ -104,6 +104,11 @@ namespace TRPG.Runtime
                 EditorApplication.delayCall += Rebuild;
 #endif
             }
+        }
+
+        private void CacheComponents()
+        {
+            grid = GetComponent<Grid>();
         }
 
         [ContextMenu(nameof(CreateTilemap))]
@@ -146,6 +151,23 @@ namespace TRPG.Runtime
                 }
 
                 tilemapControllerMap[tilemapController.Context.TilemapType] = tilemapController;
+            }
+
+            // 삭제할 Tile Key 목록을 임시로 저장합니다.
+            // 타일맵 데이터 삭제
+            List<WorldTilemapType> removeKeys = new();
+            foreach (var worldTilemapContext in context.MapTiles)
+            {
+                // tilemapControllerMap에 없는 Tile이면 삭제 대상으로 등록합니다.
+                if (tilemapControllerMap.ContainsKey(worldTilemapContext.Key) == false)
+                {
+                    removeKeys.Add(worldTilemapContext.Key);
+                }
+            }
+            foreach (WorldTilemapType removeKey in removeKeys)
+            {
+                // foreach 순회가 끝난 뒤 실제 Dictionary에서 제거합니다.
+                context.MapTiles.Remove(removeKey);
             }
         }
 

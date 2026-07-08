@@ -17,10 +17,25 @@ MonoBehaviour:
     NameKey: creature_dwarf_001_name
     DescKey: creature_dwarf_001_desc
     Faction: Human
-    Hp: 10
-    Damage: 2
-    DetectRange: 2
+    Hp: 1
+    Damage: 1
+    DetectRange: 1
     AttackRange: 1
-    AttackSpeed: 2
-    MoveSpeed: 3
+    AttackSpeed: 1
+    MoveSpeed: 1
     AIType: Ground
+    Sprite: {fileID: 21300000, guid: a6f1824e05c4683448a1220b334d087d, type: 3}
+    BehaviourTreePrefab: {fileID: 2700408986607445993, guid: 686f85a30841545478c07ee1e0fea9ad, type: 3}
+  - DataId: creature_lizard_001
+    NameKey: creature_lizard_001_name
+    DescKey: creature_lizard_001_desc
+    Faction: Monster
+    Hp: 1
+    Damage: 1
+    DetectRange: 1
+    AttackRange: 1
+    AttackSpeed: 1
+    MoveSpeed: 1
+    AIType: Ground
+    Sprite: {fileID: 21300000, guid: 30079013dd9c93e47a948521ea457742, type: 3}
+    BehaviourTreePrefab: {fileID: 6851791454609459413, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}

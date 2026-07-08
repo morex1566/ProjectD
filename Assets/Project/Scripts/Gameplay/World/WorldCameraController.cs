@@ -30,14 +30,28 @@ namespace TRPG.Runtime
         private float zoomVelocity;
 
 
+        private void OnValidate()
+        {
+            CacheComponents();
+        }
+
         /// <summary>
         /// Camera와 PixelPerfectCamera 컴포넌트를 캐싱하고 보간 목표값을 초기화합니다.
         /// </summary>
         private void Awake()
         {
+            CacheComponents();
+            InitRuntimeState();
+        }
+
+        private void CacheComponents()
+        {
             Cam = GetComponent<Camera>();
             PixelPerfectCam = GetComponent<PixelPerfectCamera>();
+        }
 
+        private void InitRuntimeState()
+        {
             targetPosition = transform.position;
             targetAssetsPPU = PixelPerfectCam.assetsPPU;
             currentAssetsPPU = PixelPerfectCam.assetsPPU;

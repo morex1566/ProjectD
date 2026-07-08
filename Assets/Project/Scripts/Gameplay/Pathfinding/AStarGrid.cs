@@ -14,22 +14,27 @@ namespace TRPG.Runtime
 
         public int Height { get; }
 
+        public Vector3Int Pivot { get; }
+
         public int NodeCount => Width * Height;
 
         /// <summary>
         /// WorldTileType 배열을 기반으로 이동 가능한 AStarNode 그리드를 생성합니다.
         /// </summary>
-        public AStarGrid(int width, int height, Func<int, int, bool> isWalkablePredicate)
+        public AStarGrid(int width, int height, Vector3Int pivot, Func<int, int, bool> isWalkablePredicate)
         {
             Width = width;
             Height = height;
+            Pivot = pivot;
             nodes = new AStarNode[width, height];
 
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    nodes[x, y] = new AStarNode(x, y, isWalkablePredicate.Invoke(x, y));
+                    int worldX = x + Pivot.x;
+                    int worldY = y + Pivot.y;
+                    nodes[x, y] = new AStarNode(worldX, worldY, isWalkablePredicate.Invoke(worldX, worldY));
                 }
             }
         }
@@ -40,16 +45,16 @@ namespace TRPG.Runtime
         /// </summary>
         public bool TryGetNode(int x, int y, out AStarNode node)
         {
-            // 좌표가 그리드 좌표인지?
+            // 외부 좌표는 Tilemap과 같은 월드 셀 좌표입니다.
             node = null;
-            if (!IsInBound(x, y))
+            if (IsInBound(x, y) == false)
             {
                 return false;
             }
 
             // 이동가능한 노드?
-            node = GetNode(x, y);
-            if (!node.IsWalkable)
+            node = GetNode(x - Pivot.x, y - Pivot.y);
+            if (node.IsWalkable == false)
             {
                 return false;
             }
@@ -94,12 +99,12 @@ namespace TRPG.Runtime
         /// </summary>
         public bool IsInBound(int x, int y)
         {
-            return x >= 0 && x < Width && y >= 0 && y < Height;
+            return x >= Pivot.x && x < Pivot.x + Width && y >= Pivot.y && y < Pivot.y + Height;
         }
 
         public bool IsInBound(Vector3Int cellPos)
         {
-            return cellPos.x >= 0 && cellPos.x < Width && cellPos.y >= 0 && cellPos.y < Height;
+            return IsInBound(cellPos.x, cellPos.y);
         }
     }
 }

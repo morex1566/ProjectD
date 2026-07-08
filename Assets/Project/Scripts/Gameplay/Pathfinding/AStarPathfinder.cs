@@ -10,9 +10,13 @@ namespace TRPG.Runtime
     [Serializable]
     public class AStarPathfinder
     {
-        [SerializeField] private int width = 10;
+        /// <summary>
+        /// 어 길 찾기에서 정확한 위치를 뽑는 게 아니라 대략 그거에서 랜덤하게 없는 데 사용하는 변수
+        /// </summary>
+        public static Vector3 RandomOffset => new Vector3(UnityEngine.Random.Range(-0.2f, 0.2f), 0f, 0f);
 
-        [SerializeField] private int height = 10;
+        [SerializeField] private Vector2Int size;
+        [SerializeField] private Vector3Int pivot;
 
         private const int StraightMoveCost = 10;
         private const int DiagonalMoveCost = 14;
@@ -23,7 +27,7 @@ namespace TRPG.Runtime
 
         public void Generate(Func<int, int, bool> isWalkablePredicate)
         {
-            astarGrid = new AStarGrid(width, height, isWalkablePredicate);
+            astarGrid = new AStarGrid(size.x, size.y, pivot, isWalkablePredicate);
         }
 
         /// <summary>

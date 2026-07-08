@@ -1,28 +1,76 @@
 using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TRPG.Runtime
 {
     ///<summary>
-    /// Unity 인스펙터에서 편집 가능한 Dictionary 래퍼입니다.
+    /// Unity 인스펙터에서 직렬화할 수 있는 고성능 Dictionary 래퍼입니다.
     ///</summary>
     [Serializable]
     public class SerializableDictionary<TKey, TValue> : ISerializationCallbackReceiver, IEnumerable<KeyValuePair<TKey, TValue>>
     {
         ///<summary>
-        /// 인스펙터에서 실제로 편집되는 Key-Value 목록입니다.
+        /// Inspector에서 Entry 목록을 표시할지 여부입니다.
+        ///</summary>
+        [SerializeField] private bool showEntriesInInspector = true;
+
+        ///<summary>
+        /// Unity가 직렬화하는 Key-Value 목록입니다.
         ///</summary>
         [SerializeField] private List<Entry> entries = new();
 
         ///<summary>
-        /// 런타임에서 빠르게 조회하기 위한 Dictionary 캐시입니다.
+        /// 런타임 조회용 Dictionary 캐시입니다.
         ///</summary>
         private Dictionary<TKey, TValue> dictionary = new();
 
         ///<summary>
-        /// 인스펙터에 표시되는 Key-Value 한 쌍입니다.
+        /// Key가 entries의 몇 번째 인덱스에 있는지 저장하는 캐시입니다.
+        ///</summary>
+        private Dictionary<TKey, int> indexByKey = new();
+
+        ///<summary>
+        /// 현재 저장된 Key-Value 개수입니다.
+        ///</summary>
+        public int Count => dictionary.Count;
+
+        ///<summary>
+        /// Inspector에서 Entry 목록을 표시할지 여부입니다.
+        ///</summary>
+        public bool ShowEntriesInInspector
+        {
+            get => showEntriesInInspector;
+            set => showEntriesInInspector = value;
+        }
+
+        ///<summary>
+        /// Dictionary의 모든 Key 목록입니다.
+        ///</summary>
+        public Dictionary<TKey, TValue>.KeyCollection Keys => dictionary.Keys;
+
+        ///<summary>
+        /// Dictionary의 모든 Value 목록입니다.
+        ///</summary>
+        public Dictionary<TKey, TValue>.ValueCollection Values => dictionary.Values;
+
+        ///<summary>
+        /// 읽기 전용 Dictionary 인터페이스입니다.
+        ///</summary>
+        public IReadOnlyDictionary<TKey, TValue> ReadOnlyDictionary => dictionary;
+
+        ///<summary>
+        /// Key를 기준으로 Value를 가져오거나 설정합니다.
+        ///</summary>
+        public TValue this[TKey key]
+        {
+            get => dictionary[key];
+            set => Set(key, value);
+        }
+
+        ///<summary>
+        /// Unity 인스펙터에 표시되는 Key-Value 한 쌍입니다.
         ///</summary>
         [Serializable]
         public class Entry
@@ -39,37 +87,11 @@ namespace TRPG.Runtime
         }
 
         ///<summary>
-        /// Key를 기준으로 Value를 가져오거나 설정합니다.
-        ///</summary>
-        public TValue this[TKey key]
-        {
-            get
-            {
-                SyncDictionaryFromEntries();
-                return dictionary[key];
-            }
-            set
-            {
-                SetValue(key, value);
-            }
-        }
-
-        ///<summary>
-        /// 저장된 Key-Value 개수입니다.
-        ///</summary>
-        public int Count => entries.Count;
-
-        ///<summary>
-        /// 읽기 전용 Dictionary를 반환합니다.
-        ///</summary>
-        public IReadOnlyDictionary<TKey, TValue> ReadOnlyDictionary => dictionary;
-
-        ///<summary>
         /// Unity가 직렬화하기 전에 호출합니다.
         ///</summary>
         public void OnBeforeSerialize()
         {
-            // 인스펙터에서 추가한 entries를 지우면 안 되므로 여기서는 아무것도 하지 않습니다.
+            // entries는 Add/Set/Remove 때마다 갱신되므로 여기서 전체 동기화를 하지 않습니다.
         }
 
         ///<summary>
@@ -77,118 +99,115 @@ namespace TRPG.Runtime
         ///</summary>
         public void OnAfterDeserialize()
         {
-            SyncDictionaryFromEntries();
+            RebuildCacheFromEntries();
         }
 
         ///<summary>
-        /// Key와 Value를 추가합니다.
-        ///</summary>
-        public void Add(TKey key, TValue value)
-        {
-            if (ContainsKey(key))
-            {
-                Debug.LogWarning($"SerializableDictionary already contains key: {key}");
-                return;
-            }
-
-            // 인스펙터에 보이는 entries에 먼저 추가합니다.
-            entries.Add(new Entry
-            {
-                Key = key,
-                Value = value
-            });
-
-            // 런타임 조회용 Dictionary도 갱신합니다.
-            dictionary.Add(key, value);
-        }
-
-        ///<summary>
-        /// Key가 이미 있으면 값을 수정하고, 없으면 새로 추가합니다.
-        ///</summary>
-        public void SetValue(TKey key, TValue value)
-        {
-            for (int i = 0; i < entries.Count; i++)
-            {
-                if (EqualityComparer<TKey>.Default.Equals(entries[i].Key, key))
-                {
-                    // 이미 같은 Key가 있으면 Value만 수정합니다.
-                    entries[i].Value = value;
-                    SyncDictionaryFromEntries();
-                    return;
-                }
-            }
-
-            // 같은 Key가 없으면 새 Entry를 추가합니다.
-            entries.Add(new Entry
-            {
-                Key = key,
-                Value = value
-            });
-
-            SyncDictionaryFromEntries();
-        }
-
-        ///<summary>
-        /// 기존 값을 지우고 여러 Key-Value를 한 번에 저장합니다.
-        ///</summary>
-        public void SetValues(IReadOnlyDictionary<TKey, TValue> values)
-        {
-            entries.Clear();
-            dictionary.Clear();
-
-            foreach (KeyValuePair<TKey, TValue> pair in values)
-            {
-                entries.Add(new Entry
-                {
-                    Key = pair.Key,
-                    Value = pair.Value
-                });
-
-                dictionary.Add(pair.Key, pair.Value);
-            }
-        }
-
-        ///<summary>
-        /// 해당 Key가 존재하는지 확인합니다.
+        /// Key가 존재하는지 확인합니다.
         ///</summary>
         public bool ContainsKey(TKey key)
         {
-            SyncDictionaryFromEntries();
             return dictionary.ContainsKey(key);
         }
 
         ///<summary>
-        /// Key로 Value를 가져옵니다.
+        /// Key를 기준으로 Value를 가져옵니다.
         ///</summary>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            SyncDictionaryFromEntries();
             return dictionary.TryGetValue(key, out value);
         }
 
         ///<summary>
-        /// 해당 Key를 제거합니다.
+        /// Key-Value를 추가합니다.
+        ///</summary>
+        public void Add(TKey key, TValue value)
+        {
+            if (ReferenceEquals(key, null) == true)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
+            if (dictionary.ContainsKey(key) == true)
+            {
+                throw new ArgumentException($"이미 존재하는 Key입니다. Key: {key}");
+            }
+
+            // Dictionary에 먼저 추가합니다.
+            dictionary.Add(key, value);
+
+            // entries의 마지막 위치에 추가합니다.
+            int entryIndex = entries.Count;
+            entries.Add(new Entry
+            {
+                Key = key,
+                Value = value
+            });
+
+            // Key가 entries의 몇 번째에 있는지 캐싱합니다.
+            indexByKey.Add(key, entryIndex);
+        }
+
+        ///<summary>
+        /// Key가 없으면 추가하고, 있으면 값을 덮어씁니다.
+        ///</summary>
+        public void Set(TKey key, TValue value)
+        {
+            if (ReferenceEquals(key, null) == true)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
+            // 기존 Key라면 Dictionary와 entries의 값만 갱신합니다.
+            if (indexByKey.TryGetValue(key, out int entryIndex) == true)
+            {
+                dictionary[key] = value;
+                entries[entryIndex].Value = value;
+                return;
+            }
+
+            // 신규 Key라면 새 Entry를 추가합니다.
+            dictionary.Add(key, value);
+
+            int newEntryIndex = entries.Count;
+            entries.Add(new Entry
+            {
+                Key = key,
+                Value = value
+            });
+
+            indexByKey.Add(key, newEntryIndex);
+        }
+
+        ///<summary>
+        /// Key에 해당하는 값을 제거합니다.
         ///</summary>
         public bool Remove(TKey key)
         {
-            bool removed = false;
-
-            for (int i = entries.Count - 1; i >= 0; i--)
+            if (dictionary.ContainsKey(key) == false)
             {
-                if (EqualityComparer<TKey>.Default.Equals(entries[i].Key, key))
-                {
-                    // 인스펙터에 보이는 entries에서도 제거합니다.
-                    entries.RemoveAt(i);
-                    removed = true;
-                }
+                return false;
             }
 
-            if (removed)
+            int removeIndex = indexByKey[key];
+            int lastIndex = entries.Count - 1;
+
+            // 제거할 Entry가 마지막이 아니면 마지막 Entry를 제거 위치로 옮깁니다.
+            if (removeIndex != lastIndex)
             {
-                SyncDictionaryFromEntries();
+                Entry lastEntry = entries[lastIndex];
+                entries[removeIndex] = lastEntry;
+                indexByKey[lastEntry.Key] = removeIndex;
             }
 
-            return removed;
+            // 마지막 Entry를 제거합니다.
+            entries.RemoveAt(lastIndex);
+
+            // 캐시에서도 제거합니다.
+            dictionary.Remove(key);
+            indexByKey.Remove(key);
+
+            return true;
         }
 
         ///<summary>
@@ -196,79 +215,67 @@ namespace TRPG.Runtime
         ///</summary>
         public void Clear()
         {
+            dictionary.Clear();
+            indexByKey.Clear();
             entries.Clear();
-            dictionary.Clear();
         }
 
         ///<summary>
-        /// 일반 Dictionary로 복사해서 반환합니다.
+        /// Dictionary 순회자를 반환합니다.
         ///</summary>
-        public Dictionary<TKey, TValue> ToDictionary()
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            SyncDictionaryFromEntries();
-            return new Dictionary<TKey, TValue>(dictionary);
+            return dictionary.GetEnumerator();
         }
 
         ///<summary>
-        /// 인스펙터 List 데이터를 Dictionary 캐시로 동기화합니다.
+        /// Dictionary 순회자를 반환합니다.
         ///</summary>
-        private void SyncDictionaryFromEntries()
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        ///<summary>
+        /// entries를 기준으로 런타임 캐시를 다시 생성합니다.
+        ///</summary>
+        private void RebuildCacheFromEntries()
         {
             dictionary.Clear();
+            indexByKey.Clear();
+
+            int writeIndex = 0;
 
             for (int i = 0; i < entries.Count; i++)
             {
                 Entry entry = entries[i];
 
-                if (entry == null)
+                // null Key는 Dictionary에 넣을 수 없으므로 무시합니다.
+                if (ReferenceEquals(entry.Key, null) == true)
                 {
                     continue;
                 }
 
-                // Dictionary는 Key 중복이 불가능하므로 중복 Key는 뒤쪽 값으로 덮어씁니다.
-                dictionary[entry.Key] = entry.Value;
-            }
-        }
+                // 중복 Key가 있으면 뒤쪽 값을 최종 값으로 사용합니다.
+                if (indexByKey.TryGetValue(entry.Key, out int existingIndex) == true)
+                {
+                    entries[existingIndex].Value = entry.Value;
+                    dictionary[entry.Key] = entry.Value;
+                    continue;
+                }
 
-        ///<summary>
-        /// 저장된 모든 Key 목록을 반환합니다.
-        ///</summary>
-        public IEnumerable<TKey> Keys
-        {
-            get
+                // 유효한 Entry를 앞쪽으로 압축합니다.
+                entries[writeIndex] = entry;
+                dictionary.Add(entry.Key, entry.Value);
+                indexByKey.Add(entry.Key, writeIndex);
+                writeIndex++;
+            }
+
+            // null Key나 중복 Key 때문에 남은 뒤쪽 Entry를 제거합니다.
+            if (writeIndex < entries.Count)
             {
-                SyncDictionaryFromEntries();
-                return dictionary.Keys;
+                entries.RemoveRange(writeIndex, entries.Count - writeIndex);
             }
-        }
-
-        ///<summary>
-        /// 저장된 모든 Value 목록을 반환합니다.
-        ///</summary>
-        public IEnumerable<TValue> Values
-        {
-            get
-            {
-                SyncDictionaryFromEntries();
-                return dictionary.Values;
-            }
-        }
-
-        ///<summary>
-        /// Key-Value 쌍을 순회할 수 있는 Enumerator를 반환합니다.
-        ///</summary>
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            SyncDictionaryFromEntries();
-            return dictionary.GetEnumerator();
-        }
-
-        ///<summary>
-        /// 비제네릭 Enumerator를 반환합니다.
-        ///</summary>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

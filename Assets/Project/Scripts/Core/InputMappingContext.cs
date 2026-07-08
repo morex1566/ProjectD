@@ -1249,6 +1249,15 @@ namespace TRPG.Runtime
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Num2Pressed"",
+                    ""type"": ""Button"",
+                    ""id"": ""8c26d727-4616-4c35-82a3-b6048148d3e5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1271,6 +1280,17 @@ namespace TRPG.Runtime
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Num1Pressed"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5a066791-2216-49c2-b18e-b3cf1eba0507"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Num2Pressed"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1370,6 +1390,7 @@ namespace TRPG.Runtime
             // Test
             m_Test = asset.FindActionMap("Test", throwIfNotFound: true);
             m_Test_Num1Pressed = m_Test.FindAction("Num1Pressed", throwIfNotFound: true);
+            m_Test_Num2Pressed = m_Test.FindAction("Num2Pressed", throwIfNotFound: true);
         }
 
         ~@InputMappingContext()
@@ -1876,6 +1897,7 @@ namespace TRPG.Runtime
         private readonly InputActionMap m_Test;
         private List<ITestActions> m_TestActionsCallbackInterfaces = new List<ITestActions>();
         private readonly InputAction m_Test_Num1Pressed;
+        private readonly InputAction m_Test_Num2Pressed;
         /// <summary>
         /// Provides access to input actions defined in input action map "Test".
         /// </summary>
@@ -1891,6 +1913,10 @@ namespace TRPG.Runtime
             /// Provides access to the underlying input action "Test/Num1Pressed".
             /// </summary>
             public InputAction @Num1Pressed => m_Wrapper.m_Test_Num1Pressed;
+            /// <summary>
+            /// Provides access to the underlying input action "Test/Num2Pressed".
+            /// </summary>
+            public InputAction @Num2Pressed => m_Wrapper.m_Test_Num2Pressed;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1920,6 +1946,9 @@ namespace TRPG.Runtime
                 @Num1Pressed.started += instance.OnNum1Pressed;
                 @Num1Pressed.performed += instance.OnNum1Pressed;
                 @Num1Pressed.canceled += instance.OnNum1Pressed;
+                @Num2Pressed.started += instance.OnNum2Pressed;
+                @Num2Pressed.performed += instance.OnNum2Pressed;
+                @Num2Pressed.canceled += instance.OnNum2Pressed;
             }
 
             /// <summary>
@@ -1934,6 +1963,9 @@ namespace TRPG.Runtime
                 @Num1Pressed.started -= instance.OnNum1Pressed;
                 @Num1Pressed.performed -= instance.OnNum1Pressed;
                 @Num1Pressed.canceled -= instance.OnNum1Pressed;
+                @Num2Pressed.started -= instance.OnNum2Pressed;
+                @Num2Pressed.performed -= instance.OnNum2Pressed;
+                @Num2Pressed.canceled -= instance.OnNum2Pressed;
             }
 
             /// <summary>
@@ -2223,6 +2255,13 @@ namespace TRPG.Runtime
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnNum1Pressed(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Num2Pressed" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnNum2Pressed(InputAction.CallbackContext context);
         }
     }
 }

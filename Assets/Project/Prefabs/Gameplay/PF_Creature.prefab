@@ -1,483 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1074258963442194482
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 638070713463993986}
-  - component: {fileID: 2557311507383105745}
-  - component: {fileID: 1629447218527677483}
-  - component: {fileID: 8685236102436771784}
-  - component: {fileID: 952308521891495300}
-  - component: {fileID: 5052479038497951884}
-  - component: {fileID: 7068349396413464170}
-  - component: {fileID: 1960071792074684045}
-  - component: {fileID: 3569748581147698581}
-  - component: {fileID: 7010324707637821743}
-  - component: {fileID: 1348576662973281849}
-  - component: {fileID: 3902299044772925864}
-  - component: {fileID: 2436689028261209556}
-  - component: {fileID: 9045869362826930830}
-  - component: {fileID: 6557722604311140347}
-  - component: {fileID: 642086300753570549}
-  - component: {fileID: 3726305926532434944}
-  - component: {fileID: 8360580786613123072}
-  - component: {fileID: 4941434796956829696}
-  m_Layer: 20
-  m_Name: MBT
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &638070713463993986
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1809254756998236648}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2557311507383105745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e5f392bbea2fa2499665ed8b604ff86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::MBT.MBTExecutor
-  monoBehaviourTree: {fileID: 8685236102436771784}
---- !u!114 &1629447218527677483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b2217e4d35c0c94ea02cf2166c17e4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::MBT.Blackboard
-  variables: []
-  masterBlackboard: {fileID: 0}
---- !u!114 &8685236102436771784
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b25af8627659c6949b60949c3aa8d91d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::MBT.MonoBehaviourTree
-  selectedEditorNode: {fileID: 3902299044772925864}
-  repeatOnFinish: 1
-  maxExecutionsPerTick: 100
-  parent: {fileID: 0}
---- !u!114 &952308521891495300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eebdc313b3a23934d844788fe512dadf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureRoot
-  title: Root
-  rect:
-    serializedVersion: 2
-    x: 444.8
-    y: 112
-    width: 160
-    height: 44
-  parent: {fileID: 0}
-  children:
-  - {fileID: 5052479038497951884}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
---- !u!114 &5052479038497951884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7886e23e52b4aa0409a85fe7f95ecdb6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.HasJob
-  title: Condition - HasJob
-  rect:
-    serializedVersion: 2
-    x: 160
-    y: 500
-    width: 160
-    height: 44
-  parent: {fileID: 952308521891495300}
-  children:
-  - {fileID: 1960071792074684045}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &7068349396413464170
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a369a8837f4575d4380fc5676fec73f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.IsMoveJob
-  title: Condition - IsMoveJob
-  rect:
-    serializedVersion: 2
-    x: -200
-    y: 680
-    width: 160
-    height: 44
-  parent: {fileID: 1960071792074684045}
-  children:
-  - {fileID: 1348576662973281849}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 5108346331041859384}
---- !u!114 &1960071792074684045
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08540605df275034fafc8e05c6704214, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::MBT.Selector
-  title: Selector
-  rect:
-    serializedVersion: 2
-    x: 100
-    y: 600
-    width: 160
-    height: 44
-  parent: {fileID: 5052479038497951884}
-  children:
-  - {fileID: 7068349396413464170}
-  - {fileID: 7010324707637821743}
-  - {fileID: 3569748581147698581}
-  - {fileID: 3726305926532434944}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  random: 0
---- !u!114 &3569748581147698581
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7575c1eabc544a82a58e38263bd74494, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.IsAttackJob
-  title: Condition - IsAttackJob
-  rect:
-    serializedVersion: 2
-    x: 320
-    y: 720
-    width: 160
-    height: 44
-  parent: {fileID: 1960071792074684045}
-  children:
-  - {fileID: 6557722604311140347}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &7010324707637821743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 934603cb53c74a0d9cf3054b2a2e7838, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.IsMiningJob
-  title: Condition - IsMiningJob
-  rect:
-    serializedVersion: 2
-    x: 80
-    y: 740
-    width: 160
-    height: 44
-  parent: {fileID: 1960071792074684045}
-  children:
-  - {fileID: 2436689028261209556}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &1348576662973281849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9787f52859d4aec9e9e538bd4b2e657, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CanMove
-  title: Condition - CanMove
-  rect:
-    serializedVersion: 2
-    x: -340
-    y: 760
-    width: 160
-    height: 44
-  parent: {fileID: 7068349396413464170}
-  children:
-  - {fileID: 3902299044772925864}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &3902299044772925864
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fc4179e3f7f96a45b7d53f13b72da99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoMove
-  title: Leaf - DoMove
-  rect:
-    serializedVersion: 2
-    x: -440
-    y: 840
-    width: 160
-    height: 44
-  parent: {fileID: 1348576662973281849}
-  children: []
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
-  pathIndex: 1
---- !u!114 &2436689028261209556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed002d7024474d1d8656eeafacc2347b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CanMining
-  title: Condition - CanMining
-  rect:
-    serializedVersion: 2
-    x: -40
-    y: 821.60004
-    width: 160
-    height: 44
-  parent: {fileID: 7010324707637821743}
-  children:
-  - {fileID: 9045869362826930830}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &9045869362826930830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b96bd82a74948c54ab8af20231350373, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoMining
-  title: Leaf - DoMining
-  rect:
-    serializedVersion: 2
-    x: -160
-    y: 905.6
-    width: 160
-    height: 44
-  parent: {fileID: 2436689028261209556}
-  children: []
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
---- !u!114 &6557722604311140347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9834065435f4fd8873dfef0a6562b8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CanAttack
-  title: Condition - CanAttack
-  rect:
-    serializedVersion: 2
-    x: 300
-    y: 820
-    width: 160
-    height: 44
-  parent: {fileID: 3569748581147698581}
-  children:
-  - {fileID: 642086300753570549}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &642086300753570549
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c53ca32d2fcff5b459686739e048e93c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoAttack
-  title: Leaf - DoAttack
-  rect:
-    serializedVersion: 2
-    x: 280
-    y: 900
-    width: 160
-    height: 44
-  parent: {fileID: 6557722604311140347}
-  children: []
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
---- !u!114 &3726305926532434944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aa5718b85be4ac4f8de6db593724dc5, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.IsWanderJob
-  title: Condition - IsWanderJob
-  rect:
-    serializedVersion: 2
-    x: 560
-    y: 720
-    width: 160
-    height: 44
-  parent: {fileID: 1960071792074684045}
-  children:
-  - {fileID: 8360580786613123072}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &8360580786613123072
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59e1163989704498a44d4aac1bb078bb, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CanWander
-  title: Condition - CanWander
-  rect:
-    serializedVersion: 2
-    x: 560
-    y: 820
-    width: 160
-    height: 44
-  parent: {fileID: 3726305926532434944}
-  children:
-  - {fileID: 4941434796956829696}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &4941434796956829696
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1074258963442194482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 986b2e205bd8a944ea8e0663675c39ed, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoWander
-  title: Leaf - DoWander
-  rect:
-    serializedVersion: 2
-    x: 560
-    y: 900
-    width: 160
-    height: 44
-  parent: {fileID: 8360580786613123072}
-  children: []
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
 --- !u!1 &1142311668006381792
 GameObject:
   m_ObjectHideFlags: 0
@@ -512,7 +34,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2928263879976859038}
-  - {fileID: 638070713463993986}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5108346331041859384
@@ -526,17 +47,24 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13139cbf984db794a93348acba74b824, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::CreatureController
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureController
   spriter: {fileID: 5466476860050821414}
+  collider2DSizeFitter: {fileID: 2687029329726899101}
+  idData: {fileID: 0}
   context:
-    CurrentHp: 1
+    Hp: 1
     Atk: 1
     DetectRange: 1
     AttackRange: 1
     AttackSpeed: 1
     MoveSpeed: 1
-    AIType: 0
-    State: 0
+    AIType: 1
+    DataId: 
+    NameKey: 
+    DescKey: 
+    Faction: 
+    Sprite: {fileID: 0}
+    BehaviourTree: {fileID: 0}
 --- !u!50 &7628241560954180809
 Rigidbody2D:
   serializedVersion: 5
@@ -598,7 +126,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -608,7 +136,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.001, y: 1.126}
+  m_Size: {x: 1.001, y: 1.001}
   m_EdgeRadius: 0
 --- !u!114 &2687029329726899101
 MonoBehaviour:
@@ -710,15 +238,15 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 2008508514574474053, guid: 71d5c814d230e7c459d3d2a78b6c3080, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.625, y: 0.6875}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!95 &7704175489737682508
 Animator:

@@ -22,12 +22,12 @@ namespace TRPG.Runtime
         public bool TryGetRandomTile(out WorldTile tile)
         {
             tile = default;
-            Dictionary<int, WorldTile> candidates = tiles.ToDictionary();
+            SerializableDictionary<int, WorldTile> candidates = tiles;
             int totalWeight = 0;
 
             foreach (KeyValuePair<int, WorldTile> pair in candidates)
             {
-                if (pair.Key <= 0 || pair.Value.TileBase == null)
+                if (pair.Key <= 0)
                 {
                     continue;
                 }
@@ -44,7 +44,7 @@ namespace TRPG.Runtime
 
             foreach (KeyValuePair<int, WorldTile> pair in candidates)
             {
-                if (pair.Key <= 0 || pair.Value.TileBase == null)
+                if (pair.Key <= 0)
                 {
                     continue;
                 }
