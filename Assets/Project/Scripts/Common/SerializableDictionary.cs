@@ -48,12 +48,12 @@ namespace TRPG.Runtime
         ///<summary>
         /// Dictionary의 모든 Key 목록입니다.
         ///</summary>
-        public Dictionary<TKey, TValue>.KeyCollection Keys => dictionary.Keys;
+        public IReadOnlyCollection<TKey> Keys => dictionary.Keys;
 
         ///<summary>
         /// Dictionary의 모든 Value 목록입니다.
         ///</summary>
-        public Dictionary<TKey, TValue>.ValueCollection Values => dictionary.Values;
+        public IReadOnlyCollection<TValue> Values => dictionary.Values;
 
         ///<summary>
         /// 읽기 전용 Dictionary 인터페이스입니다.

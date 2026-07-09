@@ -76,5 +76,41 @@ namespace TRPG.Runtime
             // Component 기준으로도 바로 호출할 수 있게 GameObject 확장 메서드로 넘깁니다.
             return component.gameObject.GetOrAddComponent<T>();
         }
+
+        ///<summary>
+        /// 현재 GameObject의 부모, 자기 자신, 자식 계층에서 지정한 컴포넌트를 찾습니다.
+        ///</summary>
+        public static T GetComponentInHierarchy<T>(this GameObject gameObject, bool includeInactive = true) where T : Component
+        {
+            if (gameObject == null)
+            {
+                return null;
+            }
+
+            // 먼저 현재 오브젝트와 자식 계층에서 찾습니다.
+            T component = gameObject.GetComponentInChildren<T>(includeInactive);
+
+            if (component != null)
+            {
+                return component;
+            }
+
+            // 자식 계층에 없으면 부모 계층에서 찾습니다.
+            return gameObject.GetComponentInParent<T>(includeInactive);
+        }
+
+        ///<summary>
+        /// 현재 Component의 부모, 자기 자신, 자식 계층에서 지정한 컴포넌트를 찾습니다.
+        ///</summary>
+        public static T GetComponentInHierarchy<T>(this Component component, bool includeInactive = true) where T : Component
+        {
+            if (component == null)
+            {
+                return null;
+            }
+
+            // Component가 붙어있는 GameObject 기준으로 계층 검색을 실행합니다.
+            return component.gameObject.GetComponentInHierarchy<T>(includeInactive);
+        }
     }
 }

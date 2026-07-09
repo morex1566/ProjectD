@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -123,6 +124,7 @@ namespace TRPG.Runtime
         }
     }
 
+    [Serializable]
     public class MiningCommandSystem : PlayerCommandSystem
     {
         [SerializeField, ReadOnly] private WorldTileSelector worldTileSelector;
@@ -138,36 +140,67 @@ namespace TRPG.Runtime
         {
             Debug.Log("MiningCommandSystem Enter");
 
-            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
+            if (worldTileSelector == null)
             {
-                inputMappingContext.Player.LeftClick.performed += OnLeftClickPerformed;
+                return;
             }
 
-
             worldTileSelector.enabled = true;
+            worldTileSelector.SelectionCompleted -= OnSelectionCompleted;
+            worldTileSelector.SelectionCompleted += OnSelectionCompleted;
         }
 
         public override void Exit()
         {
             Debug.Log("MiningCommandSystem Exit");
 
-            if (InputManager.TryGetInputMappingContext(out InputMappingContext inputMappingContext) == true)
+            if (worldTileSelector == null)
             {
-                inputMappingContext.Player.LeftClick.performed -= OnLeftClickPerformed;
+                return;
             }
 
-
+            worldTileSelector.SelectionCompleted -= OnSelectionCompleted;
             worldTileSelector.enabled = false;
         }
 
-        public void OnLeftClickPerformed(InputAction.CallbackContext context)
+        public void OnSelectionCompleted()
         {
             CommandMining();
         }
 
         public void CommandMining()
         {
+            if (worldTileSelector == null)
+            {
+                return;
+            }
 
+            foreach (Vector3Int targetCellPosition in worldTileSelector.Selecteds)
+            {
+                if (IsAlreadyPooled(targetCellPosition) == true)
+                {
+                    continue;
+                }
+
+                CreatureJobPool.Add(new CreatureMiningJob(targetCellPosition));
+            }
+        }
+
+        /// <summary>
+        /// 이미 Pool에 등록되어있는 마이닝 포인트?
+        /// </summary>
+        public bool IsAlreadyPooled(Vector3Int targetCellPosition)
+        {
+            List<CreatureMiningJob> miningJobs = CreatureJobPool.Find<CreatureMiningJob>();
+            foreach (CreatureMiningJob miningJob in miningJobs)
+            {
+                if (miningJob.TargetCellPosition == targetCellPosition)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

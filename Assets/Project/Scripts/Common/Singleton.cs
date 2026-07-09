@@ -45,6 +45,23 @@ namespace TRPG.Runtime
 
 
         /// <summary>
+        /// 싱글톤을 새로 만들지 않고 이미 존재하는 인스턴스만 반환합니다.
+        /// </summary>
+        public static bool TryGetInstance(out T existingInstance)
+        {
+            if (instance == null)
+            {
+                instance = FindAnyObjectByType<T>();
+                instanceObj = instance != null ? instance.gameObject : null;
+            }
+
+            existingInstance = instance;
+            return existingInstance != null;
+        }
+
+
+
+        /// <summary>
         /// 씬에 존재하는 MonoBehaviour 싱글톤을 찾거나 매니저 루트 아래에 생성합니다.
         /// </summary>
         public static T GetInstance()

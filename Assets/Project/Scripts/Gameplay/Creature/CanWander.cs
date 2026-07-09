@@ -31,7 +31,7 @@ namespace TRPG.Runtime
                 return false;
             }
 
-            return true;
+            return controller.JobQueue.TryPeek<CreatureWanderJob>(out _) == true;
         }
 
         private void CacheComponents()

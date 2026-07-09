@@ -61,7 +61,6 @@ namespace TRPG.Runtime
         /// </summary>
         public void Enqueue(CreatureJob job)
         {
-
             jobs.Add(new JobEntry(job, sequence));
             sequence++;
             isDirty = true;
@@ -81,6 +80,29 @@ namespace TRPG.Runtime
             }
 
             job = jobs[0].Job;
+            return true;
+        }
+
+        /// <summary>
+        /// 큐 앞쪽의 CreatureJob을 제거하지 않고 확인합니다.
+        /// </summary>
+        public bool TryPeek<T>(out T job) where T : CreatureJob 
+        {
+            Sort();
+
+            if (jobs.Count <= 0)
+            {
+                job = null;
+                return false;
+            }
+
+            if (jobs[0].Job is T typedJob == false)
+            {
+                job = null;
+                return false;
+            }
+
+            job = typedJob;
             return true;
         }
 
@@ -215,6 +237,5 @@ namespace TRPG.Runtime
 
             return a.Sequence.CompareTo(b.Sequence);
         }
-
     }
 }

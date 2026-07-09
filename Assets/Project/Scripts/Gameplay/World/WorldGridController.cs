@@ -167,7 +167,7 @@ namespace TRPG.Runtime
             foreach (WorldTilemapType removeKey in removeKeys)
             {
                 // foreach 순회가 끝난 뒤 실제 Dictionary에서 제거합니다.
-                context.MapTiles.Remove(removeKey);
+                context.RemoveTilemap(removeKey);
             }
         }
 
@@ -233,7 +233,7 @@ namespace TRPG.Runtime
             tile = default;
 
             // 타일 가져오기
-            if (context.MapTiles.TryGetValue(tilemapType, out var tiles) == false)
+            if (context.TryGetMapTiles(tilemapType, out var tiles) == false)
             {
                 return false;
             }

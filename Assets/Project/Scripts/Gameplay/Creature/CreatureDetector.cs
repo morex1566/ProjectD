@@ -3,96 +3,197 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
-    /// <summary>
+    ///<summary>
     /// Creature의 감지 범위 안에 들어온 다른 Creature를 찾고 거리순으로 정렬합니다.
-    /// </summary>
-    public class CreatureDetector
+    ///</summary>
+    [RequireComponent(typeof(CircleCollider2D))]
+    public class CreatureDetector : MonoBehaviour
     {
-        private CreatureController owner = null;
+        ///<summary>
+        /// 이 감지기를 소유한 CreatureController입니다.
+        ///</summary>
+        [SerializeField, ReadOnly] private CreatureController owner = null;
 
-        private CreatureContext status = null;
+        [SerializeField, ReadOnly] private CircleCollider2D detectionCollider = null;
 
-        private readonly List<CreatureController> detectedCreatures = new();
-
-        public IReadOnlyList<CreatureController> DetectedCreatures => detectedCreatures;
+        [SerializeField] private float radius = 1.0f;
 
 
+        ///<summary>
+        /// 감지 범위 안에 들어온 Creature 목록입니다.
+        ///</summary>
+        private readonly List<CreatureController> detecteds = new();
 
-        /// <summary>
-        /// 감지 주체와 감지에 사용할 런타임 상태값을 저장합니다.
-        /// </summary>
-        public CreatureDetector(CreatureController owner, CreatureContext status)
+        ///<summary>
+        /// 감지된 Creature 목록입니다.
+        ///</summary>
+        public IReadOnlyList<CreatureController> Detecteds => detecteds;
+
+        private void OnValidate()
         {
-            this.owner = owner;
-            this.status = status;
+            detectionCollider = GetComponent<CircleCollider2D>();
         }
 
-
-
-        /// <summary>
-        /// 현재 씬의 Creature들을 스캔해 감지 범위 안의 대상 목록을 갱신합니다.
-        /// </summary>
-        public IReadOnlyList<CreatureController> Detect()
+        ///<summary>
+        /// 컴포넌트가 처음 생성될 때 소유자를 찾습니다.
+        ///</summary>
+        private void Awake()
         {
-            detectedCreatures.Clear();
+            owner = gameObject.GetComponentInHierarchy<CreatureController>();
+        }
 
-            // 탐색 시작
-            float range = status.DetectRange;
-            float sqrRange = range * range;
-            CreatureController[] creatures = GameObject.FindObjectsByType<CreatureController>(FindObjectsSortMode.None);
-            for (int i = 0; i < creatures.Length; i++)
+        ///<summary>
+        /// 비활성화될 때 감지 목록을 초기화합니다.
+        ///</summary>
+        private void OnDisable()
+        {
+            detecteds.Clear();
+        }
+
+        ///<summary>
+        /// 감지 범위 안으로 Collider2D가 들어왔을 때 호출됩니다.
+        ///</summary>
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (TryGetCreatureController(collision, out CreatureController target) == false)
             {
-                if (creatures[i] == owner) continue;
-
-                if (!IsInRange(creatures[i], sqrRange)) continue;
-
-                detectedCreatures.Add(creatures[i]);
+                return;
             }
 
-            // 가장 가까운 크리쳐가 먼저 오도록 정렬하고, 거리가 같으면 InstanceId로 결과를 고정합니다.
-            detectedCreatures.Sort(CompareByDistance);
+            if (detecteds.Contains(target) == true)
+            {
+                return;
+            }
 
-            return detectedCreatures;
+            detecteds.Add(target);
+
+            Refresh();
         }
 
-        /// <summary>
-        /// 특정 Creature가 감지 범위 안에 있는지 검사합니다.
-        /// </summary>
-        public bool Detect(CreatureController target)
+        ///<summary>
+        /// 감지 범위 밖으로 Collider2D가 나갔을 때 호출됩니다.
+        ///</summary>
+        private void OnTriggerExit2D(Collider2D collision)
         {
-            if (target == null) return false;
-            if (target == owner) return false;
+            if (TryGetCreatureController(collision, out CreatureController target) == false)
+            {
+                return;
+            }
 
-            float range = status.DetectRange;
-            float sqrRange = range * range;
+            detecteds.Remove(target);
 
-            return IsInRange(target, sqrRange);
+            Refresh();
         }
 
-        /// <summary>
-        /// 제곱 거리 기준으로 대상이 감지 범위 안에 있는지 확인합니다.
-        /// </summary>
-        private bool IsInRange(CreatureController target, float sqrRange)
+        public void SetRadius(float radius)
         {
-            float sqrDistance = Vector3.SqrMagnitude(target.transform.position - owner.transform.position);
-
-            return sqrDistance <= sqrRange;
+            this.radius = radius;
+            detectionCollider.radius = radius;
         }
 
-        /// <summary>
-        /// 감지 결과를 가까운 순서로 정렬하고 동률이면 InstanceId로 순서를 고정합니다.
-        /// </summary>
+        ///<summary>
+        /// 감지 목록에서 유효하지 않은 대상을 제거하고 거리순으로 정렬합니다.
+        ///</summary>
+        private void Refresh()
+        {
+            for (int i = detecteds.Count - 1; i >= 0; i--)
+            {
+                CreatureController detected = detecteds[i];
+
+                if (detected == null)
+                {
+                    detecteds.RemoveAt(i);
+                    continue;
+                }
+
+                if (detected == owner)
+                {
+                    detecteds.RemoveAt(i);
+                    continue;
+                }
+
+                if (CheckTargetIsDead(detected) == true)
+                {
+                    detecteds.RemoveAt(i);
+                    continue;
+                }
+
+                if (detected.gameObject.activeInHierarchy == false)
+                {
+                    detecteds.RemoveAt(i);
+                    continue;
+                }
+            }
+
+            // 가까운 Creature가 앞에 오도록 거리순 정렬합니다.
+            detecteds.Sort(CompareByDistance);
+        }
+
+        ///<summary>
+        /// 두 Creature를 감지기 기준 거리순으로 비교합니다.
+        ///</summary>
         private int CompareByDistance(CreatureController a, CreatureController b)
         {
-            float aSqrDistance = Vector3.SqrMagnitude(a.transform.position - owner.transform.position);
-            float bSqrDistance = Vector3.SqrMagnitude(b.transform.position - owner.transform.position);
-
-            if (!Mathf.Approximately(aSqrDistance, bSqrDistance))
+            if (a == null && b == null)
             {
-                return aSqrDistance.CompareTo(bSqrDistance);
+                return 0;
             }
 
-            return a.InstanceId.CompareTo(b.InstanceId);
+            if (a == null)
+            {
+                return 1;
+            }
+
+            if (b == null)
+            {
+                return -1;
+            }
+
+            // sqrt 계산을 피하기 위해 sqrMagnitude를 사용합니다.
+            float aDistance = (a.transform.position - transform.position).sqrMagnitude;
+            float bDistance = (b.transform.position - transform.position).sqrMagnitude;
+
+            return aDistance.CompareTo(bDistance);
+        }
+
+        ///<summary>
+        /// 대상 Creature가 죽었는지 확인합니다.
+        ///</summary>
+        private bool CheckTargetIsDead(CreatureController creature)
+        {
+            if (creature == null)
+            {
+                return true;
+            }
+
+            return creature.IsDead();
+        }
+
+        ///<summary>
+        /// Collider2D에서 CreatureController를 찾습니다.
+        ///</summary>
+        private bool TryGetCreatureController(Collider2D collision, out CreatureController target)
+        {
+            target = null;
+
+            if (collision == null)
+            {
+                return false;
+            }
+
+            target = collision.GetComponentInParent<CreatureController>();
+
+            if (target == null)
+            {
+                return false;
+            }
+
+            if (target == owner)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

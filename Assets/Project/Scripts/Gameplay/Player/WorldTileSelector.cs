@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
@@ -47,11 +46,15 @@ namespace TRPG.Runtime
             Vector3 endWorldPosition = ScreenEx.ScreenToWorldPosition(cam, endScreenPos);
 
             // 셀 좌표
-            Tilemap tilemap = WorldManager.GetWorldTilemapController(WorldTilemapType.WorldTilemapGround).Tilemap;
+            WorldTilemapController tilemapController = WorldManager.GetWorldTilemapController(WorldTilemapType.WorldTilemapGround);
+            if (tilemapController == null) return;
+
+            Tilemap tilemap = tilemapController.Tilemap;
             Vector3Int startCellPos = tilemap.WorldToCell(startWorldPosition);
             Vector3Int endCellPos = tilemap.WorldToCell(endWorldPosition);
             Vector3Int minCellPos = Vector3Int.Min(startCellPos, endCellPos);
             Vector3Int maxCellPos = Vector3Int.Max(startCellPos, endCellPos);
+            HashSet<Vector3Int> currentSelecteds = new();
 
             for (int y = minCellPos.y; y <= maxCellPos.y; y++)
             {
@@ -65,12 +68,6 @@ namespace TRPG.Runtime
                         continue;
                     }
 
-                    // 이미 선택된거 아닌지?
-                    if (selecteds.Contains(cellPos))
-                    {
-                        continue;
-                    }
-
                     // 셀 중앙점이 드래그 Rect 안에 들어온 타일만 선택합니다.
                     Vector3 cellCenterWorldPosition = tilemap.GetCellCenterWorld(cellPos);
                     Vector2 cellCenterScreenPos = cam.WorldToScreenPoint(cellCenterWorldPosition);
@@ -79,10 +76,29 @@ namespace TRPG.Runtime
                         continue;
                     }
 
+                    currentSelecteds.Add(cellPos);
+
+                    // 이미 선택된거 아닌지?
+                    if (selecteds.Contains(cellPos))
+                    {
+                        continue;
+                    }
+
                     Add(cellPos);
                 }
             }
 
+            // 드래그 박스 밖으로 벗어난 타일은 즉시 선택 해제합니다.
+            for (int i = selecteds.Count - 1; i >= 0; i--)
+            {
+                if (currentSelecteds.Contains(selecteds[i]))
+                {
+                    continue;
+                }
+
+                RemoveSelectUI(selecteds[i]);
+                selecteds.RemoveAt(i);
+            }
         }
 
         /// <summary>
@@ -91,7 +107,10 @@ namespace TRPG.Runtime
         protected override void Select(Camera cam, Vector2 mouseWorldPosition)
         {
             // 셀 좌표
-            Tilemap tilemap = WorldManager.GetWorldTilemapController(WorldTilemapType.WorldTilemapGround).Tilemap;
+            WorldTilemapController tilemapController = WorldManager.GetWorldTilemapController(WorldTilemapType.WorldTilemapGround);
+            if (tilemapController == null) return;
+
+            Tilemap tilemap = tilemapController.Tilemap;
             Vector3Int mouseCellPos = tilemap.WorldToCell(mouseWorldPosition);
 
             // 실제 타일이 있는 셀만 선택합니다.

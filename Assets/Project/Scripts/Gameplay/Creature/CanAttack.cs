@@ -21,7 +21,12 @@ namespace TRPG.Runtime
 
         public override bool Check()
         {
-            return controller.IsDead() == false;
+            if (controller.IsDead() == true)
+            {
+                return false;
+            }
+
+            return controller.JobQueue.TryPeek(out CreatureJob job) == true && job is CreatureAttackJob;
         }
 
         private void CacheComponents()

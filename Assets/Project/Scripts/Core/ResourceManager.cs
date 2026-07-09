@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using IDisposable = System.IDisposable;
 using Type = System.Type;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -11,7 +12,7 @@ namespace TRPG.Runtime
     /// <summary>
     /// 런타임 리소스와 게임 데이터 로딩 작업을 처리합니다.
     /// </summary>
-    public class ResourceManager : MonoBehaviourSingleton<ResourceManager>
+    public class ResourceManager : MonoBehaviourSingleton<ResourceManager>, IDisposable
     {
         // Key : Labelname, Value : primarykey
         private readonly Dictionary<string, List<string>> cachedLabelPrimaryKeys = new();
@@ -21,6 +22,8 @@ namespace TRPG.Runtime
 
         // Addressables.Release는 로드 때 받은 handle 기준으로 처리합니다.
         private readonly Dictionary<string, AsyncOperationHandle<Object>> cachedHandles = new();
+
+        private bool isDisposed = false;
 
 
 
@@ -33,7 +36,9 @@ namespace TRPG.Runtime
         /// </summary>
         public static void Init()
         {
-            GetInstance();
+            ResourceManager manager = GetInstance();
+            manager.isDisposed = false;
+
             Load(UnityConstant.Addressable.Label.Core);
 
             Settings = GetResource<ResourceManagerSettingsData>(UnityConstant.Addressable.Label.Core);
@@ -225,6 +230,35 @@ namespace TRPG.Runtime
             }
 
             Addressables.Release(handle);
+        }
+
+        /// <summary>
+        /// 로드된 Addressables handle과 캐시를 모두 해제합니다.
+        /// </summary>
+        public void Dispose()
+        {
+            if (isDisposed == true)
+            {
+                return;
+            }
+
+            isDisposed = true;
+
+            foreach (AsyncOperationHandle<Object> handle in cachedHandles.Values)
+            {
+                ReleaseResource(handle);
+            }
+
+            cachedHandles.Clear();
+            cachedResources.Clear();
+            cachedLabelPrimaryKeys.Clear();
+            Settings = null;
+        }
+
+        protected override void OnDestroy()
+        {
+            Dispose();
+            base.OnDestroy();
         }
     }
 }

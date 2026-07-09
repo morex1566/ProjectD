@@ -9,7 +9,7 @@ namespace TRPG.Runtime
     {
         [SerializeField] private SerializableDictionary<Vector3Int, WorldTile> mapTiles = new();
 
-        public SerializableDictionary<Vector3Int, WorldTile> MapTiles => mapTiles;
+        public IReadOnlyDictionary<Vector3Int, WorldTile> MapTiles => mapTiles.ReadOnlyDictionary;
 
 
 

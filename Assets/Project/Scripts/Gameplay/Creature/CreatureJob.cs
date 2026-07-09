@@ -20,6 +20,13 @@ namespace TRPG.Runtime
         public bool IsDone => isDone;
 
         /// <summary>
+        /// 아직 할당 안받음용
+        /// </summary>
+        protected CreatureJob()
+        {
+        }
+
+        /// <summary>
         /// 완료 조건을 생성
         /// </summary>
         /// <param name="controller"></param>
@@ -122,22 +129,32 @@ namespace TRPG.Runtime
 
     public class CreatureMiningJob : CreatureJob
     {
-        [SerializeField] private List<Vector3Int> targetCellPoss;
+        private readonly Vector3Int targetCellPosition = Vector3Int.zero;
 
-        public CreatureMiningJob(CreatureController controller, List<Vector3Int> targetCellPoss) : base(controller)
+        private readonly List<CreatureController> workers = new();
+
+
+        public Vector3Int TargetCellPosition => targetCellPosition;
+
+        public IReadOnlyList<CreatureController> Workers => workers;
+
+
+        /// <summary>
+        /// 아직 Creature에게 배정되지 않은 채굴 작업을 생성합니다.
+        /// </summary>
+        public CreatureMiningJob(Vector3Int targetCellPosition)
         {
-            this.targetCellPoss = new List<Vector3Int>(targetCellPoss);
+            this.targetCellPosition = targetCellPosition;
+        }
+
+        public CreatureMiningJob(CreatureController controller, Vector3Int targetCellPosition) : base(controller)
+        {
+            this.targetCellPosition = targetCellPosition;
         }
 
         protected override bool CanExit()
         {
-            // 죽으면 못움직이지...
-            if (controller.IsDead() == true)
-            {
-                return false;
-            }
-
-            return true;
+            throw new System.NotImplementedException();
         }
 
         protected override bool CanStart()
@@ -196,4 +213,5 @@ namespace TRPG.Runtime
             return true;
         }
     }
+
 }

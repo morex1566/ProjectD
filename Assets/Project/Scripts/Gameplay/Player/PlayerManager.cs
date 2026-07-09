@@ -8,9 +8,11 @@ namespace TRPG.Runtime
     /// <summary>
     /// 플레이어 입력에 따른 명령을 중개
     /// </summary>
-    public class PlayerManager : MonoBehaviourSingleton<PlayerManager>
+    public class PlayerManager : MonoBehaviourSingleton<PlayerManager>, IDisposable
     {
         public static PlayerManagerSettingsData Settings;
+
+        private bool isDisposed = false;
 
         [SerializeField, ReadOnly] private CreatureSelector creatureSelector;
 
@@ -30,9 +32,12 @@ namespace TRPG.Runtime
         public static void Init()
         {
             PlayerManager manager = GetInstance();
+            manager.isDisposed = false;
 
             Settings = ResourceManager.GetResource<PlayerManagerSettingsData>(UnityConstant.Addressable.Label.Core);
 
+            manager.currentCommandSystem?.Exit();
+            manager.DisposeSelector();
             GameObject selectorInst = Instantiate(Settings.SelectorPrefab, manager.transform);
             manager.creatureSelector = selectorInst.GetComponent<CreatureSelector>();
             manager.worldTileSelector = selectorInst.GetComponent<WorldTileSelector>();
@@ -65,6 +70,48 @@ namespace TRPG.Runtime
             manager.currentCommandSystem = nextSystem;
             manager.currentCommandSystem?.Enter();
             manager.CommandSystemModeChanged?.Invoke(type);
+        }
+
+        /// <summary>
+        /// 플레이어 입력 명령과 선택기 인스턴스를 정리합니다.
+        /// </summary>
+        public void Dispose()
+        {
+            if (isDisposed == true)
+            {
+                return;
+            }
+
+            isDisposed = true;
+
+            currentCommandSystem?.Exit();
+            currentCommandSystem = null;
+            commandSystems.Clear();
+            CommandSystemModeChanged?.RemoveAllListeners();
+            DisposeSelector();
+            Settings = null;
+        }
+
+        protected override void OnDestroy()
+        {
+            Dispose();
+            base.OnDestroy();
+        }
+
+        /// <summary>
+        /// 현재 생성된 선택기 GameObject를 제거합니다.
+        /// </summary>
+        private void DisposeSelector()
+        {
+            GameObject selectorObj = creatureSelector != null ? creatureSelector.gameObject : worldTileSelector?.gameObject;
+
+            if (selectorObj != null)
+            {
+                UnityEngine.Object.Destroy(selectorObj);
+            }
+
+            creatureSelector = null;
+            worldTileSelector = null;
         }
     }
 }

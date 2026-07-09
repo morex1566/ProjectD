@@ -37,9 +37,11 @@ namespace TRPG.Runtime
     /// <summary>
     /// Input System 액션 맵을 생성하고 활성화하는 전역 입력 관리자입니다.
     /// </summary>
-    public class InputManager : MonoBehaviourSingleton<InputManager>
+    public class InputManager : MonoBehaviourSingleton<InputManager>, IDisposable
     {
         private InputMappingContext inputMappingContext;
+
+        private bool isDisposed = false;
 
         public InputMappingContext InputMappingContext => GetInstance().inputMappingContext;
 
@@ -57,9 +59,35 @@ namespace TRPG.Runtime
         public static void Init()
         {
             InputManager manager = GetInstance();
+            manager.isDisposed = false;
 
+            manager.inputMappingContext?.Disable();
+            manager.inputMappingContext?.Dispose();
             manager.inputMappingContext = new InputMappingContext();
             manager.inputMappingContext.Enable();
+        }
+
+        /// <summary>
+        /// InputActionAsset을 비활성화하고 내부 리소스를 해제합니다.
+        /// </summary>
+        public void Dispose()
+        {
+            if (isDisposed == true)
+            {
+                return;
+            }
+
+            isDisposed = true;
+
+            inputMappingContext?.Disable();
+            inputMappingContext?.Dispose();
+            inputMappingContext = null;
+        }
+
+        protected override void OnDestroy()
+        {
+            Dispose();
+            base.OnDestroy();
         }
     }
 }

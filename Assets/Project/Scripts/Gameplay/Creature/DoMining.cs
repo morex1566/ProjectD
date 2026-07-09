@@ -9,7 +9,7 @@ namespace TRPG.Runtime
     {
         public override NodeResult Execute()
         {
-            throw new System.NotImplementedException();
+            return NodeResult.running;
         }
     }
 }

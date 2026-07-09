@@ -26,7 +26,12 @@ namespace TRPG.Runtime
                 return false;
             }
 
-            return controller.Context.MoveSpeed > 0f;
+            if (controller.Context.MoveSpeed <= 0f)
+            {
+                return false;
+            }
+
+            return controller.JobQueue.TryPeek(out CreatureJob job) == true && job is CreatureMoveJob;
         }
 
         private void CacheComponents()

@@ -21,7 +21,17 @@ namespace TRPG.Runtime
 
         public override bool Check()
         {
-            return controller.IsDead() == false;
+            if (controller.IsDead() == true)
+            {
+                return false;
+            }
+
+            if (controller.Context.MoveSpeed <= 0f)
+            {
+                return false;
+            }
+
+            return controller.JobQueue.TryPeek<CreatureMiningJob>(out _) == true;
         }
 
         private void CacheComponents()

@@ -13,7 +13,7 @@ namespace TRPG.Runtime
         [SerializeField, ReadOnly] private SerializableDictionary<WorldTilemapType, SerializableDictionary<Vector3Int, WorldTile>> mapTiles = new();
 
 
-        public SerializableDictionary<WorldTilemapType, SerializableDictionary<Vector3Int, WorldTile>> MapTiles => mapTiles;
+        public IReadOnlyDictionary<WorldTilemapType, SerializableDictionary<Vector3Int, WorldTile>> MapTiles => mapTiles.ReadOnlyDictionary;
 
 
         public void SetTile(WorldTilemapType tilemapType, WorldTile tile)
@@ -26,6 +26,11 @@ namespace TRPG.Runtime
             return GetMapTiles(tilemapType).Remove(cellPos);
         }
 
+        public bool RemoveTilemap(WorldTilemapType tilemapType)
+        {
+            return mapTiles.Remove(tilemapType);
+        }
+
         public bool ContainsTile(WorldTilemapType tilemapType, Vector3Int cellPos)
         {
             return GetMapTiles(tilemapType).ContainsKey(cellPos);
@@ -34,6 +39,11 @@ namespace TRPG.Runtime
         public bool TryGetTile(WorldTilemapType tilemapType, Vector3Int cellPos, out WorldTile tile)
         {
             return GetMapTiles(tilemapType).TryGetValue(cellPos, out tile);
+        }
+
+        public bool TryGetMapTiles(WorldTilemapType tilemapType, out SerializableDictionary<Vector3Int, WorldTile> tiles)
+        {
+            return mapTiles.TryGetValue(tilemapType, out tiles);
         }
 
         public void ClearTiles(WorldTilemapType tilemapType)

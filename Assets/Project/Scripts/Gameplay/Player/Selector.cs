@@ -47,6 +47,11 @@ namespace TRPG.Runtime
         public virtual IReadOnlyList<T> Selecteds => selecteds;
 
 
+        /// <summary>
+        /// 클릭 또는 드래그 선택이 확정된 뒤 호출됩니다.
+        /// </summary>
+        public event Action SelectionCompleted;
+
 
         /// <summary>
         /// 선택 박스 UI를 생성하고 초기 상태를 숨김으로 맞춥니다.
@@ -103,6 +108,7 @@ namespace TRPG.Runtime
             }
 
             ShowSelectionBox(startPointerDownScreenPos, pointerScreenPos);
+            Selects(cam, startPointerDownScreenPos, pointerScreenPos);
         }
 
         /// <summary>
@@ -169,6 +175,8 @@ namespace TRPG.Runtime
 
                 Select(cam, pointerWorldPosition);
             }
+
+            SelectionCompleted?.Invoke();
         }
 
         /// <summary>

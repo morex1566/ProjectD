@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,11 +7,13 @@ namespace TRPG.Runtime
     /// <summary>
     /// 월드 시스템 진입점으로서 맵, 크리처, 인디케이터 기능을 중개합니다.
     /// </summary>
-    public partial class WorldManager : MonoBehaviourSingleton<WorldManager>
+    public partial class WorldManager : MonoBehaviourSingleton<WorldManager>, IDisposable
     {
         public static WorldManagerSettingsData Settings { get; private set; }
 
         private GameObject worldRoot = null;
+
+        private bool isDisposed = false;
 
         /// <summary>
         /// 반복적인 태그 검색 없이 월드 카메라를 재사용하기 위한 런타임 캐시입니다.
@@ -40,12 +43,49 @@ namespace TRPG.Runtime
         public static void Init()
         {
             WorldManager manager = GetInstance();
+            manager.isDisposed = false;
+
             Settings = ResourceManager.GetResource<WorldManagerSettingsData>(UnityConstant.Addressable.Label.Core);
+
+            if (manager.worldRoot != null)
+            {
+                UnityEngine.Object.Destroy(manager.worldRoot);
+            }
 
             manager.worldRoot = new GameObject("World");
             manager.worldCameraController = null;
             manager.worldGridController = null;
             manager.creatures.Clear();
+        }
+
+        /// <summary>
+        /// 월드 런타임 오브젝트와 캐시를 정리합니다.
+        /// </summary>
+        public void Dispose()
+        {
+            if (isDisposed == true)
+            {
+                return;
+            }
+
+            isDisposed = true;
+
+            if (worldRoot != null)
+            {
+                UnityEngine.Object.Destroy(worldRoot);
+            }
+
+            worldRoot = null;
+            worldCameraController = null;
+            worldGridController = null;
+            creatures.Clear();
+            Settings = null;
+        }
+
+        protected override void OnDestroy()
+        {
+            Dispose();
+            base.OnDestroy();
         }
 
         /// <summary>
@@ -169,7 +209,11 @@ namespace TRPG.Runtime
 
         public static WorldCameraController GetWorldCameraController()
         {
-            WorldManager manager = GetInstance();
+            if (TryGetInstance(out WorldManager manager) == false)
+            {
+                return null;
+            }
+
             if (manager.worldCameraController == null)
             {
                 manager.worldCameraController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldCamera)?.GetComponent<WorldCameraController>();
@@ -180,7 +224,11 @@ namespace TRPG.Runtime
 
         public static WorldGridController GetWorldGridController()
         {
-            WorldManager manager = GetInstance();
+            if (TryGetInstance(out WorldManager manager) == false)
+            {
+                return null;
+            }
+
             if (manager.worldGridController == null)
             {
                 manager.worldGridController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridController>();
