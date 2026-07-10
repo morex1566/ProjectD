@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1513937922316707045}
   - component: {fileID: 3063331576967544884}
   - component: {fileID: 6241586405010179120}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: PF_CreatureDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureDetector
   owner: {fileID: 0}
-  detectionCollider: {fileID: 0}
+  detectionCollider: {fileID: 6241586405010179120}
   radius: 6
 --- !u!58 &6241586405010179120
 CircleCollider2D:

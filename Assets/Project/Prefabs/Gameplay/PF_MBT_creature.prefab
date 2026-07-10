@@ -53,6 +53,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3793842267770381713, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
+      propertyPath: selectedEditorNode
+      value: 
+      objectReference: {fileID: 1720920926776487151}
+    - target: {fileID: 3793842267770381713, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
       propertyPath: maxExecutionsPerTick
       value: 10
       objectReference: {fileID: 0}
@@ -72,16 +76,7 @@ PrefabInstance:
       addedObject: {fileID: 6774190706644713471}
     - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2240401553341656857}
-    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 4905751734546709370}
-    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8567135425898810984}
-    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7350602010153320667}
     - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1597612336276414780}
@@ -90,7 +85,25 @@ PrefabInstance:
       addedObject: {fileID: 1720920926776487151}
     - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5997491705317174364}
+      addedObject: {fileID: 1430526296694689566}
+    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -773293667527902345}
+    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7793661467743790308}
+    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5201909756003245860}
+    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2818320488604232163}
+    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1189730441002896982}
+    - targetCorrespondingSourceObject: {fileID: 6648181129348194861, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 812345678901234567}
   m_SourcePrefab: {fileID: 100100000, guid: 189465d14b6ba8f49989403fb86c83cb, type: 3}
 --- !u!1 &4055836836839155791 stripped
 GameObject:
@@ -113,12 +126,12 @@ MonoBehaviour:
   rect:
     serializedVersion: 2
     x: 360
-    y: 240
+    y: 60
     width: 160
     height: 44
   parent: {fileID: 0}
   children:
-  - {fileID: 1597612336276414780}
+  - {fileID: 2818320488604232163}
   behaviourTree: {fileID: 0}
   runtimePriority: 0
   breakpoint: 0
@@ -137,43 +150,20 @@ MonoBehaviour:
   title: Selector
   rect:
     serializedVersion: 2
-    x: 100
-    y: 540
+    x: 300
+    y: 560
     width: 160
     height: 44
   parent: {fileID: 1720920926776487151}
   children:
-  - {fileID: 2240401553341656857}
+  - {fileID: 1189730441002896982}
+  - {fileID: 4905751734546709370}
+  - {fileID: -773293667527902345}
+  - {fileID: 7793661467743790308}
   behaviourTree: {fileID: 0}
   runtimePriority: 0
   breakpoint: 0
   random: 0
---- !u!114 &2240401553341656857
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4055836836839155791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed002d7024474d1d8656eeafacc2347b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CanMining
-  title: Condition - CanMining
-  rect:
-    serializedVersion: 2
-    x: 100
-    y: 660
-    width: 160
-    height: 44
-  parent: {fileID: 6774190706644713471}
-  children:
-  - {fileID: 4905751734546709370}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
 --- !u!114 &4905751734546709370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,69 +179,16 @@ MonoBehaviour:
   title: Leaf - DoMining
   rect:
     serializedVersion: 2
-    x: 100
-    y: 740
+    x: 19.200012
+    y: 833.6003
     width: 160
     height: 44
-  parent: {fileID: 2240401553341656857}
-  children: []
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
---- !u!114 &8567135425898810984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4055836836839155791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59e1163989704498a44d4aac1bb078bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CanWander
-  title: Condition - CanWander
-  rect:
-    serializedVersion: 2
-    x: 660
-    y: 420
-    width: 160
-    height: 44
-  parent: {fileID: 1597612336276414780}
-  children:
-  - {fileID: 7350602010153320667}
-  behaviourTree: {fileID: 0}
-  runtimePriority: 0
-  breakpoint: 0
-  controller: {fileID: 0}
---- !u!114 &7350602010153320667
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4055836836839155791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 986b2e205bd8a944ea8e0663675c39ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoWander
-  title: Leaf - DoWander
-  rect:
-    serializedVersion: 2
-    x: 800
-    y: 480
-    width: 160
-    height: 44
-  parent: {fileID: 8567135425898810984}
+  parent: {fileID: 6774190706644713471}
   children: []
   behaviourTree: {fileID: 0}
   runtimePriority: 0
   breakpoint: 0
   controller: {fileID: 0}
-  targetCellPosition: {x: 0, y: 0, z: 0}
-  wanderRadius: 4
-  retryIntervalSec: 5
 --- !u!114 &1597612336276414780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,14 +205,15 @@ MonoBehaviour:
   rect:
     serializedVersion: 2
     x: 360
-    y: 320
+    y: 280
     width: 160
     height: 44
-  parent: {fileID: 3664922098657577596}
+  parent: {fileID: 2818320488604232163}
   children:
+  - {fileID: 5201909756003245860}
+  - {fileID: 1430526296694689566}
   - {fileID: 1720920926776487151}
-  - {fileID: 5997491705317174364}
-  - {fileID: 8567135425898810984}
+  - {fileID: 812345678901234567}
   behaviourTree: {fileID: 0}
   runtimePriority: 0
   breakpoint: 0
@@ -295,8 +233,8 @@ MonoBehaviour:
   title: Condition - HasJob
   rect:
     serializedVersion: 2
-    x: 100
-    y: 420
+    x: 339.2
+    y: 452.8
     width: 160
     height: 44
   parent: {fileID: 1597612336276414780}
@@ -306,7 +244,7 @@ MonoBehaviour:
   runtimePriority: 0
   breakpoint: 0
   controller: {fileID: 0}
---- !u!114 &5997491705317174364
+--- !u!114 &1430526296694689566
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -321,7 +259,7 @@ MonoBehaviour:
   title: Leaf - TakeJobFromPool
   rect:
     serializedVersion: 2
-    x: 380
+    x: 100
     y: 440
     width: 160
     height: 44
@@ -331,3 +269,159 @@ MonoBehaviour:
   runtimePriority: 0
   breakpoint: 0
   controller: {fileID: 0}
+--- !u!114 &-773293667527902345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055836836839155791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c53ca32d2fcff5b459686739e048e93c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoEngage
+  title: Leaf - DoEngage
+  rect:
+    serializedVersion: 2
+    x: 239.20001
+    y: 833.6003
+    width: 160
+    height: 44
+  parent: {fileID: 6774190706644713471}
+  children: []
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  controller: {fileID: 0}
+--- !u!114 &7793661467743790308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055836836839155791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 986b2e205bd8a944ea8e0663675c39ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoWander
+  title: Leaf - DoWander
+  rect:
+    serializedVersion: 2
+    x: 519.2
+    y: 833.6003
+    width: 160
+    height: 44
+  parent: {fileID: 6774190706644713471}
+  children: []
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  controller: {fileID: 0}
+--- !u!114 &5201909756003245860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055836836839155791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d011f863bd1e4acd88be83acb3901149, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.TakeEngageJobAuto
+  title: Leaf - TakeEngageJobAuto
+  rect:
+    serializedVersion: 2
+    x: -140
+    y: 440
+    width: 160
+    height: 44
+  parent: {fileID: 1597612336276414780}
+  children: []
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  controller: {fileID: 0}
+  detector: {fileID: 0}
+--- !u!114 &2818320488604232163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055836836839155791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 807610a934554dd08e36e7a7d0bcebb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CanAct
+  title: Condition - CanAct
+  rect:
+    serializedVersion: 2
+    x: 360
+    y: 180
+    width: 160
+    height: 44
+  parent: {fileID: 3664922098657577596}
+  children:
+  - {fileID: 1597612336276414780}
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  controller: {fileID: 0}
+--- !u!114 &1189730441002896982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055836836839155791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fc4179e3f7f96a45b7d53f13b72da99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.DoMove
+  title: Leaf - DoMove
+  rect:
+    serializedVersion: 2
+    x: -180.79999
+    y: 833.6003
+    width: 160
+    height: 44
+  parent: {fileID: 6774190706644713471}
+  children: []
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  controller: {fileID: 0}
+--- !u!114 &812345678901234567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055836836839155791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbb10c7322b54b3ca7e05051c035fe7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.TakeWanderJobAuto
+  title: Leaf - TakeWanderJobAuto
+  rect:
+    serializedVersion: 2
+    x: 560
+    y: 440
+    width: 160
+    height: 59
+  parent: {fileID: 1597612336276414780}
+  children: []
+  behaviourTree: {fileID: 0}
+  runtimePriority: 0
+  breakpoint: 0
+  controller: {fileID: 0}
+  wanderRadius: 1
+  startDelaySec:
+    Min: 6
+    Max: 12

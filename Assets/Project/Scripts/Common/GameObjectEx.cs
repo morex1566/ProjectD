@@ -78,7 +78,7 @@ namespace TRPG.Runtime
         }
 
         ///<summary>
-        /// 현재 GameObject의 부모, 자기 자신, 자식 계층에서 지정한 컴포넌트를 찾습니다.
+        /// 현재 GameObject의 자기 자신, 자식, 부모, 형제 계층에서 지정한 컴포넌트를 찾습니다.
         ///</summary>
         public static T GetComponentInHierarchy<T>(this GameObject gameObject, bool includeInactive = true) where T : Component
         {
@@ -95,12 +95,26 @@ namespace TRPG.Runtime
                 return component;
             }
 
-            // 자식 계층에 없으면 부모 계층에서 찾습니다.
-            return gameObject.GetComponentInParent<T>(includeInactive);
+            Transform parent = gameObject.transform.parent;
+
+            while (parent != null)
+            {
+                // 부모의 자식 계층까지 검색해서 현재 오브젝트의 형제 계층도 포함합니다.
+                component = parent.GetComponentInChildren<T>(includeInactive);
+
+                if (component != null)
+                {
+                    return component;
+                }
+
+                parent = parent.parent;
+            }
+
+            return null;
         }
 
         ///<summary>
-        /// 현재 Component의 부모, 자기 자신, 자식 계층에서 지정한 컴포넌트를 찾습니다.
+        /// 현재 Component의 자기 자신, 자식, 부모, 형제 계층에서 지정한 컴포넌트를 찾습니다.
         ///</summary>
         public static T GetComponentInHierarchy<T>(this Component component, bool includeInactive = true) where T : Component
         {

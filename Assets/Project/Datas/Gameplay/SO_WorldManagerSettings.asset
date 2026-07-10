@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: SO_WorldManagerSettings
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldManagerSettingsData
   CreatureDataSheet: {fileID: 11400000, guid: 3c79fbe8208c71542ad8a4fea3fe4504, type: 2}
+  WeaponDataSheet: {fileID: 11400000, guid: 838a9cc3129c451883bac0354c7fe1b0, type: 2}

@@ -21,8 +21,7 @@ namespace TRPG.Runtime
 
         public override bool Check()
         {
-            return controller.JobQueue.TryPeek<CreatureWanderJob>(out _) == false &&
-                   controller.JobQueue.Count > 1 &&
+            return controller.JobQueue.Count > 0 &&
                    controller.IsDead() == false;
         }
 

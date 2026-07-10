@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4386306045601934724}
   - component: {fileID: 2687029329726899101}
   m_Layer: 20
-  m_Name: PF_Creature
+  m_Name: PF_creature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,6 +35,7 @@ Transform:
   m_Children:
   - {fileID: 2928263879976859038}
   - {fileID: 6797849172220703020}
+  - {fileID: 646119806368336570}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5108346331041859384
@@ -50,9 +51,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureController
   spriter: {fileID: 5466476860050821414}
-  collider2DSizeFitter: {fileID: 2687029329726899101}
-  idData: {fileID: 0}
   context:
+    BaseAtk: 1
+    BaseAttackRange: 1
+    BaseAttackSpeed: 1
     Hp: 1
     Atk: 1
     DetectRange: 1
@@ -60,12 +62,21 @@ MonoBehaviour:
     AttackSpeed: 1
     MoveSpeed: 1
     AIType: 1
-    DataId: 
-    NameKey: 
-    DescKey: 
-    Faction: 
+    Id: 
+    Name: 
+    Description: 
+    Faction: 0
     Sprite: {fileID: 0}
     BehaviourTree: {fileID: 0}
+    EquippedWeapon:
+      Id: 
+      Name: 
+      Description: 
+      Damage: 0
+      AttackRange: 0
+      AttackSpeed: 0
+      Weight: 0
+      Sprite: {fileID: 0}
 --- !u!50 &7628241560954180809
 Rigidbody2D:
   serializedVersion: 5
@@ -85,7 +96,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 8192
+    m_Bits: 1056768
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -157,6 +168,59 @@ MonoBehaviour:
   isFitOnStart: 1
   alphaThreshold: 1
   padding: {x: 0.001, y: 0.001}
+--- !u!1 &3536934753780346285
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 646119806368336570}
+  - component: {fileID: 8766207349533028156}
+  m_Layer: 20
+  m_Name: GroundChecker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &646119806368336570
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3536934753780346285}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1809254756998236648}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8766207349533028156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3536934753780346285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5199eebf579554e4196f55881ab63041, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.GroundChecker
+  targetRenderer: {fileID: 5466476860050821414}
+  alphaThreshold: 0.1
+  bottomSampleHeight: 1
+  spriteLocalPosition: {x: 0, y: 0}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 8192
+  checkSize: {x: 0, y: 0}
+  hasFootPivot: 0
 --- !u!1 &7173048168623611036
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +232,7 @@ GameObject:
   - component: {fileID: 2928263879976859038}
   - component: {fileID: 5466476860050821414}
   - component: {fileID: 7704175489737682508}
-  m_Layer: 10
+  m_Layer: 20
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

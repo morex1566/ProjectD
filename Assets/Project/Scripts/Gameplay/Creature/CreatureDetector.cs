@@ -12,7 +12,7 @@ namespace TRPG.Runtime
         ///<summary>
         /// 이 감지기를 소유한 CreatureController입니다.
         ///</summary>
-        [SerializeField, ReadOnly] private CreatureController owner = null;
+        [SerializeField, ReadOnly] private CreatureController controller = null;
 
         [SerializeField, ReadOnly] private CircleCollider2D detectionCollider = null;
 
@@ -39,7 +39,7 @@ namespace TRPG.Runtime
         ///</summary>
         private void Awake()
         {
-            owner = gameObject.GetComponentInHierarchy<CreatureController>();
+            controller = gameObject.GetComponentInHierarchy<CreatureController>();
         }
 
         ///<summary>
@@ -55,11 +55,13 @@ namespace TRPG.Runtime
         ///</summary>
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            // 감지 대상이 creature임?
             if (TryGetCreatureController(collision, out CreatureController target) == false)
             {
                 return;
             }
 
+            // 이미 등록된 녀석?
             if (detecteds.Contains(target) == true)
             {
                 return;
@@ -91,6 +93,22 @@ namespace TRPG.Runtime
             detectionCollider.radius = radius;
         }
 
+        public bool IsEnemyDetected(out CreatureController enemy)
+        {
+            enemy = default;
+
+            foreach (var detected in detecteds)
+            {
+                if (Faction.GetRelationType(controller.Context.Faction, detected.Context.Faction) == RelationType.Hostile)
+                {
+                    enemy = detected;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         ///<summary>
         /// 감지 목록에서 유효하지 않은 대상을 제거하고 거리순으로 정렬합니다.
         ///</summary>
@@ -106,7 +124,7 @@ namespace TRPG.Runtime
                     continue;
                 }
 
-                if (detected == owner)
+                if (detected == controller)
                 {
                     detecteds.RemoveAt(i);
                     continue;
@@ -188,7 +206,7 @@ namespace TRPG.Runtime
                 return false;
             }
 
-            if (target == owner)
+            if (target == controller)
             {
                 return false;
             }

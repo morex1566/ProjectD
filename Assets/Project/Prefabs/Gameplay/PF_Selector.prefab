@@ -45,8 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9d731a8de3a8a44da0a5f4b7ef41c19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.IdleSelector
-  dragThreshold: 4
+  dragThreshold: 16
   selectionBoxPrefab: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
+  selectedCreatureSprite: {fileID: 21300000, guid: 8375de24b11314f4e9deddb2fa7b1d26, type: 3}
 --- !u!114 &7379261557961419523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59,6 +60,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ffe2462d41521c4ea4d8a841341da68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.ConstructionSelector
-  dragThreshold: 4
+  dragThreshold: 16
   selectionBoxPrefab: {fileID: 205294001459704690, guid: 20dabdaf0339ffd4f9ba04d1776100e9, type: 3}
   selectedWithBorderTileBase: {fileID: 11400000, guid: 707d26c372578f24fbfe4c83dc808657, type: 2}

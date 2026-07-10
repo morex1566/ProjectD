@@ -89,22 +89,36 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// Creature 프리팹을 생성한 뒤 DataId에 해당하는 CreatureData로 컨텍스트를 로드합니다.
+        /// Id에 해당하는 CreatureData의 완성 프리팹을 월드에 생성합니다.
         /// </summary>
-        public static CreatureController SpawnCreature(GameObject creaturePrefab, string dataId, Vector3 worldPosition)
+        public static CreatureController SpawnCreature(string id, Vector3 worldPosition)
         {
-            if (TryGetCreatureData(dataId, out CreatureData data) == false)
+            if (TryGetCreatureData(id, out CreatureData data) == false)
             {
                 return null;
             }
 
-            CreatureController creature = SpawnCreature(creaturePrefab, worldPosition);
-            if (creature != null)
+            if (data.Prefab == null)
             {
-                creature.LoadContext(data);
+                Debug.LogWarning($"SpawnCreature failed. Creature prefab is not assigned. Id: {id}");
+                return null;
             }
 
-            return creature;
+            return SpawnCreature(data.Prefab, worldPosition);
+        }
+
+        /// <summary>
+        /// Creature 프리팹을 월드에 생성합니다.
+        /// </summary>
+        public static CreatureController SpawnCreature(GameObject creaturePrefab, string id, Vector3 worldPosition)
+        {
+            if (TryGetCreatureData(id, out CreatureData data) == false)
+            {
+                return null;
+            }
+
+            GameObject prefab = creaturePrefab != null ? creaturePrefab : data.Prefab;
+            return SpawnCreature(prefab, worldPosition);
         }
 
         /// <summary>
@@ -170,7 +184,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 월드 설정에 연결된 CreatureSheet에서 CreatureData를 조회합니다.
         /// </summary>
-        public static bool TryGetCreatureData(string dataId, out CreatureData data)
+        public static bool TryGetCreatureData(string id, out CreatureData data)
         {
             data = null;
 
@@ -180,7 +194,74 @@ namespace TRPG.Runtime
                 return false;
             }
 
-            return Settings.CreatureDataSheet.TryGetEntity(dataId, out data);
+            return Settings.CreatureDataSheet.TryGetEntity(id, out data);
+        }
+
+        /// <summary>
+        /// 월드 설정에 연결된 WeaponSheet에서 WeaponData를 조회합니다.
+        /// </summary>
+        public static bool TryGetWeaponData(string id, out WeaponData data)
+        {
+            data = null;
+
+            if (Settings == null || Settings.WeaponDataSheet == null)
+            {
+                Debug.LogWarning("TryGetWeaponData failed. WeaponDataSheet is not assigned.");
+                return false;
+            }
+
+            return Settings.WeaponDataSheet.TryGetEntity(id, out data);
+        }
+
+        /// <summary>
+        /// 이전 Item 명칭으로 작성된 호출부와의 호환을 유지합니다.
+        /// </summary>
+        public static bool TryGetItemData(string id, out WeaponData data)
+        {
+            return TryGetWeaponData(id, out data);
+        }
+
+        /// <summary>
+        /// Id에 해당하는 WeaponData의 완성 프리팹을 월드에 생성합니다.
+        /// </summary>
+        public static WeaponController SpawnWeapon(string id, Vector3 worldPosition)
+        {
+            if (TryGetWeaponData(id, out WeaponData data) == false)
+            {
+                return null;
+            }
+
+            if (data.Prefab == null)
+            {
+                Debug.LogWarning($"SpawnWeapon failed. Weapon prefab is not assigned. Id: {id}");
+                return null;
+            }
+
+            return SpawnWeapon(data.Prefab, worldPosition);
+        }
+
+        /// <summary>
+        /// Weapon 프리팹을 월드에 생성합니다.
+        /// </summary>
+        public static WeaponController SpawnWeapon(GameObject weaponPrefab, Vector3 worldPosition)
+        {
+            if (weaponPrefab == null)
+            {
+                Debug.LogWarning("SpawnWeapon failed. Weapon prefab is null.");
+                return null;
+            }
+
+            if (weaponPrefab.GetComponent<WeaponController>() == null)
+            {
+                Debug.LogWarning("SpawnWeapon failed. Prefab is not weapon.");
+                return null;
+            }
+
+            WorldManager manager = GetInstance();
+            Transform parent = manager.worldRoot != null ? manager.worldRoot.transform : manager.transform;
+            WeaponController weapon = Instantiate(weaponPrefab, worldPosition, Quaternion.identity, parent).GetComponent<WeaponController>();
+
+            return weapon;
         }
 
         /// <summary>

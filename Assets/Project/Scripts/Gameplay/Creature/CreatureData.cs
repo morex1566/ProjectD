@@ -9,9 +9,9 @@ namespace TRPG.Runtime
     [Serializable]
     public class CreatureData
     {
-        public string DataId;
-        public string NameKey;
-        public string DescKey;
+        public string Id;
+        public string Name;
+        public string Description;
         public string Faction;
         public float Hp;
         public float Damage;
@@ -20,8 +20,10 @@ namespace TRPG.Runtime
         public float AttackSpeed;
         public float MoveSpeed;
         public string AIType;
+        public string PrefabPath;
 
         public Sprite Sprite;
         public GameObject BehaviourTreePrefab;
+        public GameObject Prefab;
     }
 }

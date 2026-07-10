@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TRPG.Runtime
 {
@@ -9,8 +10,14 @@ namespace TRPG.Runtime
     public class WorldManagerSettingsData : ScriptableObject
     {
         /// <summary>
-        /// DataId로 CreatureData를 조회할 시트입니다.
+        /// Id로 CreatureData를 조회할 시트입니다.
         /// </summary>
         public CreatureSheet CreatureDataSheet;
+
+        /// <summary>
+        /// Id로 WeaponData를 조회할 시트입니다.
+        /// </summary>
+        [FormerlySerializedAs("ItemDataSheet")]
+        public WeaponSheet WeaponDataSheet;
     }
 }

@@ -1,7 +1,5 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 namespace TRPG.Runtime
 {
@@ -10,9 +8,6 @@ namespace TRPG.Runtime
     /// </summary>
     public class Console : MonoBehaviour
     {
-        [FormerlySerializedAs("creaturePf")]
-        [SerializeField] private GameObject creaturePrefab;
-
         [SerializeField] private CreatureIdData num1CreatureIdData = null;
 
         [SerializeField] private CreatureIdData num2CreatureIdData = null;
@@ -37,11 +32,6 @@ namespace TRPG.Runtime
 
         private void SpawnCreature(CreatureIdData creatureIdData)
         {
-            if (creaturePrefab == null)
-            {
-                return;
-            }
-
             if (creatureIdData == null || string.IsNullOrEmpty(creatureIdData.Id) == true)
             {
                 return;
@@ -49,7 +39,7 @@ namespace TRPG.Runtime
 
             Camera cam = WorldManager.GetWorldCameraController().Cam;
             Vector3 mouseWorldPosition = MouseEx.GetMouseWorldPosition(cam);
-            WorldManager.SpawnCreature(creaturePrefab, creatureIdData.Id, mouseWorldPosition);
+            WorldManager.SpawnCreature(creatureIdData.Id, mouseWorldPosition);
         }
 
         /// <summary>

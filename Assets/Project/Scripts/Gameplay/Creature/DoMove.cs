@@ -8,13 +8,7 @@ namespace TRPG.Runtime
     [MBTNode(name = "Creature/Leaf - DoMove")]
     public class DoMove : Leaf
     {
-        private const float ArriveDistance = 0.01f;
-
         [SerializeField, ReadOnly] private CreatureController controller = null;
-        [SerializeField, ReadOnly] private int pathIndex = 1;
-
-        private CreatureMoveJob currentMoveJob = null;
-        private IReadOnlyList<AStarNode> path = null;
 
         private void OnValidate()
         {
@@ -28,59 +22,23 @@ namespace TRPG.Runtime
 
         public override NodeResult Execute()
         {
+            if (controller == null || controller.IsDead() == true || controller.Context.MoveSpeed <= 0f)
+            {
+                return NodeResult.failure;
+            }
+
             if (controller.JobQueue.TryPeek(out CreatureJob job) == false || job is not CreatureMoveJob moveJob)
             {
                 return NodeResult.failure;
             }
 
-            if (currentMoveJob != moveJob)
+            if (controller.MoveAlongMoveJob(moveJob) == true)
             {
-                currentMoveJob = moveJob;
-                path = currentMoveJob.Path;
-                pathIndex = currentMoveJob.PathIndex;
-            }
-
-            if (path == null || path.Count <= 0 || pathIndex >= path.Count)
-            {
-                return NodeResult.success;
-            }
-
-            WorldGridController gridController = WorldManager.GetWorldGridController();
-            if (gridController == null || gridController.Grid == null)
-            {
-                return NodeResult.failure;
-            }
-
-            AStarNode targetNode = path[pathIndex];
-            Vector3Int targetCellPosition = new Vector3Int(targetNode.X, targetNode.Y, 0);
-            Vector3 targetWorldPosition = gridController.Grid.GetCellCenterWorld(targetCellPosition);
-            Vector3 currentWorldPosition = controller.transform.position;
-            float nextX = Mathf.MoveTowards(currentWorldPosition.x, targetWorldPosition.x, controller.Context.MoveSpeed * Time.deltaTime);
-            controller.transform.position = new Vector3(nextX, currentWorldPosition.y, currentWorldPosition.z);
-
-            if (Mathf.Abs(controller.transform.position.x - targetWorldPosition.x) <= ArriveDistance)
-            {
-                controller.transform.position = new Vector3(targetWorldPosition.x, currentWorldPosition.y, currentWorldPosition.z);
-                pathIndex++;
-                currentMoveJob.SetPathIndex(pathIndex);
-            }
-
-            if (pathIndex >= path.Count)
-            {
+                moveJob.Complete();
                 return NodeResult.success;
             }
 
             return NodeResult.running;
-        }
-
-        public override void OnExit()
-        {
-            // Leaf 실행이 끝나면 다음 이동 명령을 받을 수 있도록 실행 상태를 비웁니다.
-            currentMoveJob = null;
-            path = null;
-            pathIndex = 1;
-
-            base.OnExit();
         }
 
         public override void DrawGizmos()

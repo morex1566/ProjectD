@@ -1,4 +1,3 @@
-using Codice.Client.Common.GameUI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -61,6 +60,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void Enqueue(CreatureJob job)
         {
+            job.Completed += HandleJobCompleted;
             jobs.Add(new JobEntry(job, sequence));
             sequence++;
             isDirty = true;
@@ -120,7 +120,7 @@ namespace TRPG.Runtime
             }
 
             job = jobs[0].Job;
-            jobs.RemoveAt(0);
+            RemoveAt(0);
             return true;
         }
 
@@ -150,7 +150,7 @@ namespace TRPG.Runtime
                 // 같은 참조의 Job을 찾으면 제거합니다.
                 if (jobs[i].Job == targetJob)
                 {
-                    jobs.RemoveAt(i);
+                    RemoveAt(i);
                     return true;
                 }
             }
@@ -170,7 +170,7 @@ namespace TRPG.Runtime
                 // 조건에 맞는 Job이면 제거합니다.
                 if (predicate(jobs[i].Job))
                 {
-                    jobs.RemoveAt(i);
+                    RemoveAt(i);
                     removedCount++;
                 }
             }
@@ -183,30 +183,13 @@ namespace TRPG.Runtime
         ///</summary>
         public void Clear()
         {
+            for (int i = 0; i < jobs.Count; i++)
+            {
+                jobs[i].Job.Completed -= HandleJobCompleted;
+            }
+
             jobs.Clear();
             isDirty = false;
-        }
-
-        ///<summary>
-        /// 현재 맨 앞 Job 하나만 실행합니다.
-        ///</summary>
-        public void Update()
-        {
-            Sort();
-
-            while (jobs.Count > 0)
-            {
-                CreatureJob job = jobs[0].Job;
-
-                if (job.IsDone)
-                {
-                    jobs.RemoveAt(0);
-                    continue;
-                }
-
-                job.Evaluate();
-                return;
-            }
         }
 
         ///<summary>
@@ -228,7 +211,7 @@ namespace TRPG.Runtime
         ///</summary>
         private int CompareJobEntry(JobEntry a, JobEntry b)
         {
-            int priorityCompare = a.Job.Priority.CompareTo(b.Job.Priority);
+            int priorityCompare = b.Job.Priority.CompareTo(a.Job.Priority);
 
             if (priorityCompare != 0)
             {
@@ -236,6 +219,17 @@ namespace TRPG.Runtime
             }
 
             return a.Sequence.CompareTo(b.Sequence);
+        }
+
+        private void HandleJobCompleted(CreatureJob job)
+        {
+            Remove(job);
+        }
+
+        private void RemoveAt(int index)
+        {
+            jobs[index].Job.Completed -= HandleJobCompleted;
+            jobs.RemoveAt(index);
         }
     }
 }

@@ -22,23 +22,34 @@ namespace TRPG.Runtime
 
         public override NodeResult Execute()
         {
-            List<CreatureMiningJob> miningJobs = CreatureJobPool.Find<CreatureMiningJob>();
-            if (miningJobs.Count <= 0)
+            if (TryTakeMiningJob() == true)
             {
-                return NodeResult.failure;
+                return NodeResult.success;
             }
 
-            // 아직 배정되지 않은 채굴 Job 하나를 현재 Creature의 실행 큐로 옮깁니다.
-            CreatureMiningJob miningJob = miningJobs[0];
-            CreatureJobPool.Remove(miningJob);
-            controller.JobQueue.Enqueue(new CreatureMiningJob(controller, miningJob.TargetCellPosition));
-
-            return NodeResult.success;
+            return NodeResult.failure;
         }
 
         private void CacheComponents()
         {
             controller = GetComponentInParent<CreatureController>();
+        }
+
+        private bool TryTakeMiningJob()
+        {
+            List<CreatureMiningJob> miningJobs = CreatureJobPool.Find<CreatureMiningJob>();
+            if (miningJobs.Count <= 0)
+            {
+                return false;
+            }
+
+            // 아직 배정되지 않은 채굴 Job 하나를 현재 Creature의 실행 큐로 옮깁니다.
+            CreatureMiningJob miningJob = miningJobs[0];
+            miningJob.SetCreatureController(controller);
+            CreatureJobPool.Remove(miningJob);
+            controller.JobQueue.Enqueue(miningJob);
+
+            return true;
         }
     }
 }

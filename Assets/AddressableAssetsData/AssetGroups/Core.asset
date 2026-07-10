@@ -33,6 +33,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - Core
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4fdb6686cd7f2ae41a55392d95a893c1
+    m_Address: SO_WeaponSheet
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Core
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8473cb7ddb28ba7438a668f8d55c8343
     m_Address: SO_DOTweenSettings
     m_ReadOnly: 0

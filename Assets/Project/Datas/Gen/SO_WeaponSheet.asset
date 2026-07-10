@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316f89cad29942b1bad6467448e5ea0c, type: 3}
+  m_Name: SO_WeaponSheet
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WeaponSheet
+  Entities:
+  - Id: weapon_sword
+    Name: sword
+    Description: 
+    Damage: 1
+    AttackRange: 1
+    AttackSpeed: 1
+    Weight: 1
+    PrefabPath: Assets/Project/Prefabs/Gameplay/PF_weapon_sword.prefab
+    Sprite: {fileID: -4639184141837683043, guid: 41e2ec78f70790a499c8652f9f4480af, type: 3}
+    Prefab: {fileID: 3273693481985314832, guid: e2f0ef10989e6b441a0b5b45db85036c, type: 3}
+  - Id: weapon_bow
+    Name: bow
+    Description: 
+    Damage: 1
+    AttackRange: 1
+    AttackSpeed: 1
+    Weight: 1
+    PrefabPath: Assets/Project/Prefabs/Gameplay/PF_weapon_bow.prefab
+    Sprite: {fileID: 7851239491379939459, guid: feb9d23119aa3384ab2dd05678a16973, type: 3}
+    Prefab: {fileID: 8398428877806313051, guid: e60fb70a7f2a7c440a471effda31df78, type: 3}
+  - Id: weapon_pickaxe
+    Name: pickaxe
+    Description: 
+    Damage: 1
+    AttackRange: 1
+    AttackSpeed: 1
+    Weight: 1
+    PrefabPath: Assets/Project/Prefabs/Gameplay/PF_weapon_pickaxe.prefab
+    Sprite: {fileID: -653041530162890241, guid: 1098b72d38d87bd46a9cf510aa66c49c, type: 3}
+    Prefab: {fileID: 5285842898607233358, guid: 309648d158dc8384c81fd282a1d56474, type: 3}

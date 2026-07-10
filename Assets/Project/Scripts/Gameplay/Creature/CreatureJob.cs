@@ -1,4 +1,4 @@
-using Mono.Cecil.Cil;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,13 +9,19 @@ namespace TRPG.Runtime
     /// </summary>
     public abstract class CreatureJob
     {
-        public virtual int Priority => 100;
+        /// <summary>
+        /// 클수록 중요하다.
+        /// 같으면 CreatureQueue의 먼저 들어온를 기준으로
+        /// </summary>
+        public virtual int Priority => 0;
 
         protected bool isDone;
 
         protected bool isStarted;
 
         protected CreatureController controller;
+
+        public event Action<CreatureJob> Completed;
 
         public bool IsDone => isDone;
 
@@ -32,43 +38,34 @@ namespace TRPG.Runtime
         /// <param name="controller"></param>
         protected CreatureJob(CreatureController controller)
         {
+            SetCreatureController(controller);
+        }
+
+        public void SetCreatureController(CreatureController controller)
+        {
             this.controller = controller;
         }
 
         /// <summary>
-        /// True면 다음 Job으로 넘어갈 수 있음, False면 아직 이 작업이 끝나지 않았음.
+        /// 작업이 끝났음을 알리고, 이 Job을 구독 중인 큐가 즉시 제거할 수 있게 합니다.
         /// </summary>
-        /// <returns></returns>
-        public bool Evaluate()
+        public void Complete()
         {
-            if (isStarted == false)
+            if (isDone == true)
             {
-                isStarted = CanStart();
+                return;
             }
 
-            if (isStarted == false)
-            {
-                return false;
-            }
-
-            isDone = CanExit();
-
-            return isDone;
+            isStarted = true;
+            isDone = true;
+            Completed?.Invoke(this);
         }
-
-        /// <summary>
-        /// 이 잡이 실행될 수 있는지?
-        /// </summary>
-        protected abstract bool CanStart();
-
-        /// <summary>
-        /// 이 잡이 끝났는지?
-        /// </summary>
-        protected abstract bool CanExit();
     }
 
     public class CreatureMoveJob : CreatureJob
     {
+        public override int Priority => 1000;
+
         private readonly Vector3Int targetCellPos;
 
         private List<AStarNode> path;
@@ -87,6 +84,9 @@ namespace TRPG.Runtime
             // 길찾기
             Vector3Int worldCellPos = WorldManager.WorldToCell(controller.transform.position);
             path = AStarPathfinder.FindPath(worldCellPos, targetCellPos);
+
+            // 방황하던 로직 삭제
+            controller.JobQueue.RemoveWhere(job => job is CreatureWanderJob == true);
         }
 
 
@@ -97,46 +97,28 @@ namespace TRPG.Runtime
         {
             this.pathIndex = pathIndex;
         }
-
-        protected override bool CanStart()
-        {
-            // 죽으면 못움직이지...
-            if (controller.IsDead() == true)
-            {
-                return false;
-            }
-
-            // 이미 도착한거 아님?
-            if (path == null || path.Count <= 0)
-            {
-                return true;
-            }
-
-            return true;
-        }
-
-        protected override bool CanExit()
-        {
-            // 이미 도착한거 아님?
-            if (path == null || path.Count <= 0 || pathIndex >= path.Count)
-            {
-                return true;
-            }
-
-            return false;
-        }
     }
 
     public class CreatureMiningJob : CreatureJob
     {
+        public override int Priority => 10;
+
         private readonly Vector3Int targetCellPosition = Vector3Int.zero;
 
         private readonly List<CreatureController> workers = new();
+
+        private List<AStarNode> path = null;
+
+        private int pathIndex = 1;
 
 
         public Vector3Int TargetCellPosition => targetCellPosition;
 
         public IReadOnlyList<CreatureController> Workers => workers;
+
+        public IReadOnlyList<AStarNode> Path => path;
+
+        public int PathIndex => pathIndex;
 
 
         /// <summary>
@@ -150,33 +132,103 @@ namespace TRPG.Runtime
         public CreatureMiningJob(CreatureController controller, Vector3Int targetCellPosition) : base(controller)
         {
             this.targetCellPosition = targetCellPosition;
+
+            // 방황하던 로직 삭제
+            controller.JobQueue.RemoveWhere(job => job is CreatureWanderJob == true);
         }
 
-        protected override bool CanExit()
+        /// <summary>
+        /// 채굴 지점까지 이동하기 위한 경로를 Job에 저장합니다.
+        /// </summary>
+        public void SetPath(IReadOnlyList<AStarNode> path)
         {
-            throw new System.NotImplementedException();
+            this.path = path == null ? null : new List<AStarNode>(path);
+            pathIndex = 1;
         }
 
-        protected override bool CanStart()
+        /// <summary>
+        /// DoMining이 현재 진행 중인 경로 인덱스를 Job에 동기화합니다.
+        /// </summary>
+        public void SetPathIndex(int pathIndex)
         {
-            throw new System.NotImplementedException();
+            this.pathIndex = pathIndex;
+        }
+
+        /// <summary>
+        /// 현재 채굴 이동 경로를 초기화합니다.
+        /// </summary>
+        public void ClearPath()
+        {
+            path = null;
+            pathIndex = 1;
         }
     }
 
-    public class CreatureAttackJob : CreatureJob
+    public class CreatureEngageJob : CreatureJob
     {
-        public CreatureAttackJob(CreatureController controller) : base(controller)
+        public override int Priority => 100;
+
+        private readonly CreatureController target = null;
+
+        private List<AStarNode> path = null;
+
+        private int pathIndex = 1;
+
+        private Vector3Int pathTargetCellPosition = Vector3Int.zero;
+
+        public CreatureController Target => target;
+
+        public IReadOnlyList<AStarNode> Path => path;
+
+        public int PathIndex => pathIndex;
+
+        public Vector3Int PathTargetCellPosition => pathTargetCellPosition;
+
+
+        public CreatureEngageJob(CreatureController controller, CreatureController target) : base(controller)
         {
+            this.target = target;
+
+            // 방황하던 로직 삭제
+            controller.JobQueue.RemoveWhere(job => job is CreatureWanderJob == true);
         }
 
-        protected override bool CanExit()
+        /// <summary>
+        /// 전투 대상에게 접근하기 위한 경로를 Job에 저장합니다.
+        /// </summary>
+        public void SetPath(Vector3Int pathTargetCellPosition, IReadOnlyList<AStarNode> path)
         {
-            throw new System.NotImplementedException();
+            this.pathTargetCellPosition = pathTargetCellPosition;
+            this.path = path == null ? null : new List<AStarNode>(path);
+            pathIndex = 1;
         }
 
-        protected override bool CanStart()
+        /// <summary>
+        /// DoEngage가 현재 진행 중인 경로 인덱스를 Job에 동기화합니다.
+        /// </summary>
+        public void SetPathIndex(int pathIndex)
         {
-            throw new System.NotImplementedException();
+            this.pathIndex = pathIndex;
+        }
+
+        /// <summary>
+        /// 현재 전투 접근 경로를 초기화합니다.
+        /// </summary>
+        public void ClearPath()
+        {
+            path = null;
+            pathIndex = 1;
+            pathTargetCellPosition = Vector3Int.zero;
+        }
+
+        private bool IsTargetValid()
+        {
+            if (target == null)
+            {
+                return false;
+            }
+
+            return target.IsDead() == false;
         }
     }
 
@@ -185,32 +237,87 @@ namespace TRPG.Runtime
     /// </summary>
     public class CreatureWanderJob : CreatureJob
     {
-        public override int Priority => 1000;
+        public override int Priority => 1;
 
-        public CreatureWanderJob(CreatureController controller) : base(controller)
+        private readonly List<Vector3> pathWorldPositions = new();
+
+        private Vector3Int targetCellPosition = Vector3Int.zero;
+
+        private float startTime = 0f;
+
+        private int pathIndex = 1;
+
+        private bool hasStarted = false;
+
+        /// <summary>
+        /// 현재 배회 Job이 목적지를 탐색할 좌우 반경입니다.
+        /// </summary>
+        public int WanderRadius { get; }
+
+        /// <summary>
+        /// 현재 배회 Job이 시작 전 대기할 시간입니다.
+        /// </summary>
+        public float StartDelaySec { get; }
+
+        public IReadOnlyList<Vector3> PathWorldPositions => pathWorldPositions;
+
+        public Vector3Int TargetCellPosition => targetCellPosition;
+
+        public float StartTime => startTime;
+
+        public int PathIndex => pathIndex;
+
+        public bool HasStarted => hasStarted;
+
+        /// <summary>
+        /// 자동 Job 생성 시점의 배회 설정을 Job에 고정합니다.
+        /// </summary>
+        public CreatureWanderJob(CreatureController controller, int wanderRadius, float startDelaySec) : base(controller)
         {
-
+            WanderRadius = wanderRadius;
+            StartDelaySec = startDelaySec;
         }
 
-        protected override bool CanExit()
+        /// <summary>
+        /// 배회 시작 시간을 기록합니다.
+        /// </summary>
+        public void Begin(float startTime)
         {
-            if (controller.IsDead() == true)
-            {
-                return true;
-            }
-
-            return false;
+            this.startTime = startTime;
+            hasStarted = true;
+            pathIndex = 1;
+            pathWorldPositions.Clear();
         }
 
-        protected override bool CanStart()
+        /// <summary>
+        /// 배회 이동 경로를 Job에 저장합니다.
+        /// </summary>
+        public void SetPath(Vector3Int targetCellPosition, IReadOnlyList<Vector3> pathWorldPositions)
         {
-            // 죽으면 못움직이지...
-            if (controller.IsDead() == true)
-            {
-                return false;
-            }
+            this.targetCellPosition = targetCellPosition;
+            this.pathWorldPositions.Clear();
+            this.pathWorldPositions.AddRange(pathWorldPositions);
+            pathIndex = 1;
+        }
 
-            return true;
+        /// <summary>
+        /// DoWander가 현재 진행 중인 경로 인덱스를 Job에 동기화합니다.
+        /// </summary>
+        public void SetPathIndex(int pathIndex)
+        {
+            this.pathIndex = pathIndex;
+        }
+
+        /// <summary>
+        /// 현재 배회 상태를 초기화합니다.
+        /// </summary>
+        public void ClearWanderState()
+        {
+            pathWorldPositions.Clear();
+            targetCellPosition = Vector3Int.zero;
+            startTime = 0f;
+            pathIndex = 1;
+            hasStarted = false;
         }
     }
 

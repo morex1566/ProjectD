@@ -175,11 +175,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8be0c287a18bbd745b4be7515a6158e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldCameraController
-  Cam: {fileID: 0}
-  PixelPerfectCam: {fileID: 0}
-  moveSpeed: 3
+  Cam: {fileID: 6011299844308590543}
+  PixelPerfectCam: {fileID: 640294479649020211}
+  moveSpeed: 6
   minAssetsPPU: 32
   maxAssetsPPU: 64
-  zoomStep: 1
-  moveSmoothTime: 0.12
-  zoomSmoothTime: 0.08
+  zoomStep: 2
+  moveSmoothTime: 0.24
+  zoomSmoothTime: 0.16

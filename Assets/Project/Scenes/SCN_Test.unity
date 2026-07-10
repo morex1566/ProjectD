@@ -145,15 +145,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7491423020794455166, guid: 9a1d59f92744a9c45bc37118d1103d23, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7491423020794455166, guid: 9a1d59f92744a9c45bc37118d1103d23, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7491423020794455166, guid: 9a1d59f92744a9c45bc37118d1103d23, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7491423020794455166, guid: 9a1d59f92744a9c45bc37118d1103d23, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -273844,7 +273844,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af2ffdf46a8e80f4ea9884ecd6e4416c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.Console
-  creaturePrefab: {fileID: 1142311668006381792, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
   num1CreatureIdData: {fileID: 11400000, guid: 69420ef9979a6164f82aebea28890d2a, type: 2}
   num2CreatureIdData: {fileID: 11400000, guid: 5bce4f1a4c237584a879cadfbd938b42, type: 2}
 --- !u!1 &1839025078

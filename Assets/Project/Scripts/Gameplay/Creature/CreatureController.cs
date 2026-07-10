@@ -1,7 +1,4 @@
-#if UNITY_EDITOR
-using System.Collections.Generic;
-using UnityEditor;
-#endif
+using System;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -9,13 +6,9 @@ namespace TRPG.Runtime
     /// <summary>
     /// Creature의 런타임 상태, 선택 상태, Job 큐를 관리하는 월드 컴포넌트입니다.
     /// </summary>
-    public class CreatureController : MonoBehaviour, ISelectable
+    public partial class CreatureController : MonoBehaviour, ISelectable
     {
         [SerializeField, ReadOnly] private SpriteRenderer spriter = null;
-
-        [SerializeField] private BoxCollider2DSizeFitter collider2DSizeFitter = null;
-
-        [SerializeField] private CreatureIdData idData = null;
 
         [SerializeField] private CreatureContext context = null;
 
@@ -23,7 +16,6 @@ namespace TRPG.Runtime
 
 
         public bool CanSelect { get; set; } = true;
-
 
         public bool IsSelected { get; set; } = false;
 
@@ -39,6 +31,13 @@ namespace TRPG.Runtime
 
         public CreatureContext Context => context;
 
+        public WeaponContext EquippedWeapon => context.EquippedWeapon;
+
+        /// <summary>
+        /// in - creaturecontroller is Victim
+        /// </summary>
+        public Action<CreatureController> OnHit;
+
 
         private void OnValidate()
         {
@@ -49,19 +48,6 @@ namespace TRPG.Runtime
         {
             CacheComponents();
             Init();
-        }
-
-        private void Start()
-        {
-            JobQueue.Enqueue(new CreatureWanderJob(this));
-        }
-
-        /// <summary>
-        /// 매 프레임 현재 큐의 CreatureJob을 실행합니다.
-        /// </summary>
-        private void Update()
-        {
-            jobQueue.Update();
         }
 
         /// <summary>
@@ -80,54 +66,15 @@ namespace TRPG.Runtime
             {
                 return;
             }
-
-//#if UNITY_EDITOR
-//            // Scene View에 텍스트 표시
-//            Vector3 labelPos = transform.position + Vector3.up * 0.75f;
-//            string label = $"InstanceId: {InstanceId}\n" + $"DataId: {DataId}";
-//            Handles.Label(labelPos, label);
-            //#endif
         }
 
 
         /// <summary>
-        /// CreatureData를 런타임 상태로 변환하고 표시용 스프라이트 프리팹을 연결합니다.
+        /// 프리팹에 저장된 런타임 상태를 사용할 수 있도록 보정합니다.
         /// </summary>
         public void Init()
         {
             jobQueue = new CreatureJobQueue(this);
-            context = new CreatureContext();
-        }
-
-        /// <summary>
-        /// DataId로 CreatureData를 찾아 런타임 컨텍스트에 반영합니다.
-        /// </summary>
-        public bool LoadContext(string dataId)
-        {
-            if (WorldManager.TryGetCreatureData(dataId, out CreatureData data) == false)
-            {
-                Debug.LogWarning($"LoadContext failed. CreatureData not found. DataId: {dataId}");
-                return false;
-            }
-
-            return LoadContext(data);
-        }
-
-        /// <summary>
-        /// CreatureData를 런타임 컨텍스트에 반영합니다.
-        /// </summary>
-        public bool LoadContext(CreatureData data)
-        {
-            if (data == null)
-            {
-                Debug.LogWarning("CreatureContext load failed. CreatureData is null.");
-                return false;
-            }
-
-            Init();
-            ApplyContext(data);
-
-            return true;
         }
 
         /// <summary>
@@ -151,32 +98,70 @@ namespace TRPG.Runtime
             return context.Hp <= 0f;
         }
 
-        private void ApplyContext(CreatureData data)
-        {
-            context.DataId = data.DataId;
-            context.NameKey = data.NameKey;
-            context.DescKey = data.DescKey;
-            context.Faction = data.Faction;
-            context.Hp = data.Hp;
-            context.Atk = data.Damage;
-            context.DetectRange = data.DetectRange;
-            context.AttackRange = data.AttackRange;
-            context.AttackSpeed = data.AttackSpeed;
-            context.MoveSpeed = data.MoveSpeed;
-            context.AIType = CreatureContext.ParseAIType(data.AIType);
-
-            context.Sprite = data.Sprite;
-            spriter.sprite = data.Sprite;
-            collider2DSizeFitter.Fit();
-
-            context.BehaviourTree = Instantiate(data.BehaviourTreePrefab, transform);
-            context.BehaviourTree.transform.localPosition = Vector3.zero;
-            context.BehaviourTree.transform.localRotation = Quaternion.identity;
-        }
-
         private void CacheComponents()
         {
             spriter = GetComponentInChildren<SpriteRenderer>();
+        }
+
+        /// <summary>
+        /// Weapon id를 조회해서 현재 Creature의 무기로 장착합니다.
+        /// </summary>
+        public bool EquipWeapon(string weaponId)
+        {
+            if (WorldManager.TryGetWeaponData(weaponId, out WeaponData weaponData) == false)
+            {
+                Debug.LogWarning($"EquipWeapon failed. WeaponData not found. Id: {weaponId}", this);
+                return false;
+            }
+
+            return EquipWeapon(weaponData);
+        }
+
+        /// <summary>
+        /// WeaponData를 런타임 장착 상태로 복사하고 전투 스탯을 다시 계산합니다.
+        /// </summary>
+        public bool EquipWeapon(WeaponData weaponData)
+        {
+            if (weaponData == null)
+            {
+                Debug.LogWarning("EquipWeapon failed. WeaponData is null.", this);
+                return false;
+            }
+
+            context.EquippedWeapon.Load(weaponData);
+
+            return true;
+        }
+
+        /// <summary>
+        /// 월드에 배치된 WeaponController의 현재 상태를 복사해서 장착합니다.
+        /// </summary>
+        public bool EquipWeapon(WeaponController weaponController)
+        {
+            if (weaponController == null || weaponController.Context == null)
+            {
+                Debug.LogWarning("EquipWeapon failed. WeaponController is null or not initialized.", this);
+                return false;
+            }
+
+            context.EquippedWeapon.Load(weaponController.Context);
+
+            return true;
+        }
+
+        /// <summary>
+        /// 현재 장착 중인 무기를 해제하고 Creature 기본 전투 스탯으로 되돌립니다.
+        /// </summary>
+        public void UnequipWeapon()
+        {
+            context.EquippedWeapon.Clear();
+        }
+
+        public void TakeDamage(int damage)
+        {
+            context.Hp -= damage;
+
+            OnHit?.Invoke(this);
         }
     }
 }
