@@ -1,97 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &5912362085365562049
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 8273676238852363981}
-    m_Modifications:
-    - target: {fileID: 1524114099891270956, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_Name
-      value: PF_MBT_creature_lizard_001
-      objectReference: {fileID: 0}
-    - target: {fileID: 2749887071918773988, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: controller
-      value: 
-      objectReference: {fileID: 3255467862384039965}
-    - target: {fileID: 4703766132918040967, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: detector
-      value: 
-      objectReference: {fileID: 729224379394345688}
-    - target: {fileID: 4703766132918040967, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: controller
-      value: 
-      objectReference: {fileID: 3255467862384039965}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6353226872492631572, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: controller
-      value: 
-      objectReference: {fileID: 3255467862384039965}
-    - target: {fileID: 7304665916965732935, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: detector
-      value: 
-      objectReference: {fileID: 729224379394345688}
-    - target: {fileID: 7304665916965732935, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-      propertyPath: controller
-      value: 
-      objectReference: {fileID: 3255467862384039965}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
---- !u!4 &1160233488134251302 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4761738329000679911, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-  m_PrefabInstance: {fileID: 5912362085365562049}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5127999426897203181 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1524114099891270956, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-  m_PrefabInstance: {fileID: 5912362085365562049}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &7766953615527403301
+--- !u!1001 &8892246808251625838
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -160,10 +69,6 @@ PrefabInstance:
       value: -0.25
       objectReference: {fileID: 0}
     - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
-      propertyPath: idData
-      value: 
-      objectReference: {fileID: 11400000, guid: 5bce4f1a4c237584a879cadfbd938b42, type: 2}
-    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: context.Id
       value: creature_lizard_001
       objectReference: {fileID: 0}
@@ -179,14 +84,6 @@ PrefabInstance:
       propertyPath: context.Faction
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
-      propertyPath: behaviourTreePrefab
-      value: 
-      objectReference: {fileID: 1524114099891270956, guid: 6c18ff3b598f3cb44950a731f7507273, type: 3}
-    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
-      propertyPath: context.BehaviourTree
-      value: 
-      objectReference: {fileID: 5127999426897203181}
     - target: {fileID: 5466476860050821414, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: m_Size.x
       value: 2
@@ -205,36 +102,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1809254756998236648, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1160233488134251302}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
---- !u!114 &729224379394345688 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7050238552493823485, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
-  m_PrefabInstance: {fileID: 7766953615527403301}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f558da287da14ae6b9a18478cd757bc0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureDetector
---- !u!114 &3255467862384039965 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
-  m_PrefabInstance: {fileID: 7766953615527403301}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13139cbf984db794a93348acba74b824, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureController
---- !u!4 &8273676238852363981 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1809254756998236648, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
-  m_PrefabInstance: {fileID: 7766953615527403301}
-  m_PrefabAsset: {fileID: 0}

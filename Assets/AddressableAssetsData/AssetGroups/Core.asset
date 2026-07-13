@@ -45,12 +45,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - Core
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: dd0721e8a8074684bc2ba11a4814369d
-    m_Address: SO_PlayerManagerSettings
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f5cbf40727fb08245bc8feff7057ca3e
     m_Address: SO_UIManagerSettings
     m_ReadOnly: 0

@@ -23,7 +23,6 @@ namespace TRPG.Runtime
         public string PrefabPath;
 
         public Sprite Sprite;
-        public GameObject BehaviourTreePrefab;
         public GameObject Prefab;
     }
 }

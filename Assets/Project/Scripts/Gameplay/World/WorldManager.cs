@@ -20,21 +20,10 @@ namespace TRPG.Runtime
         /// </summary>
         private WorldCameraController worldCameraController = null;
 
-        /// <summary>
-        /// 반복적인 태그 검색 없이 월드 그리드 컨트롤러를 재사용하기 위한 런타임 캐시입니다.
-        /// </summary>
-        private WorldGridController worldGridController = null;
-
         [SerializeField, ReadOnly] private Dictionary<int, CreatureController> creatures = new();
 
 
         public static IReadOnlyDictionary<int, CreatureController> Creatures => GetInstance().creatures;
-
-
-        private void Update()
-        {
-            // ApplyWorldForcesToCreature();
-        }
 
 
         /// <summary>
@@ -54,7 +43,6 @@ namespace TRPG.Runtime
 
             manager.worldRoot = new GameObject("World");
             manager.worldCameraController = null;
-            manager.worldGridController = null;
             manager.creatures.Clear();
         }
 
@@ -77,7 +65,6 @@ namespace TRPG.Runtime
 
             worldRoot = null;
             worldCameraController = null;
-            worldGridController = null;
             creatures.Clear();
             Settings = null;
         }
@@ -264,30 +251,6 @@ namespace TRPG.Runtime
             return weapon;
         }
 
-        /// <summary>
-        /// 월드가 등록된 Creature에게 매 프레임 적용할 힘을 처리합니다.
-        /// </summary>
-        private void ApplyWorldForcesToCreature()
-        {
-            if (GetWorldGridController() == null)
-            {
-                return;
-            }
-
-            foreach (KeyValuePair<int, CreatureController> pair in creatures)
-            {
-                ApplyGravityToCreature(pair.Value);
-            }
-        }
-
-        /// <summary>
-        /// Creature의 발 위치를 기준으로 중력 이동과 지면 스냅을 적용합니다.
-        /// </summary>
-        private void ApplyGravityToCreature(CreatureController creature)
-        {
-            creature.transform.position += WorldTile.DefaultGravity * Time.deltaTime;
-        }
-
         public static WorldCameraController GetWorldCameraController()
         {
             if (TryGetInstance(out WorldManager manager) == false)
@@ -301,62 +264,6 @@ namespace TRPG.Runtime
             }
 
             return manager.worldCameraController;
-        }
-
-        public static WorldGridController GetWorldGridController()
-        {
-            if (TryGetInstance(out WorldManager manager) == false)
-            {
-                return null;
-            }
-
-            if (manager.worldGridController == null)
-            {
-                manager.worldGridController = GameObject.FindGameObjectWithTag(UnityConstant.Tags.WorldGrid)?.GetComponent<WorldGridController>();
-            }
-
-            return manager.worldGridController;
-        }
-
-        public static WorldTilemapController GetWorldTilemapController(WorldTilemapType worldTilemapType)
-        {
-            WorldGridController gridController = GetWorldGridController();
-
-            if (gridController == null)
-            {
-                return null;
-            }
-
-            if (gridController.TryGetTilemapController(worldTilemapType, out WorldTilemapController tilemapController) == false)
-            {
-                return null;
-            }
-
-            return tilemapController;
-        }
-
-        public static Vector3Int WorldToCell(Vector3 worldPosition)
-        {
-            WorldGridController gridController = GetWorldGridController();
-
-            if (gridController == null || gridController.Grid == null)
-            {
-                return Vector3Int.zero;
-            }
-
-            return gridController.Grid.WorldToCell(worldPosition);
-        }
-
-        public static Vector3 CellToWorld(Vector3Int cellPos)
-        {
-            WorldGridController gridController = GetWorldGridController();
-
-            if (gridController == null || gridController.Grid == null)
-            {
-                return Vector3.zero;
-            }
-
-            return gridController.Grid.CellToWorld(cellPos);
         }
     }
 }

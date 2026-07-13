@@ -20,11 +20,7 @@ namespace TRPG.Runtime
 
         private const string CreatureIdAssetNamePrefix = "SO_CreatureId_";
 
-        private const string CreatureBehaviourTreePrefabFolder = "Assets/Project/Prefabs/Gameplay";
-
         private const string CreaturePrefabFolder = "Assets/Project/Prefabs/Gameplay";
-
-        private const string CreatureBehaviourTreePrefabNamePrefix = "PF_MBT_";
 
         ///<summary>
         /// 엑셀에서 생성된 원본 CreatureData 목록입니다.
@@ -160,19 +156,13 @@ namespace TRPG.Runtime
                     continue;
                 }
 
-                // Id와 같은 이름 규칙의 스프라이트/BT 프리팹을 찾아 엔티티에 매핑합니다.
+                // Id와 같은 이름 규칙의 스프라이트를 찾아 엔티티에 매핑합니다.
                 entity.Sprite = FindCreatureSprite(entity.Id);
-                entity.BehaviourTreePrefab = FindCreatureBehaviourTreePrefab(entity.Id);
                 entity.Prefab = CreateOrUpdateCreaturePrefab(entity);
 
                 if (entity.Sprite == null)
                 {
                     Debug.LogWarning($"Creature sprite not found. Id: {entity.Id}", this);
-                }
-
-                if (entity.BehaviourTreePrefab == null)
-                {
-                    Debug.LogWarning($"Creature behaviour tree prefab not found. Id: {entity.Id}", this);
                 }
 
                 if (entity.Prefab == null)
@@ -255,28 +245,6 @@ namespace TRPG.Runtime
         }
 
         ///<summary>
-        /// Id와 같은 이름 규칙의 Creature BT 프리팹을 찾습니다.
-        ///</summary>
-        private static GameObject FindCreatureBehaviourTreePrefab(string id)
-        {
-            string expectedName = $"{CreatureBehaviourTreePrefabNamePrefix}{id}";
-            string[] prefabGuids = AssetDatabase.FindAssets($"{id} t:Prefab", new[] { CreatureBehaviourTreePrefabFolder });
-
-            foreach (string prefabGuid in prefabGuids)
-            {
-                string assetPath = AssetDatabase.GUIDToAssetPath(prefabGuid);
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-
-                if (prefab != null && prefab.name == expectedName)
-                {
-                    return prefab;
-                }
-            }
-
-            return null;
-        }
-
-        ///<summary>
         /// CreatureData를 반영한 완성 Creature 프리팹을 생성하거나 갱신합니다.
         ///</summary>
         private static GameObject CreateOrUpdateCreaturePrefab(CreatureData entity)
@@ -330,11 +298,9 @@ namespace TRPG.Runtime
         {
             SpriteRenderer spriteRenderer = prefabRoot.GetComponentInChildren<SpriteRenderer>(true);
             BoxCollider2DSizeFitter collider2DSizeFitter = prefabRoot.GetComponentInChildren<BoxCollider2DSizeFitter>(true);
-            GameObject behaviourTree = CreateGeneratedBehaviourTree(prefabRoot, entity.BehaviourTreePrefab);
-
             SerializedObject serializedController = new(controller);
             SetObjectReference(serializedController, "spriter", spriteRenderer);
-            WriteGeneratedCreatureContext(serializedController, entity, behaviourTree);
+            WriteGeneratedCreatureContext(serializedController, entity);
             serializedController.ApplyModifiedPropertiesWithoutUndo();
 
             if (spriteRenderer != null)
@@ -352,7 +318,7 @@ namespace TRPG.Runtime
             EditorUtility.SetDirty(controller);
         }
 
-        private static void WriteGeneratedCreatureContext(SerializedObject serializedController, CreatureData entity, GameObject behaviourTree)
+        private static void WriteGeneratedCreatureContext(SerializedObject serializedController, CreatureData entity)
         {
             SetFloat(serializedController, "context.BaseAtk", entity.Damage);
             SetFloat(serializedController, "context.BaseAttackRange", entity.AttackRange);
@@ -362,14 +328,11 @@ namespace TRPG.Runtime
             SetFloat(serializedController, "context.DetectRange", entity.DetectRange);
             SetFloat(serializedController, "context.AttackRange", entity.AttackRange);
             SetFloat(serializedController, "context.AttackSpeed", entity.AttackSpeed);
-            SetFloat(serializedController, "context.MoveSpeed", entity.MoveSpeed);
-            SetInt(serializedController, "context.AIType", (int)CreatureContext.ParseAIType(entity.AIType));
             SetString(serializedController, "context.Id", entity.Id);
             SetString(serializedController, "context.Name", entity.Name);
             SetString(serializedController, "context.Description", entity.Description);
             SetInt(serializedController, "context.Faction", (int)CreatureContext.ParseFaction(entity.Faction));
             SetObjectReference(serializedController, "context.Sprite", entity.Sprite);
-            SetObjectReference(serializedController, "context.BehaviourTree", behaviourTree);
             ClearGeneratedWeaponContext(serializedController);
         }
 
@@ -383,44 +346,6 @@ namespace TRPG.Runtime
             SetFloat(serializedController, "context.EquippedWeapon.AttackSpeed", 0f);
             SetFloat(serializedController, "context.EquippedWeapon.Weight", 0f);
             SetObjectReference(serializedController, "context.EquippedWeapon.Sprite", null);
-        }
-
-        private static void RemoveGeneratedBehaviourTrees(GameObject prefabRoot)
-        {
-            MBT.MonoBehaviourTree[] behaviourTrees = prefabRoot.GetComponentsInChildren<MBT.MonoBehaviourTree>(true);
-            foreach (MBT.MonoBehaviourTree behaviourTree in behaviourTrees)
-            {
-                if (behaviourTree == null || behaviourTree.transform == prefabRoot.transform)
-                {
-                    continue;
-                }
-
-                DestroyImmediate(behaviourTree.gameObject);
-            }
-        }
-
-        private static GameObject CreateGeneratedBehaviourTree(GameObject prefabRoot, GameObject behaviourTreePrefab)
-        {
-            RemoveGeneratedBehaviourTrees(prefabRoot);
-
-            if (behaviourTreePrefab == null)
-            {
-                return null;
-            }
-
-            GameObject behaviourTree = PrefabUtility.InstantiatePrefab(behaviourTreePrefab, prefabRoot.transform) as GameObject;
-            if (behaviourTree == null)
-            {
-                behaviourTree = Instantiate(behaviourTreePrefab, prefabRoot.transform);
-            }
-
-            behaviourTree.name = behaviourTreePrefab.name;
-            behaviourTree.transform.localPosition = Vector3.zero;
-            behaviourTree.transform.localRotation = Quaternion.identity;
-            behaviourTree.transform.localScale = Vector3.one;
-            EditorUtility.SetDirty(behaviourTree);
-
-            return behaviourTree;
         }
 
         private static void SetString(SerializedObject serializedObject, string propertyPath, string value)

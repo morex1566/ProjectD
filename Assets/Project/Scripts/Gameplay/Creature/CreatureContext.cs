@@ -4,16 +4,6 @@ using UnityEngine;
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// CreatureContext AI의 이동/행동 타입입니다.
-    /// </summary>
-    public enum AIType
-    {
-        None,
-        Ground,
-        Air
-    }
-
-    /// <summary>
     /// CreatureData를 복사해서 생성되는 전투 중 상태값입니다.
     /// </summary>
     [Serializable]
@@ -35,10 +25,6 @@ namespace TRPG.Runtime
 
         public float AttackSpeed = 1;
 
-        public float MoveSpeed = 1;
-
-        public AIType AIType = AIType.Ground;
-
         public string Id;
 
         public string Name;
@@ -48,27 +34,6 @@ namespace TRPG.Runtime
         public FactionType Faction = FactionType.None;
 
         public Sprite Sprite;
-
-        public GameObject BehaviourTree;
-
-        public WeaponContext EquippedWeapon = new();
-
-
-        public static AIType ParseAIType(string aiType)
-        {
-            if (string.IsNullOrWhiteSpace(aiType))
-            {
-                return AIType.None;
-            }
-
-            if (Enum.TryParse(aiType, true, out AIType parsedAIType))
-            {
-                return parsedAIType;
-            }
-
-            Debug.LogWarning($"Invalid Creature AIType: {aiType}");
-            return AIType.None;
-        }
 
         public static FactionType ParseFaction(string faction)
         {

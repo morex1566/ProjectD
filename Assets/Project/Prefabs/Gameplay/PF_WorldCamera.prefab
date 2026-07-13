@@ -180,6 +180,6 @@ MonoBehaviour:
   moveSpeed: 6
   minAssetsPPU: 32
   maxAssetsPPU: 64
-  zoomStep: 2
+  zoomStep: 1
   moveSmoothTime: 0.24
   zoomSmoothTime: 0.16

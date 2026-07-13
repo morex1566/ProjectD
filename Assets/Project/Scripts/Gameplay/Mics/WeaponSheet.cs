@@ -292,7 +292,7 @@ namespace TRPG.Runtime
             WeaponController controller = prefabRoot.GetComponent<WeaponController>();
             if (controller == null)
             {
-                Debug.LogWarning($"Weapon prefab generation failed. WeaponController is missing. Path: {prefabPath}");
+                Debug.LogWarning($"Weapon prefab generation failed. WeaponInstance is missing. Path: {prefabPath}");
                 ReleasePrefabRoot(prefabRoot, isExistingPrefab);
                 return null;
             }

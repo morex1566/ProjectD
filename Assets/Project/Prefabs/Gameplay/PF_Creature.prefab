@@ -34,8 +34,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2928263879976859038}
-  - {fileID: 6797849172220703020}
-  - {fileID: 646119806368336570}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5108346331041859384
@@ -60,23 +58,12 @@ MonoBehaviour:
     DetectRange: 1
     AttackRange: 1
     AttackSpeed: 1
-    MoveSpeed: 1
-    AIType: 1
     Id: 
     Name: 
     Description: 
     Faction: 0
     Sprite: {fileID: 0}
-    BehaviourTree: {fileID: 0}
-    EquippedWeapon:
-      Id: 
-      Name: 
-      Description: 
-      Damage: 0
-      AttackRange: 0
-      AttackSpeed: 0
-      Weight: 0
-      Sprite: {fileID: 0}
+  weaponInstance: {fileID: 0}
 --- !u!50 &7628241560954180809
 Rigidbody2D:
   serializedVersion: 5
@@ -85,7 +72,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1142311668006381792}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
@@ -96,7 +83,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 1056768
+    m_Bits: 2105344
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -168,59 +155,6 @@ MonoBehaviour:
   isFitOnStart: 1
   alphaThreshold: 1
   padding: {x: 0.001, y: 0.001}
---- !u!1 &3536934753780346285
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 646119806368336570}
-  - component: {fileID: 8766207349533028156}
-  m_Layer: 20
-  m_Name: GroundChecker
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &646119806368336570
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3536934753780346285}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1809254756998236648}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8766207349533028156
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3536934753780346285}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5199eebf579554e4196f55881ab63041, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.GroundChecker
-  targetRenderer: {fileID: 5466476860050821414}
-  alphaThreshold: 0.1
-  bottomSampleHeight: 1
-  spriteLocalPosition: {x: 0, y: 0}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 8192
-  checkSize: {x: 0, y: 0}
-  hasFootPivot: 0
 --- !u!1 &7173048168623611036
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,65 +269,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1001 &5428061628963476937
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1809254756998236648}
-    m_Modifications:
-    - target: {fileID: 394367596531992276, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_Name
-      value: PF_CreatureDetector
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
---- !u!4 &6797849172220703020 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1513937922316707045, guid: 3291dcf0898cfb045931aae99cf04d34, type: 3}
-  m_PrefabInstance: {fileID: 5428061628963476937}
-  m_PrefabAsset: {fileID: 0}

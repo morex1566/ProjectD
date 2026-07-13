@@ -829,7 +829,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1999060473}
-  - component: {fileID: 1999060474}
   m_Layer: 5
   m_Name: Prefab_UI_ActionLayout
   m_TagString: Untagged
@@ -858,20 +857,6 @@ RectTransform:
   m_AnchoredPosition: {x: -430, y: 85}
   m_SizeDelta: {x: 800, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1999060474
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1999060472}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 581908de04522404db34b67178b22457, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.ActionLayout
-  idleButton: {fileID: 563640596}
-  constructionButton: {fileID: 236741963}
 --- !u!1 &2060585162
 GameObject:
   m_ObjectHideFlags: 0
