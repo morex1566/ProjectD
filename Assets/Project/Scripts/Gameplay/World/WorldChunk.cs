@@ -3,13 +3,13 @@ using UnityEngine;
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// 일정 크기의 월드 셀을 연속 배열로 관리합니다.
+    /// 일정 범위의 월드 타일을 연속 배열로 관리합니다.
     /// </summary>
     public sealed class WorldChunk
     {
-        public const int Size = 128;
+        public const int Size = 32;
 
-        private readonly WorldCell[] cells = new WorldCell[Size * Size];
+        private readonly WorldTile[] tiles = new WorldTile[Size * Size];
 
 
         public Vector2Int Coordinate { get; }
@@ -21,30 +21,27 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 로컬 좌표가 청크 내부인지 확인합니다.
+        /// 로컬 타일 좌표가 청크 내부인지 확인합니다.
         /// </summary>
         public bool IsInside(int localX, int localY)
         {
-            return localX >= 0 &&
-                   localX < Size &&
-                   localY >= 0 &&
-                   localY < Size;
+            return localX >= 0 && localX < Size && localY >= 0 && localY < Size;
         }
 
         /// <summary>
-        /// 로컬 좌표의 셀을 반환합니다.
+        /// 로컬 좌표의 타일을 반환합니다.
         /// </summary>
-        public WorldCell GetCell(int localX, int localY)
+        public WorldTile GetTile(int localX, int localY)
         {
-            return cells[ToIndex(localX, localY)];
+            return tiles[ToIndex(localX, localY)];
         }
 
         /// <summary>
-        /// 로컬 좌표의 셀을 교체합니다.
+        /// 로컬 좌표의 타일을 교체합니다.
         /// </summary>
-        public void SetCell(int localX, int localY, WorldCell cell)
+        public void SetTile(int localX, int localY, WorldTile tile)
         {
-            cells[ToIndex(localX, localY)] = cell;
+            tiles[ToIndex(localX, localY)] = tile;
         }
 
         /// <summary>
