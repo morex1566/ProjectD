@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -9,86 +10,326 @@ namespace TRPG.Runtime
     [Serializable]
     public sealed class TunnelGenerator
     {
-        [SerializeField, Min(0.0001f)] private float frequency = 0.008f;
+        private static readonly Vector2Int[] neighborDirections =
+        {
+            Vector2Int.left,
+            Vector2Int.right,
+            Vector2Int.down,
+            Vector2Int.up,
+        };
 
-        [SerializeField, Min(0f)] private float depth = 48f;
+        [SerializeField] private bool isEnabled = true;
 
-        [SerializeField, Min(0f)] private float amplitude = 8f;
+        [SerializeField, Min(1)] private int radius = 2;
 
-        [SerializeField, Min(1f)] private float radius = 4f;
+        [SerializeField, Range(0f, 0.5f)] private float curveOffsetRatio = 0.2f;
 
 
         /// <summary>
-        /// 지표면 아래에 노이즈로 높낮이가 변하는 주 통로를 굴착합니다.
+        /// 월드의 모든 동굴 영역을 하나의 연결망으로 만듭니다.
         /// </summary>
-        public void Generate(WorldChunk chunk, float[] surfaceHeights, int seed)
+        public void Generate(WorldMap worldMap, int seed)
         {
-            FastNoiseLite tunnelNoise = CreateNoise(seed);
-
-            int originX = chunk.Coordinate.x * WorldChunk.Size;
-            int originY = chunk.Coordinate.y * WorldChunk.Size;
-
-            for (int localX = 0; localX < WorldChunk.Size; localX++)
+            if (isEnabled == false)
             {
-                int worldX = originX + localX;
+                return;
+            }
 
-                float tunnelCenterY = GetTunnelCenterY(worldX, surfaceHeights[localX], tunnelNoise);
+            List<List<Vector2Int>> caveRegions = WorldPathfinder.FindCaveRegions(worldMap);
+            if (caveRegions.Count <= 1)
+            {
+                return;
+            }
 
-                for (int localY = 0; localY < WorldChunk.Size; localY++)
+            // 각 리전의 외곽좌표들만 모아둔다
+            List<List<Vector2Int>> regionBoundaries = GetRegionBoundaries(worldMap, caveRegions);
+            int largestRegionIndex = FindLargestRegionIndex(caveRegions);
+            HashSet<int> connectedRegionIndexes = new HashSet<int>();
+            {
+                connectedRegionIndexes.Add(largestRegionIndex);
+            }
+
+            // 이 외곽 좌표들을 이용해서 각각 동굴을 연결
+            while (connectedRegionIndexes.Count < caveRegions.Count)
+            {
+                FindClosestConnection(
+                    regionBoundaries,
+                    connectedRegionIndexes,
+                    out Vector2Int startCoordinate,
+                    out Vector2Int endCoordinate,
+                    out int endRegionIndex);
+
+                System.Random random = new System.Random(seed);
+                CarveTunnel(worldMap, startCoordinate, endCoordinate, random);
+
+                connectedRegionIndexes.Add(endRegionIndex);
+            }
+        }
+
+        /// <summary>
+        /// 각 동굴 영역을 대표하는 중심 타일을 계산합니다.
+        /// </summary>
+        private static List<Vector2Int> GetRegionCenters(List<List<Vector2Int>> caveRegions)
+        {
+            List<Vector2Int> regionCenters = new List<Vector2Int>();
+
+            foreach (List<Vector2Int> region in caveRegions)
+            {
+                regionCenters.Add(GetRegionCenter(region));
+            }
+
+            return regionCenters;
+        }
+
+        /// <summary>
+        /// 동굴의 평균 좌표와 가장 가까운 실제 Empty 타일을 반환합니다.
+        /// </summary>
+        private static Vector2Int GetRegionCenter(List<Vector2Int> region)
+        {
+            Vector2 averagePosition = Vector2.zero;
+
+            foreach (Vector2Int coordinate in region)
+            {
+                averagePosition += coordinate;
+            }
+
+            averagePosition /= region.Count;
+
+            Vector2Int centerCoordinate = region[0];
+            float closestDistance = ((Vector2)centerCoordinate - averagePosition).sqrMagnitude;
+
+            foreach (Vector2Int coordinate in region)
+            {
+                float distance = ((Vector2)coordinate - averagePosition).sqrMagnitude;
+
+                if (distance < closestDistance)
                 {
-                    int worldY = originY + localY;
+                    centerCoordinate = coordinate;
+                    closestDistance = distance;
+                }
+            }
 
-                    if (IsInsideTunnel(worldY, tunnelCenterY) == false)
+            return centerCoordinate;
+        }
+
+        /// <summary>
+        /// 각 동굴 영역에서 고체 타일과 맞닿은 경계 타일을 찾습니다.
+        /// </summary>
+        private static List<List<Vector2Int>> GetRegionBoundaries(WorldMap worldMap, List<List<Vector2Int>> caveRegions)
+        {
+            List<List<Vector2Int>> regionBoundaries = new List<List<Vector2Int>>();
+
+            foreach (List<Vector2Int> region in caveRegions)
+            {
+                regionBoundaries.Add(GetRegionBoundary(worldMap, region));
+            }
+
+            return regionBoundaries;
+        }
+
+        /// <summary>
+        /// 하나의 동굴에서 Stone과 맞닿은 Empty 타일을 반환합니다.
+        /// </summary>
+        private static List<Vector2Int> GetRegionBoundary(WorldMap worldMap, List<Vector2Int> region)
+        {
+            List<Vector2Int> boundary = new List<Vector2Int>();
+
+            foreach (Vector2Int coordinate in region)
+            {
+                foreach (Vector2Int direction in neighborDirections)
+                {
+                    Vector2Int neighborCoordinate = coordinate + direction;
+
+                    if (worldMap.TryGetTile(neighborCoordinate, out WorldTile neighborTile) == false)
                     {
                         continue;
                     }
 
-                    WorldTile tile = chunk.GetTile(localX, localY);
-                    if (tile.IsEmpty)
+                    if (neighborTile.IsEmpty)
                     {
                         continue;
                     }
 
-                    // 통로에 포함되는 고체 타일을 비웁니다.
-                    chunk.SetTile(localX, localY, new WorldTile(WorldTileType.Empty));
+                    boundary.Add(coordinate);
+                    break;
+                }
+            }
+
+            return boundary;
+        }
+
+        /// <summary>
+        /// 가장 많은 Empty 타일을 가진 동굴의 인덱스를 반환합니다.
+        /// </summary>
+        private static int FindLargestRegionIndex(List<List<Vector2Int>> caveRegions)
+        {
+            int largestRegionIndex = 0;
+
+            for (int regionIndex = 1; regionIndex < caveRegions.Count; regionIndex++)
+            {
+                if (caveRegions[regionIndex].Count > caveRegions[largestRegionIndex].Count)
+                {
+                    largestRegionIndex = regionIndex;
+                }
+            }
+
+            return largestRegionIndex;
+        }
+
+        /// <summary>
+        /// 연결된 동굴과 미연결 동굴 사이에서 가장 가까운 경계 타일 쌍을 찾습니다.
+        /// </summary>
+        private static void FindClosestConnection(
+            List<List<Vector2Int>> regionBoundaries,
+            HashSet<int> connectedRegionIndexes,
+            out Vector2Int startCoordinate,
+            out Vector2Int endCoordinate,
+            out int endRegionIndex)
+        {
+            startCoordinate = default;
+            endCoordinate = default;
+            endRegionIndex = -1;
+
+            int closestDistance = int.MaxValue;
+
+            foreach (int connectedIndex in connectedRegionIndexes)
+            {
+                for (int regionIndex = 0; regionIndex < regionBoundaries.Count; regionIndex++)
+                {
+                    if (connectedRegionIndexes.Contains(regionIndex))
+                    {
+                        continue;
+                    }
+
+                    foreach (Vector2Int connectedBoundary in regionBoundaries[connectedIndex])
+                    {
+                        foreach (Vector2Int targetBoundary in regionBoundaries[regionIndex])
+                        {
+                            int distance = (connectedBoundary - targetBoundary).sqrMagnitude;
+
+                            if (distance < closestDistance)
+                            {
+                                startCoordinate = connectedBoundary;
+                                endCoordinate = targetBoundary;
+                                endRegionIndex = regionIndex;
+                                closestDistance = distance;
+                            }
+                        }
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// 해당 X 좌표에서 주 통로의 중심 높이를 계산합니다.
+        /// 두 동굴 중심 사이를 직선으로 이동하며 원형 영역을 굴착합니다.
         /// </summary>
-        private float GetTunnelCenterY(
-            int worldX,
-            float surfaceHeight,
-            FastNoiseLite tunnelNoise)
+        private void CarveTunnel(WorldMap worldMap, Vector2Int startCoordinate, Vector2Int endCoordinate, System.Random random)
         {
-            float noiseValue = tunnelNoise.GetNoise(worldX, 0f);
+            Vector2 startPosition = startCoordinate;
+            Vector2 endPosition = endCoordinate;
+            Vector2 controlPosition = CreateControlPoint(worldMap, startPosition, endPosition, random);
 
-            return surfaceHeight - depth + noiseValue * amplitude;
+            int stepCount = Mathf.CeilToInt(
+                Vector2.Distance(startPosition, controlPosition) +
+                Vector2.Distance(controlPosition, endPosition));
+
+            for (int step = 0; step <= stepCount; step++)
+            {
+                float ratio = step / (float)stepCount;
+                Vector2 position = CalculateBezierPoint(startPosition, controlPosition, endPosition, ratio);
+                Vector2Int tunnelCoordinate = Vector2Int.RoundToInt(position);
+
+                CarveCircle(worldMap, tunnelCoordinate);
+            }
         }
 
         /// <summary>
-        /// 월드 Y 좌표가 통로 굴착 범위 안인지 확인합니다.
+        /// 시작점과 끝점 사이에서 곡선 방향을 결정하는 제어점을 만듭니다.
         /// </summary>
-        private bool IsInsideTunnel(int worldY, float tunnelCenterY)
+        private Vector2 CreateControlPoint(WorldMap worldMap, Vector2 startPosition, Vector2 endPosition, System.Random random)
         {
-            float distanceFromCenter = Mathf.Abs(worldY - tunnelCenterY);
+            Vector2 middlePosition = (startPosition + endPosition) * 0.5f;
+            Vector2 direction = (endPosition - startPosition).normalized;
+            Vector2 perpendicular = new Vector2(-direction.y, direction.x);
 
-            return distanceFromCenter <= radius;
+            float offset = Vector2.Distance(startPosition, endPosition) * curveOffsetRatio;
+            Vector2 positiveControl = middlePosition + perpendicular * offset;
+            Vector2 negativeControl = middlePosition - perpendicular * offset;
+
+            bool isPositiveValid = IsCurveInsideWorld(worldMap, startPosition, positiveControl, endPosition);
+            bool isNegativeValid = IsCurveInsideWorld(worldMap, startPosition, negativeControl, endPosition);
+
+            if (isPositiveValid && isNegativeValid)
+            {
+                return random.Next(0, 2) == 0 ? positiveControl : negativeControl;
+            }
+
+            if (isPositiveValid)
+            {
+                return positiveControl;
+            }
+
+            if (isNegativeValid)
+            {
+                return negativeControl;
+            }
+
+            return middlePosition;
         }
 
         /// <summary>
-        /// 통로의 높낮이를 결정하는 노이즈를 생성합니다.
+        /// 2차 베지어 곡선 위의 좌표를 계산합니다.
         /// </summary>
-        private FastNoiseLite CreateNoise(int seed)
+        private static Vector2 CalculateBezierPoint(Vector2 startPosition, Vector2 controlPosition, Vector2 endPosition, float ratio)
         {
-            FastNoiseLite noise = new FastNoiseLite(seed);
+            float inverseRatio = 1f - ratio;
 
-            noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-            noise.SetFrequency(frequency);
+            return
+                inverseRatio * inverseRatio * startPosition +
+                2f * inverseRatio * ratio * controlPosition +
+                ratio * ratio * endPosition;
+        }
 
-            return noise;
+        /// <summary>
+        /// 곡선에서 가장 많이 휘어지는 중간 지점이 월드 내부인지 확인합니다.
+        /// </summary>
+        private static bool IsCurveInsideWorld(WorldMap worldMap, Vector2 startPosition, Vector2 controlPosition, Vector2 endPosition)
+        {
+            Vector2 middlePosition = CalculateBezierPoint(startPosition, controlPosition, endPosition, 0.5f);
+            Vector2Int middleCoordinate = Vector2Int.RoundToInt(middlePosition);
+
+            if (middleCoordinate.x < 0 || middleCoordinate.y < 0)
+            {
+                return false;
+            }
+
+            return worldMap.TryGetTile(middleCoordinate, out _);
+        }
+
+        /// <summary>
+        /// 중심 좌표 주변을 지정된 반경만큼 Empty로 변경합니다.
+        /// </summary>
+        private void CarveCircle(WorldMap worldMap, Vector2Int centerCoordinate)
+        {
+            for (int offsetY = -radius; offsetY <= radius; offsetY++)
+            {
+                for (int offsetX = -radius; offsetX <= radius; offsetX++)
+                {
+                    if (offsetX * offsetX + offsetY * offsetY > radius * radius)
+                    {
+                        continue;
+                    }
+
+                    Vector2Int targetCoordinate = centerCoordinate + new Vector2Int(offsetX, offsetY);
+
+                    if (targetCoordinate.x < 0 || targetCoordinate.y < 0)
+                    {
+                        continue;
+                    }
+
+                    worldMap.TrySetTile(targetCoordinate, new WorldTile(WorldTileType.Empty));
+                }
+            }
         }
 
         /// <summary>
@@ -96,10 +337,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void Validate()
         {
-            frequency = Mathf.Max(0.0001f, frequency);
-            depth = Mathf.Max(0f, depth);
-            amplitude = Mathf.Max(0f, amplitude);
-            radius = Mathf.Max(1f, radius);
+            radius = Mathf.Max(1, radius);
         }
     }
 }

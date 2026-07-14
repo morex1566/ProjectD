@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8070f48b971f44f4974ae5158f2dd23d, type: 3}
+  m_Name: SO_WorldSetup
+  m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldSetup
+  pixelsPerTile: 16
+  pixelsPerUnit: 16
+  soilColor:
+    serializedVersion: 2
+    rgba: 4279507250
+  soilPatternColor:
+    serializedVersion: 2
+    rgba: 4280824410
+  stoneColor:
+    serializedVersion: 2
+    rgba: 4280820515
+  gravelColor:
+    serializedVersion: 2
+    rgba: 4282141560
+  soilPatternFrequency: 0.02
+  soilPatternStepCount: 5
+  soilPatternThreshold: 0.8
+  gravelFrequency: 0.25
+  gravelThreshold: 0.85

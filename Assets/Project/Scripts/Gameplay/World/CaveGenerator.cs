@@ -9,6 +9,8 @@ namespace TRPG.Runtime
     [Serializable]
     public class CaveGenerator 
     {
+        [SerializeField] private bool isEnabled = true;
+
         [SerializeField, Min(0.0001f)] private float frequency = 0.035f;
 
         [SerializeField, Range(-1f, 1f)] private float threshold = -0.1f;
@@ -22,6 +24,11 @@ namespace TRPG.Runtime
         /// </summary>
         public void Generate(WorldChunk chunk, float[] surfaceHeights, int seed)
         {
+            if (isEnabled == false)
+            {
+                return;
+            }
+
             FastNoiseLite caveNoise = CreateNoise(seed);
 
             int originX = chunk.Coordinate.x * WorldChunk.Size;
