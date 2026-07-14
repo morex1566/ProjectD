@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,18 +6,20 @@ namespace TRPG.Runtime
     /// <summary>
     /// 월드 시스템 진입점으로서 맵, 크리처, 인디케이터 기능을 중개합니다.
     /// </summary>
-    public partial class WorldManager : MonoBehaviourSingleton<WorldManager>, IDisposable
+    public partial class WorldManager : MonoBehaviourSingleton<WorldManager>
     {
         public static WorldManagerSettingsData Settings { get; private set; }
 
         private GameObject worldRoot = null;
 
-        private bool isDisposed = false;
-
         /// <summary>
         /// 반복적인 태그 검색 없이 월드 카메라를 재사용하기 위한 런타임 캐시입니다.
         /// </summary>
         private WorldCameraController worldCameraController = null;
+
+        private WorldMap worldMap = null;
+
+        private GameObject worldMapInstance = null;
 
         [SerializeField, ReadOnly] private Dictionary<int, CreatureController> creatures = new();
 
@@ -26,38 +27,74 @@ namespace TRPG.Runtime
         public static IReadOnlyDictionary<int, CreatureController> Creatures => GetInstance().creatures;
 
 
+        public void Start()
+        {
+            worldCameraController = null;
+
+            // 월드 런타임 루트와 생성 결과를 구성합니다.
+            worldRoot = new GameObject("World");
+            {
+                worldRoot.transform.SetParent(transform, false);
+                worldMap = Settings.WorldGenerationSettingsData.WorldGenerator.Generate(Settings.WorldGenerationSettingsData);
+                worldMapInstance = RenderWorld(Settings.WorldGenerationSettingsData, worldMap);
+                worldMapInstance.transform.SetParent(worldRoot.transform, false);
+            }
+        }
+
         /// <summary>
         /// 월드 매니저 인스턴스와 설정 데이터를 준비합니다.
         /// </summary>
         public static void Init()
         {
-            WorldManager manager = GetInstance();
-            manager.isDisposed = false;
+            GetInstance();
 
             Settings = ResourceManager.GetResource<WorldManagerSettingsData>(UnityConstant.Addressable.Label.Core);
+        }
 
-            if (manager.worldRoot != null)
+        /// <summary>
+        /// 생성된 월드의 모든 청크를 런타임 오브젝트로 표시합니다.
+        /// </summary>
+        public static GameObject RenderWorld(WorldGenerationSettingsData settings, WorldMap map)
+        {
+            GameObject worldMapInstance = new GameObject("WorldMap");
+            Grid grid = worldMapInstance.AddComponent<Grid>();
             {
-                UnityEngine.Object.Destroy(manager.worldRoot);
+                int tileWorldSize = settings.TilesPerUnit;
+                grid.cellSize = new Vector3(tileWorldSize, tileWorldSize, 1f);
             }
 
-            manager.worldRoot = new GameObject("World");
-            manager.worldCameraController = null;
-            manager.creatures.Clear();
+            foreach (WorldChunk chunk in map.Chunks.Values)
+            {
+                CreateChunkInstance(worldMapInstance, settings, chunk);
+            }
+
+            return worldMapInstance;
+        }
+
+        /// <summary>
+        /// 청크 렌더러를 월드 루트 아래에 생성하고 청크 좌표에 맞게 배치합니다.
+        /// </summary>
+        private static void CreateChunkInstance(GameObject worldMapInstance, WorldGenerationSettingsData settings, WorldChunk chunk)
+        {
+            GameObject chunkInstance = new GameObject($"Chunk_{chunk.Coordinate.x}_{chunk.Coordinate.y}");
+            chunkInstance.transform.SetParent(worldMapInstance.transform, false);
+
+            // 청크의 좌측 하단이 청크 월드 좌표와 일치하도록 배치합니다.
+            float chunkWorldSize = settings.TilesPerUnit * settings.TilesPerChunk;
+            chunkInstance.transform.localPosition = new Vector3(
+                chunk.Coordinate.x * chunkWorldSize,
+                chunk.Coordinate.y * chunkWorldSize,
+                0f);
+
+            WorldChunkRenderer chunkRenderer = chunkInstance.AddComponent<WorldChunkRenderer>();
+            chunkRenderer.Render(chunk, settings);
         }
 
         /// <summary>
         /// 월드 런타임 오브젝트와 캐시를 정리합니다.
         /// </summary>
-        public void Dispose()
+        protected override void OnDestroy()
         {
-            if (isDisposed == true)
-            {
-                return;
-            }
-
-            isDisposed = true;
-
             if (worldRoot != null)
             {
                 UnityEngine.Object.Destroy(worldRoot);
@@ -65,13 +102,11 @@ namespace TRPG.Runtime
 
             worldRoot = null;
             worldCameraController = null;
+            worldMap = null;
+            worldMapInstance = null;
             creatures.Clear();
             Settings = null;
-        }
 
-        protected override void OnDestroy()
-        {
-            Dispose();
             base.OnDestroy();
         }
 

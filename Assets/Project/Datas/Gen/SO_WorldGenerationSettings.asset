@@ -10,8 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8070f48b971f44f4974ae5158f2dd23d, type: 3}
-  m_Name: SO_WorldSetup
+  m_Name: SO_WorldGenerationSettings
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldSetup
+  worldGenerator:
+    seed: 12345
+    surfaceFrequency: 0.03
+    surfaceBaseHeight: 60
+    surfaceAmplitude: 8
+    caveGenerator:
+      isEnabled: 1
+      frequency: 0.035
+      threshold: -0.1
+      depth: 8
+    tunnelGenerator:
+      isEnabled: 1
+      radius: 2
+      curveOffsetRatio: 0.2
+  chunkSize: {x: 5, y: 5}
   pixelsPerTile: 16
   pixelsPerUnit: 16
   soilColor:

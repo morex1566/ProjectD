@@ -22,6 +22,8 @@ namespace TRPG.Runtime
 
         [SerializeField, Min(1)] private int radius = 2;
 
+        [SerializeField, Min(0)] private int radiusVariation = 1;
+
         [SerializeField, Range(0f, 0.5f)] private float curveOffsetRatio = 0.2f;
 
 
@@ -35,13 +37,14 @@ namespace TRPG.Runtime
                 return;
             }
 
-            List<List<Vector2Int>> caveRegions = WorldPathfinder.FindCaveRegions(worldMap);
+            List<List<Vector2Int>> caveRegions = CaveRegionFinder.FindCaveRegions(worldMap);
             if (caveRegions.Count <= 1)
             {
                 return;
             }
 
             // 각 리전의 외곽좌표들만 모아둔다
+            List<Vector2Int> regionCenters = GetRegionCenters(caveRegions);
             List<List<Vector2Int>> regionBoundaries = GetRegionBoundaries(worldMap, caveRegions);
             int largestRegionIndex = FindLargestRegionIndex(caveRegions);
             HashSet<int> connectedRegionIndexes = new HashSet<int>();
@@ -50,6 +53,7 @@ namespace TRPG.Runtime
             }
 
             // 이 외곽 좌표들을 이용해서 각각 동굴을 연결
+            System.Random random = new System.Random(seed);
             while (connectedRegionIndexes.Count < caveRegions.Count)
             {
                 FindClosestConnection(
@@ -59,7 +63,6 @@ namespace TRPG.Runtime
                     out Vector2Int endCoordinate,
                     out int endRegionIndex);
 
-                System.Random random = new System.Random(seed);
                 CarveTunnel(worldMap, startCoordinate, endCoordinate, random);
 
                 connectedRegionIndexes.Add(endRegionIndex);
@@ -221,7 +224,7 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 두 동굴 중심 사이를 직선으로 이동하며 원형 영역을 굴착합니다.
+        /// 두 동굴 경계 사이를 곡선으로 이동하며 반경이 변하는 터널을 굴착합니다.
         /// </summary>
         private void CarveTunnel(WorldMap worldMap, Vector2Int startCoordinate, Vector2Int endCoordinate, System.Random random)
         {
@@ -233,14 +236,28 @@ namespace TRPG.Runtime
                 Vector2.Distance(startPosition, controlPosition) +
                 Vector2.Distance(controlPosition, endPosition));
 
+            float radiusPhase = (float)random.NextDouble() * Mathf.PI * 2f;
+
             for (int step = 0; step <= stepCount; step++)
             {
                 float ratio = step / (float)stepCount;
                 Vector2 position = CalculateBezierPoint(startPosition, controlPosition, endPosition, ratio);
                 Vector2Int tunnelCoordinate = Vector2Int.RoundToInt(position);
+                int currentRadius = GetTunnelRadius(ratio, radiusPhase);
 
-                CarveCircle(worldMap, tunnelCoordinate);
+                CarveCircle(worldMap, tunnelCoordinate, currentRadius);
             }
+        }
+
+        /// <summary>
+        /// 터널 진행 위치에 따라 현재 굴착 반경을 계산합니다.
+        /// </summary>
+        private int GetTunnelRadius(float ratio, float radiusPhase)
+        {
+            float radiusWave = Mathf.Sin(ratio * Mathf.PI * 2f + radiusPhase);
+            int radiusOffset = Mathf.RoundToInt(radiusWave * radiusVariation);
+
+            return Mathf.Max(1, radius + radiusOffset);
         }
 
         /// <summary>
@@ -309,13 +326,13 @@ namespace TRPG.Runtime
         /// <summary>
         /// 중심 좌표 주변을 지정된 반경만큼 Empty로 변경합니다.
         /// </summary>
-        private void CarveCircle(WorldMap worldMap, Vector2Int centerCoordinate)
+        private void CarveCircle(WorldMap worldMap, Vector2Int centerCoordinate, int currentRadius)
         {
-            for (int offsetY = -radius; offsetY <= radius; offsetY++)
+            for (int offsetY = -currentRadius; offsetY <= currentRadius; offsetY++)
             {
-                for (int offsetX = -radius; offsetX <= radius; offsetX++)
+                for (int offsetX = -currentRadius; offsetX <= currentRadius; offsetX++)
                 {
-                    if (offsetX * offsetX + offsetY * offsetY > radius * radius)
+                    if (offsetX * offsetX + offsetY * offsetY > currentRadius * currentRadius)
                     {
                         continue;
                     }
@@ -332,12 +349,5 @@ namespace TRPG.Runtime
             }
         }
 
-        /// <summary>
-        /// Inspector 설정값을 유효한 범위로 보정합니다.
-        /// </summary>
-        public void Validate()
-        {
-            radius = Mathf.Max(1, radius);
-        }
     }
 }

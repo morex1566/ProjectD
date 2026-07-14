@@ -15,9 +15,9 @@ namespace TRPG.Runtime
     /// <summary>
     /// 월드의 논리적인 타일 한 칸입니다.
     /// </summary>
-    public readonly struct WorldTile
+    public struct WorldTile
     {
-        public WorldTileType Type { get; }
+        public WorldTileType Type;
 
         public bool IsEmpty => Type == WorldTileType.Empty;
 

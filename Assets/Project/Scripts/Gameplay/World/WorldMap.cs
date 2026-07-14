@@ -10,10 +10,19 @@ namespace TRPG.Runtime
     {
         private readonly Dictionary<Vector2Int, WorldChunk> chunks = new();
 
+        /// <summary>
+        /// 청크 한 변에 포함되는 타일 수입니다.
+        /// </summary>
+        public int TilesPerChunk { get; }
+
         public IReadOnlyDictionary<Vector2Int, WorldChunk> Chunks => chunks;
 
         public int ChunkCount => chunks.Count;
 
+        public WorldMap(int tilesPerChunk)
+        {
+            TilesPerChunk = tilesPerChunk;
+        }
 
         /// <summary>
         /// 월드에 새로운 청크를 등록합니다.
@@ -73,17 +82,17 @@ namespace TRPG.Runtime
         /// <summary>
         /// 월드 타일 좌표를 청크 좌표로 변환합니다.
         /// </summary>
-        public static Vector2Int WorldToChunkCoordinate(Vector2Int worldTileCoordinate)
+        public Vector2Int WorldToChunkCoordinate(Vector2Int worldTileCoordinate)
         {
-            return new Vector2Int(worldTileCoordinate.x / WorldChunk.Size, worldTileCoordinate.y / WorldChunk.Size);
+            return new Vector2Int(worldTileCoordinate.x / TilesPerChunk, worldTileCoordinate.y / TilesPerChunk);
         }
 
         /// <summary>
         /// 월드 타일 좌표를 청크 내부의 로컬 좌표로 변환합니다.
         /// </summary>
-        public static Vector2Int WorldToLocalCoordinate(Vector2Int worldTileCoordinate)
+        public Vector2Int WorldToLocalCoordinate(Vector2Int worldTileCoordinate)
         {
-            return new Vector2Int(worldTileCoordinate.x % WorldChunk.Size, worldTileCoordinate.y % WorldChunk.Size);
+            return new Vector2Int(worldTileCoordinate.x % TilesPerChunk, worldTileCoordinate.y % TilesPerChunk);
         }
     }
 }

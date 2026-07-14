@@ -7,17 +7,19 @@ namespace TRPG.Runtime
     /// </summary>
     public sealed class WorldChunk
     {
-        public const int Size = 32;
+        private readonly int tilesPerChunk;
 
-        private readonly WorldTile[] tiles = new WorldTile[Size * Size];
+        private readonly WorldTile[] tiles;
 
 
         public Vector2Int Coordinate { get; }
 
 
-        public WorldChunk(Vector2Int coordinate)
+        public WorldChunk(Vector2Int coordinate, int tilesPerChunk)
         {
             Coordinate = coordinate;
+            this.tilesPerChunk = tilesPerChunk;
+            tiles = new WorldTile[tilesPerChunk * tilesPerChunk];
         }
 
         /// <summary>
@@ -25,7 +27,7 @@ namespace TRPG.Runtime
         /// </summary>
         public bool IsInside(int localX, int localY)
         {
-            return localX >= 0 && localX < Size && localY >= 0 && localY < Size;
+            return localX >= 0 && localX < tilesPerChunk && localY >= 0 && localY < tilesPerChunk;
         }
 
         /// <summary>
@@ -47,9 +49,9 @@ namespace TRPG.Runtime
         /// <summary>
         /// 2차원 로컬 좌표를 연속 배열 인덱스로 변환합니다.
         /// </summary>
-        private static int ToIndex(int localX, int localY)
+        private int ToIndex(int localX, int localY)
         {
-            return localX + localY * Size;
+            return localX + localY * tilesPerChunk;
         }
     }
 }

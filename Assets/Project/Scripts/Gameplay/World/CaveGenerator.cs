@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TRPG.Runtime
@@ -15,14 +16,16 @@ namespace TRPG.Runtime
 
         [SerializeField, Range(-1f, 1f)] private float threshold = -0.1f;
 
-        [SerializeField, Min(0f)] private float depth = 8f;
+        [SerializeField, Min(0f)] private float surfaceProtectDepth = 8f;
+
+        [SerializeField, Min(0)] private int minimumCaveTileCount = 32;
 
 
 
         /// <summary>
-        /// 지정한 청크의 고체 타일 일부를 Empty로 변경합니다.
+        /// 월드 전체의 고체 타일 일부를 Empty로 변경하고 작은 동굴을 제거합니다.
         /// </summary>
-        public void Generate(WorldChunk chunk, float[] surfaceHeights, int seed)
+        public void Generate(WorldMap worldMap, float[] surfaceHeights, int seed)
         {
             if (isEnabled == false)
             {
@@ -31,12 +34,25 @@ namespace TRPG.Runtime
 
             FastNoiseLite caveNoise = CreateNoise(seed);
 
-            int originX = chunk.Coordinate.x * WorldChunk.Size;
-            int originY = chunk.Coordinate.y * WorldChunk.Size;
-
-            for (int localY = 0; localY < WorldChunk.Size; localY++)
+            foreach (WorldChunk chunk in worldMap.Chunks.Values)
             {
-                for (int localX = 0; localX < WorldChunk.Size; localX++)
+                GenerateChunk(chunk, surfaceHeights, caveNoise, worldMap.TilesPerChunk);
+            }
+
+            RemoveSmallCaves(worldMap);
+        }
+
+        /// <summary>
+        /// 지정한 청크에 동굴 타일을 생성합니다.
+        /// </summary>
+        private void GenerateChunk(WorldChunk chunk, float[] surfaceHeights, FastNoiseLite caveNoise, int tilesPerChunk)
+        {
+            int originX = chunk.Coordinate.x * tilesPerChunk;
+            int originY = chunk.Coordinate.y * tilesPerChunk;
+
+            for (int localY = 0; localY < tilesPerChunk; localY++)
+            {
+                for (int localX = 0; localX < tilesPerChunk; localX++)
                 {
                     WorldTile tile = chunk.GetTile(localX, localY);
 
@@ -49,8 +65,8 @@ namespace TRPG.Runtime
                     // 지표면 바로 아래는 동굴이 뚫리지 않도록 보호합니다.
                     int worldX = originX + localX;
                     int worldY = originY + localY;
-                    float depth = surfaceHeights[localX] - worldY;
-                    if (depth < this.depth)
+                    float depth = surfaceHeights[worldX] - worldY;
+                    if (depth < this.surfaceProtectDepth)
                     {
                         continue;
                     }
@@ -62,6 +78,35 @@ namespace TRPG.Runtime
                         chunk.SetTile(localX, localY, new WorldTile(WorldTileType.Empty));
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// 최소 타일 개수보다 작은 동굴 영역을 Stone으로 복구합니다.
+        /// </summary>
+        private void RemoveSmallCaves(WorldMap worldMap)
+        {
+            List<List<Vector2Int>> caveRegions = CaveRegionFinder.FindCaveRegions(worldMap);
+
+            foreach (List<Vector2Int> caveRegion in caveRegions)
+            {
+                if (caveRegion.Count >= minimumCaveTileCount)
+                {
+                    continue;
+                }
+
+                FillCaveWithStone(worldMap, caveRegion);
+            }
+        }
+
+        /// <summary>
+        /// 지정한 동굴 영역의 모든 타일을 Stone으로 변경합니다.
+        /// </summary>
+        private static void FillCaveWithStone(WorldMap worldMap, List<Vector2Int> caveRegion)
+        {
+            foreach (Vector2Int coordinate in caveRegion)
+            {
+                worldMap.TrySetTile(coordinate, new WorldTile(WorldTileType.Stone));
             }
         }
 
@@ -78,16 +123,6 @@ namespace TRPG.Runtime
             noise.SetFrequency(frequency);
 
             return noise;
-        }
-
-        /// <summary>
-        /// Inspector 설정값을 유효한 범위로 보정합니다.
-        /// </summary>
-        public void Validate()
-        {
-            frequency = Mathf.Max(0.0001f, frequency);
-            threshold = Mathf.Clamp(threshold, -1f, 1f);
-            depth = Mathf.Max(0f, depth);
         }
     }
 }

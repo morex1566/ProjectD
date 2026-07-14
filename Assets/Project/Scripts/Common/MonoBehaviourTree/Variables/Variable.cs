@@ -122,7 +122,7 @@ namespace MBT
         }
 
         /// <summary>
-        /// Returns true when variable setup is invalid
+        /// Returns true when variable settings is invalid
         /// </summary>
         public bool isInvalid
         {

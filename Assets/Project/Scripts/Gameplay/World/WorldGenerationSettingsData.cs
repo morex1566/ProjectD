@@ -7,12 +7,18 @@ namespace TRPG.Runtime
     /// 월드 청크를 텍스처로 표시할 때 사용하는 설정입니다.
     /// </summary>
     [Serializable]
-    [CreateAssetMenu(fileName = "SO_WorldSetup", menuName = "ScriptableObjects/Settings/WorldSetup")]
-    public class WorldSetup : ScriptableObject
+    [CreateAssetMenu(fileName = "SO_WorldSetup", menuName = "ScriptableObjects/Settings/WorldGenerationSettingsData")]
+    public class WorldGenerationSettingsData : ScriptableObject
     {
+        [SerializeField] private WorldGenerator worldGenerator = null;
+
+        [SerializeField] private Vector2Int chunkSize = new Vector2Int(5, 5);
+
         [SerializeField, Min(1)] private int pixelsPerTile = 16;
 
-        [SerializeField, Min(1)] private float pixelsPerUnit = 16f;
+        [SerializeField, Min(1)] private int tilesPerChunk = 32;
+
+        [SerializeField, Min(1)] private int tilesPerUnit = 1;
 
         [SerializeField] private Color32 soilColor = new Color32(50, 25, 20, 255);
 
@@ -34,7 +40,11 @@ namespace TRPG.Runtime
 
         public int PixelsPerTile => pixelsPerTile;
 
-        public float PixelsPerUnit => pixelsPerUnit;
+        public int PixelsPerUnit => pixelsPerTile * tilesPerUnit;
+
+        public int TilesPerChunk => tilesPerChunk;
+
+        public int TilesPerUnit => tilesPerUnit;
 
         public Color32 SoilColor => soilColor;
 
@@ -54,21 +64,8 @@ namespace TRPG.Runtime
 
         public float GravelThreshold => gravelThreshold;
 
-        public float TileWorldSize => pixelsPerTile / pixelsPerUnit;
+        public Vector2Int ChunkSize => chunkSize;
 
-
-        /// <summary>
-        /// Inspector에서 들어온 렌더 설정값을 유효한 범위로 보정합니다.
-        /// </summary>
-        public void Validate()
-        {
-            pixelsPerTile = Mathf.Max(1, pixelsPerTile);
-            pixelsPerUnit = Mathf.Max(1f, pixelsPerUnit);
-            soilPatternFrequency = Mathf.Max(0.0001f, soilPatternFrequency);
-            soilPatternStepCount = Mathf.Max(2, soilPatternStepCount);
-            soilPatternThreshold = Mathf.Clamp(soilPatternThreshold, 0f, 0.99f);
-            gravelFrequency = Mathf.Max(0.0001f, gravelFrequency);
-            gravelThreshold = Mathf.Clamp(gravelThreshold, 0f, 0.99f);
-        }
+        public WorldGenerator WorldGenerator => worldGenerator;
     }
 }

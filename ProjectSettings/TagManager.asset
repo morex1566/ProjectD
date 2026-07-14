@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Creature
   - WorldCamera
+  - WorldGenerator
   layers:
   - Default
   - TransparentFX
@@ -16,18 +17,18 @@ TagManager:
   - OverlayUI
   - WorldUI
   - CameraUI
-  -
-  -
-  -
-  -
-  -
   - 
   - 
   - 
   - 
   - 
   - 
-  - WorldCreature
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 

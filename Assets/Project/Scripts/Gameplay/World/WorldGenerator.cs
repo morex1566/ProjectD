@@ -11,17 +11,15 @@ namespace TRPG.Runtime
     {
         [SerializeField] private int seed = 12345;
 
-        [SerializeField, Min(0.0001f)] private float surfaceFrequency = 0.03f;
-
-        [SerializeField] private float surfaceBaseHeight = 16f;
-
-        [SerializeField, Min(0f)] private float surfaceAmplitude = 8f;
-
         [SerializeField] private GroundGenerator groundGenerator = new GroundGenerator();
+
+        [SerializeField] private SurfaceGenerator surfaceGenerator = new SurfaceGenerator();
 
         [SerializeField] private CaveGenerator caveGenerator = new CaveGenerator();
 
         [SerializeField] private TunnelGenerator tunnelGenerator = new TunnelGenerator();
+
+        private float[] surfaceHeights = null;
 
 
         public int Seed => seed;
@@ -30,76 +28,37 @@ namespace TRPG.Runtime
         /// <summary>
         /// 지정한 청크 크기의 월드를 생성합니다.
         /// </summary>
-        public WorldMap Generate(Vector2Int chunkSize)
+        public WorldMap Generate(WorldGenerationSettingsData setting)
         {
-            Validate();
+            WorldMap worldMap = CreateChunks(setting.ChunkSize, setting.TilesPerChunk);
+            int worldWidth = setting.ChunkSize.x * setting.TilesPerChunk;
 
-            WorldMap worldMap = new WorldMap();
-            FastNoiseLite surfaceNoise = CreateSurfaceNoise();
-
-            for (int chunkX = 0; chunkX < chunkSize.x; chunkX++)
-            {
-                int originX = chunkX * WorldChunk.Size;
-                float[] surfaceHeights = CreateSurfaceHeights(originX, surfaceNoise);
-
-                for (int chunkY = 0; chunkY < chunkSize.y; chunkY++)
-                {
-                    Vector2Int chunkCoordinate = new Vector2Int(chunkX, chunkY);
-                    WorldChunk chunk = groundGenerator.Generate(chunkCoordinate, surfaceHeights);
-                    caveGenerator.Generate(chunk, surfaceHeights, seed + 1);
-
-                    worldMap.AddChunk(chunk);
-                }
-            }
-
+            // CAUTION : 순서 중요합니다...
+            groundGenerator.Generate(worldMap);
+            surfaceHeights = surfaceGenerator.Generate(worldMap, worldWidth, seed);
+            caveGenerator.Generate(worldMap, surfaceHeights, seed + 1);
             tunnelGenerator.Generate(worldMap, seed + 2);
 
             return worldMap;
         }
 
         /// <summary>
-        /// 한 청크 너비에 해당하는 지표면 높이를 계산합니다.
+        /// 지정한 크기만큼 빈 월드 청크를 생성합니다.
         /// </summary>
-        private float[] CreateSurfaceHeights(int originX, FastNoiseLite surfaceNoise)
+        private static WorldMap CreateChunks(Vector2Int chunkSize, int tilesPerChunk)
         {
-            float[] surfaceHeights = new float[WorldChunk.Size];
+            WorldMap worldMap = new WorldMap(tilesPerChunk);
 
-            for (int localX = 0; localX < WorldChunk.Size; localX++)
+            for (int chunkX = 0; chunkX < chunkSize.x; chunkX++)
             {
-                int worldX = originX + localX;
-                float noiseValue = surfaceNoise.GetNoise(worldX, 0f);
-
-                surfaceHeights[localX] = surfaceBaseHeight + noiseValue * surfaceAmplitude;
+                for (int chunkY = 0; chunkY < chunkSize.y; chunkY++)
+                {
+                    Vector2Int chunkCoordinate = new Vector2Int(chunkX, chunkY);
+                    worldMap.AddChunk(new WorldChunk(chunkCoordinate, tilesPerChunk));
+                }
             }
 
-            return surfaceHeights;
-        }
-
-        /// <summary>
-        /// 지표면 높이를 결정하는 노이즈를 생성합니다.
-        /// </summary>
-        private FastNoiseLite CreateSurfaceNoise()
-        {
-            FastNoiseLite noise = new FastNoiseLite(seed);
-            {
-                noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-                noise.SetFrequency(surfaceFrequency);
-            }
-
-            return noise;
-        }
-
-        /// <summary>
-        /// Inspector 설정값을 유효한 범위로 보정합니다.
-        /// </summary>
-        public void Validate()
-        {
-            surfaceFrequency = Mathf.Max(0.0001f, surfaceFrequency);
-            surfaceAmplitude = Mathf.Max(0f, surfaceAmplitude);
-
-            groundGenerator.Validate();
-            caveGenerator.Validate();
-            tunnelGenerator.Validate();
+            return worldMap;
         }
     }
 }

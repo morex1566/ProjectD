@@ -91,7 +91,7 @@ namespace MBT
         }
 
         /// <summary>
-        /// Check if node setup is valid
+        /// Check if node settings is valid
         /// </summary>
         /// <returns>Returns true if node is configured correctly</returns>
         public virtual bool IsValid()

@@ -15,6 +15,11 @@ namespace TRPG.Runtime
         public CreatureSheet CreatureDataSheet;
 
         /// <summary>
+        /// 월드 설정
+        /// </summary>
+        public WorldGenerationSettingsData WorldGenerationSettingsData;
+
+        /// <summary>
         /// Id로 WeaponData를 조회할 시트입니다.
         /// </summary>
         [FormerlySerializedAs("ItemDataSheet")]
