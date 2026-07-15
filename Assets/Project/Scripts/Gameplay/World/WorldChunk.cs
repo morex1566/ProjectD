@@ -11,8 +11,9 @@ namespace TRPG.Runtime
 
         private readonly WorldTile[] tiles;
 
+        public WorldChunkPixelData PixelData;
 
-        public Vector2Int Coordinate { get; }
+        public Vector2Int Coordinate;
 
 
         public WorldChunk(Vector2Int coordinate, int tilesPerChunk)
@@ -44,6 +45,14 @@ namespace TRPG.Runtime
         public void SetTile(int localX, int localY, WorldTile tile)
         {
             tiles[ToIndex(localX, localY)] = tile;
+        }
+
+        /// <summary>
+        /// 타일 데이터로부터 생성된 최종 픽셀 지형 데이터를 저장합니다.
+        /// </summary>
+        public void SetPixelData(WorldChunkPixelData pixelData)
+        {
+            PixelData = pixelData;
         }
 
         /// <summary>

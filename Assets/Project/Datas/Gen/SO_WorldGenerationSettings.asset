@@ -14,21 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.WorldSetup
   worldGenerator:
     seed: 12345
-    surfaceFrequency: 0.03
-    surfaceBaseHeight: 60
-    surfaceAmplitude: 8
+    surfaceGenerator:
+      frequency: 0.03
+      baseHeight: 16
+      amplitude: 8
     caveGenerator:
       isEnabled: 1
       frequency: 0.035
       threshold: -0.1
-      depth: 8
+      surfaceProtectDepth: 8
+      minimumCaveTileCount: 32
     tunnelGenerator:
       isEnabled: 1
       radius: 2
+      radiusVariation: 1
       curveOffsetRatio: 0.2
-  chunkSize: {x: 5, y: 5}
+    terrainPixelGenerator:
+      cornerCutDepth: 1
+  chunkSize: {x: 3, y: 3}
   pixelsPerTile: 16
-  pixelsPerUnit: 16
+  tilesPerChunk: 32
+  tilesPerUnit: 1
   soilColor:
     serializedVersion: 2
     rgba: 4279507250

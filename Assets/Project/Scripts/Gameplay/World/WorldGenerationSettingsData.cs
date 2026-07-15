@@ -46,6 +46,10 @@ namespace TRPG.Runtime
 
         public int TilesPerUnit => tilesPerUnit;
 
+        public float TileWorldSize => 1f / tilesPerUnit;
+
+        public float ChunkWorldSize => tilesPerChunk * TileWorldSize;
+
         public Color32 SoilColor => soilColor;
 
         public Color32 SoilPatternColor => soilPatternColor;

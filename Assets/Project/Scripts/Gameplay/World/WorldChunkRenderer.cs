@@ -1,24 +1,22 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// WorldChunk의 WorldTile 데이터를 청크 Tilemap에 표시합니다.
+    /// WorldChunk의 최종 픽셀 지형 데이터를 청크 텍스처로 표시합니다.
     /// </summary>
-    [RequireComponent(typeof(Tilemap), typeof(TilemapRenderer))]
+    [RequireComponent(typeof(SpriteRenderer))]
     public sealed class WorldChunkRenderer : MonoBehaviour
     {
-        private readonly List<Texture2D> textures = new();
+        private WorldChunk chunk;
 
-        private readonly List<Sprite> sprites = new();
+        private WorldGenerationSettingsData settings;
 
-        private readonly List<Tile> tiles = new();
+        private SpriteRenderer spriteRenderer;
 
-        private readonly Dictionary<WorldTileType, TileBase> tileCache = new();
+        private Texture2D texture;
 
-        private Tilemap tilemap;
+        private Sprite sprite;
 
 
         private void Awake()
@@ -33,111 +31,95 @@ namespace TRPG.Runtime
 
 
         /// <summary>
-        /// 청크의 각 WorldTile을 픽셀로 그린 뒤 TileBase로 변환하여 표시합니다.
+        /// 청크의 최종 픽셀 지형 데이터를 텍스처로 변환하여 표시합니다.
         /// </summary>
         public void Render(WorldChunk chunk, WorldGenerationSettingsData settings)
         {
+            this.chunk = chunk;
+            this.settings = settings;
+
             CacheComponents();
             ReleaseRenderResources();
-            int tilesPerChunk = settings.TilesPerChunk;
-            TileBase[] tileBuffer = new TileBase[tilesPerChunk * tilesPerChunk];
-
-            for (int localY = 0; localY < tilesPerChunk; localY++)
-            {
-                for (int localX = 0; localX < tilesPerChunk; localX++)
-                {
-                    int tileIndex = localX + localY * tilesPerChunk;
-                    WorldTile worldTile = chunk.GetTile(localX, localY);
-
-                    if (worldTile.IsEmpty)
-                    {
-                        tileBuffer[tileIndex] = null;
-                        continue;
-                    }
-
-                    tileBuffer[tileIndex] = GetOrCreateTileBase(worldTile, settings);
-                }
-            }
-
-            BoundsInt chunkBounds = new BoundsInt(
-                0,
-                0,
-                0,
-                tilesPerChunk,
-                tilesPerChunk,
-                1);
-
-            tilemap.SetTilesBlock(chunkBounds, tileBuffer);
+            CreateRenderResources();
+            Refresh();
         }
 
         /// <summary>
-        /// 같은 WorldTileType은 이미 그려 둔 TileBase를 재사용합니다.
+        /// 크기가 고정된 청크 텍스처와 스프라이트를 생성합니다.
         /// </summary>
-        private TileBase GetOrCreateTileBase(WorldTile worldTile, WorldGenerationSettingsData settings)
+        private void CreateRenderResources()
         {
-            if (tileCache.TryGetValue(worldTile.Type, out TileBase tileBase))
+            int textureSize = chunk.PixelData.Size;
+
+            texture = new Texture2D(textureSize, textureSize, TextureFormat.RGBA32, false);
             {
-                return tileBase;
-            }
-
-            tileBase = CreateTileBase(worldTile, settings);
-            tileCache.Add(worldTile.Type, tileBase);
-
-            return tileBase;
-        }
-
-        /// <summary>
-        /// WorldTile을 픽셀 텍스처로 그린 뒤 TileBase로 변환합니다.
-        /// </summary>
-        private TileBase CreateTileBase(WorldTile worldTile, WorldGenerationSettingsData settings)
-        {
-            int textureSize = settings.PixelsPerTile;
-            Color32[] pixels = CreatePixelData(worldTile, settings, textureSize);
-
-            Texture2D texture = new Texture2D(textureSize, textureSize, TextureFormat.RGBA32, false);
-            {
+                texture.name = $"ChunkTexture_{chunk.Coordinate.x}_{chunk.Coordinate.y}";
                 texture.hideFlags = HideFlags.HideAndDontSave;
                 texture.filterMode = FilterMode.Point;
                 texture.wrapMode = TextureWrapMode.Clamp;
-                texture.SetPixels32(pixels);
-                texture.Apply(false, false);
             }
 
-            Sprite sprite = Sprite.Create(
+            // 청크 오브젝트의 위치가 텍스처 좌측 하단과 일치하도록 피벗을 좌측 하단에 둡니다.
+            sprite = Sprite.Create(
                 texture,
                 new Rect(0f, 0f, textureSize, textureSize),
-                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
                 settings.PixelsPerUnit,
                 0,
                 SpriteMeshType.FullRect);
             {
+                sprite.name = $"ChunkSprite_{chunk.Coordinate.x}_{chunk.Coordinate.y}";
                 sprite.hideFlags = HideFlags.HideAndDontSave;
             }
 
-            Tile tile = ScriptableObject.CreateInstance<Tile>();
-            {
-                tile.hideFlags = HideFlags.HideAndDontSave;
-                tile.sprite = sprite;
-            }
-
-            textures.Add(texture);
-            sprites.Add(sprite);
-            tiles.Add(tile);
-
-            return tile;
+            spriteRenderer.sprite = sprite;
         }
 
         /// <summary>
-        /// WorldTile 하나에 해당하는 픽셀 데이터를 생성합니다.
+        /// 현재 청크 픽셀 데이터 전체를 기존 텍스처에 반영합니다.
         /// </summary>
-        private static Color32[] CreatePixelData(WorldTile worldTile, WorldGenerationSettingsData settings, int textureSize)
+        public void Refresh()
         {
-            Color32[] pixels = new Color32[textureSize * textureSize];
-            Color32 color = GetTileColor(worldTile.Type, settings);
+            int textureSize = chunk.PixelData.Size;
+            Refresh(new RectInt(0, 0, textureSize, textureSize));
+        }
 
-            for (int pixelIndex = 0; pixelIndex < pixels.Length; pixelIndex++)
+        /// <summary>
+        /// 지정한 로컬 픽셀 영역을 기존 청크 텍스처에 반영합니다.
+        /// </summary>
+        public void Refresh(RectInt dirtyRect)
+        {
+            Color32[] pixels = CreatePixelData(chunk.PixelData, settings, dirtyRect);
+
+            texture.SetPixels32(
+                dirtyRect.x,
+                dirtyRect.y,
+                dirtyRect.width,
+                dirtyRect.height,
+                pixels,
+                0);
+
+            texture.Apply(false, false);
+        }
+
+        /// <summary>
+        /// 청크의 지정한 픽셀 영역을 렌더링용 색상 데이터로 변환합니다.
+        /// </summary>
+        private static Color32[] CreatePixelData(WorldChunkPixelData pixelData, WorldGenerationSettingsData settings, RectInt pixelRect)
+        {
+            Color32[] pixels = new Color32[pixelRect.width * pixelRect.height];
+
+            for (int y = 0; y < pixelRect.height; y++)
             {
-                pixels[pixelIndex] = color;
+                for (int x = 0; x < pixelRect.width; x++)
+                {
+                    int localPixelX = pixelRect.x + x;
+                    int localPixelY = pixelRect.y + y;
+                    int pixelIndex = x + y * pixelRect.width;
+                    WorldTileType pixelType = pixelData.GetPixel(localPixelX, localPixelY);
+
+                    pixels[pixelIndex] = GetTileColor(pixelType, settings);
+                }
             }
 
             return pixels;
@@ -162,45 +144,34 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// Tilemap 컴포넌트를 준비합니다.
+        /// SpriteRenderer 컴포넌트를 준비합니다.
         /// </summary>
         private void CacheComponents()
         {
-            if (tilemap == null)
-            {
-                tilemap = GetComponent<Tilemap>();
-            }
+            spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
         /// <summary>
-        /// Tilemap을 비우고 동적으로 생성한 렌더링 리소스를 제거합니다.
+        /// 동적으로 생성한 청크 렌더링 리소스를 제거합니다.
         /// </summary>
         private void ReleaseRenderResources()
         {
-            if (tilemap != null)
+            if (spriteRenderer != null)
             {
-                tilemap.ClearAllTiles();
+                spriteRenderer.sprite = null;
             }
 
-            foreach (Tile tile in tiles)
-            {
-                DestroyGeneratedObject(tile);
-            }
-
-            foreach (Sprite sprite in sprites)
+            if (sprite != null)
             {
                 DestroyGeneratedObject(sprite);
+                sprite = null;
             }
 
-            foreach (Texture2D texture in textures)
+            if (texture != null)
             {
                 DestroyGeneratedObject(texture);
+                texture = null;
             }
-
-            tileCache.Clear();
-            tiles.Clear();
-            sprites.Clear();
-            textures.Clear();
         }
 
         /// <summary>

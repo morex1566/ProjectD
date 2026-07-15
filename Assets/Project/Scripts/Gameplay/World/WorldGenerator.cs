@@ -19,6 +19,8 @@ namespace TRPG.Runtime
 
         [SerializeField] private TunnelGenerator tunnelGenerator = new TunnelGenerator();
 
+        [SerializeField] private TerrainPixelGenerator terrainPixelGenerator = new TerrainPixelGenerator();
+
         private float[] surfaceHeights = null;
 
 
@@ -28,16 +30,17 @@ namespace TRPG.Runtime
         /// <summary>
         /// 지정한 청크 크기의 월드를 생성합니다.
         /// </summary>
-        public WorldMap Generate(WorldGenerationSettingsData setting)
+        public WorldMap Generate(WorldGenerationSettingsData settings)
         {
-            WorldMap worldMap = CreateChunks(setting.ChunkSize, setting.TilesPerChunk);
-            int worldWidth = setting.ChunkSize.x * setting.TilesPerChunk;
+            WorldMap worldMap = CreateChunks(settings.ChunkSize, settings.TilesPerChunk);
+            int worldWidth = settings.ChunkSize.x * settings.TilesPerChunk;
 
             // CAUTION : 순서 중요합니다...
             groundGenerator.Generate(worldMap);
             surfaceHeights = surfaceGenerator.Generate(worldMap, worldWidth, seed);
             caveGenerator.Generate(worldMap, surfaceHeights, seed + 1);
             tunnelGenerator.Generate(worldMap, seed + 2);
+            terrainPixelGenerator.Generate(worldMap, settings.PixelsPerTile);
 
             return worldMap;
         }

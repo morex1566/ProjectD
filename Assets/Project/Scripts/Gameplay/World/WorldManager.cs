@@ -57,12 +57,6 @@ namespace TRPG.Runtime
         public static GameObject RenderWorld(WorldGenerationSettingsData settings, WorldMap map)
         {
             GameObject worldMapInstance = new GameObject("WorldMap");
-            Grid grid = worldMapInstance.AddComponent<Grid>();
-            {
-                int tileWorldSize = settings.TilesPerUnit;
-                grid.cellSize = new Vector3(tileWorldSize, tileWorldSize, 1f);
-            }
-
             foreach (WorldChunk chunk in map.Chunks.Values)
             {
                 CreateChunkInstance(worldMapInstance, settings, chunk);
@@ -80,7 +74,7 @@ namespace TRPG.Runtime
             chunkInstance.transform.SetParent(worldMapInstance.transform, false);
 
             // 청크의 좌측 하단이 청크 월드 좌표와 일치하도록 배치합니다.
-            float chunkWorldSize = settings.TilesPerUnit * settings.TilesPerChunk;
+            float chunkWorldSize = settings.ChunkWorldSize;
             chunkInstance.transform.localPosition = new Vector3(
                 chunk.Coordinate.x * chunkWorldSize,
                 chunk.Coordinate.y * chunkWorldSize,
