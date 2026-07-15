@@ -20,10 +20,16 @@ namespace TRPG.Runtime
 
         [SerializeField, Min(0)] private int cornerCutDepth = 2;
 
+        [SerializeField, Min(0)] private int edgeRoughnessDepth = 2;
+
+        [SerializeField, Min(0.0001f)] private float edgeNoiseFrequency = 0.12f;
+
+        [SerializeField, Range(-1f, 1f)] private float edgeNoiseThreshold = 0.1f;
+
         /// <summary>
         /// 월드의 모든 청크에 픽셀 지형 데이터를 생성합니다.
         /// </summary>
-        public void Generate(WorldMap worldMap, int pixelsPerTile)
+        public void Generate(WorldMap worldMap, int pixelsPerTile, int seed)
         {
             int pixelsPerChunk = worldMap.TilesPerChunk * pixelsPerTile;
 
@@ -35,7 +41,83 @@ namespace TRPG.Runtime
                 chunk.SetPixelData(pixelData);
             }
 
+            // 타일각을 둥글게
             CarveConvexCorners(worldMap);
+
+            // 모서리를 거칠게
+            FastNoiseLite edgeNoise = CreateEdgeNoise(seed);
+            CarveRoughEdges(worldMap, edgeNoise);
+        }
+
+        /// <summary>
+        /// 노이즈 조건을 만족하는 외곽 픽셀을 지정한 깊이만큼 제거합니다.
+        /// </summary>
+        private void CarveRoughEdges(WorldMap worldMap, FastNoiseLite edgeNoise)
+        {
+            for (int pass = 0; pass < edgeRoughnessDepth; pass++)
+            {
+                List<(WorldChunk Chunk, Vector2Int Coordinate)> roughPixels = FindRoughBoundaryPixels(worldMap, edgeNoise);
+
+                if (roughPixels.Count == 0)
+                {
+                    return;
+                }
+
+                foreach (var roughPixel in roughPixels)
+                {
+                    roughPixel.Chunk.PixelData.SetPixel(roughPixel.Coordinate.x, roughPixel.Coordinate.y, WorldTileType.Empty);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 노이즈 조건을 만족하는 현재 외곽 픽셀을 찾습니다.
+        /// </summary>
+        private List<(WorldChunk Chunk, Vector2Int Coordinate)> FindRoughBoundaryPixels(WorldMap worldMap, FastNoiseLite edgeNoise)
+        {
+            List<(WorldChunk Chunk, Vector2Int Coordinate)> roughPixels = new();
+
+            foreach (WorldChunk chunk in worldMap.Chunks.Values)
+            {
+                int pixelSize = chunk.PixelData.Size;
+
+                for (int y = 0; y < pixelSize; y++)
+                {
+                    for (int x = 0; x < pixelSize; x++)
+                    {
+                        if (IsBoundaryPixel(worldMap, chunk, x, y) == false)
+                        {
+                            continue;
+                        }
+
+                        int worldPixelX = chunk.Coordinate.x * pixelSize + x;
+                        int worldPixelY = chunk.Coordinate.y * pixelSize + y;
+                        float noiseValue = edgeNoise.GetNoise(worldPixelX, worldPixelY);
+                        if (noiseValue <= edgeNoiseThreshold)
+                        {
+                            continue;
+                        }
+
+                        roughPixels.Add((chunk, new Vector2Int(x, y)));
+                    }
+                }
+            }
+
+            return roughPixels;
+        }
+
+        /// <summary>
+        /// 청크 경계에서도 연속되는 외곽 노이즈를 생성합니다.
+        /// </summary>
+        private FastNoiseLite CreateEdgeNoise(int seed)
+        {
+            FastNoiseLite noise = new FastNoiseLite(seed);
+            {
+                noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+                noise.SetFrequency(edgeNoiseFrequency);
+            }
+
+            return noise;
         }
 
         /// <summary>

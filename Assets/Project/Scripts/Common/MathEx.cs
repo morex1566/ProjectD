@@ -14,6 +14,18 @@ namespace TRPG.Runtime
         {
             return new Vector3Int(vector.x, vector.y, z);
         }
+
+        /// <summary>
+        /// 최소 좌표와 최대 좌표를 기준으로 RectInt를 생성합니다.
+        /// </summary>
+        public static RectInt MinMaxRect(int xMin, int yMin, int xMax, int yMax)
+        {
+            return new RectInt(
+                xMin,
+                yMin,
+                xMax - xMin,
+                yMax - yMin);
+        }
     }
 
     /// <summary>

@@ -40,7 +40,7 @@ namespace TRPG.Runtime
             surfaceHeights = surfaceGenerator.Generate(worldMap, worldWidth, seed);
             caveGenerator.Generate(worldMap, surfaceHeights, seed + 1);
             tunnelGenerator.Generate(worldMap, seed + 2);
-            terrainPixelGenerator.Generate(worldMap, settings.PixelsPerTile);
+            terrainPixelGenerator.Generate(worldMap, settings.PixelsPerTile, seed + 3);
 
             return worldMap;
         }

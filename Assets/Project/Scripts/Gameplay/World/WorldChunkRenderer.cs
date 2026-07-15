@@ -18,10 +18,26 @@ namespace TRPG.Runtime
 
         private Sprite sprite;
 
+        private bool hasDirtyRect;
+
+        private RectInt dirtyRect;
+
 
         private void Awake()
         {
             CacheComponents();
+        }
+
+        private void LateUpdate()
+        {
+            if (hasDirtyRect == false)
+            {
+                return;
+            }
+
+            Refresh(dirtyRect);
+
+            hasDirtyRect = false;
         }
 
         private void OnDestroy()
@@ -37,11 +53,59 @@ namespace TRPG.Runtime
         {
             this.chunk = chunk;
             this.settings = settings;
+            hasDirtyRect = false;
 
             CacheComponents();
             ReleaseRenderResources();
             CreateRenderResources();
             Refresh();
+        }
+
+        /// <summary>
+        /// 현재 청크 픽셀 데이터 전체를 기존 텍스처에 반영합니다.
+        /// </summary>
+        public void Refresh()
+        {
+            int textureSize = chunk.PixelData.Size;
+            Refresh(new RectInt(0, 0, textureSize, textureSize));
+        }
+
+        /// <summary>
+        /// 지정한 로컬 픽셀 영역을 기존 청크 텍스처에 반영합니다.
+        /// </summary>
+        public void Refresh(RectInt dirtyRect)
+        {
+            Color32[] pixels = CreatePixelData(chunk.PixelData, settings, dirtyRect);
+
+            texture.SetPixels32(
+                dirtyRect.x,
+                dirtyRect.y,
+                dirtyRect.width,
+                dirtyRect.height,
+                pixels,
+                0);
+
+            texture.Apply(false, false);
+        }
+
+        /// <summary>
+        /// 이번 프레임에 갱신할 로컬 픽셀 영역을 누적합니다.
+        /// </summary>
+        public void MarkDirty(RectInt pixelRect)
+        {
+            if (hasDirtyRect == false)
+            {
+                dirtyRect = pixelRect;
+                hasDirtyRect = true;
+                return;
+            }
+
+            int xMin = Mathf.Min(dirtyRect.xMin, pixelRect.xMin);
+            int yMin = Mathf.Min(dirtyRect.yMin, pixelRect.yMin);
+            int xMax = Mathf.Max(dirtyRect.xMax, pixelRect.xMax);
+            int yMax = Mathf.Max(dirtyRect.yMax, pixelRect.yMax);
+
+            dirtyRect = MathEx.MinMaxRect(xMin, yMin, xMax, yMax);
         }
 
         /// <summary>
@@ -73,33 +137,6 @@ namespace TRPG.Runtime
             }
 
             spriteRenderer.sprite = sprite;
-        }
-
-        /// <summary>
-        /// 현재 청크 픽셀 데이터 전체를 기존 텍스처에 반영합니다.
-        /// </summary>
-        public void Refresh()
-        {
-            int textureSize = chunk.PixelData.Size;
-            Refresh(new RectInt(0, 0, textureSize, textureSize));
-        }
-
-        /// <summary>
-        /// 지정한 로컬 픽셀 영역을 기존 청크 텍스처에 반영합니다.
-        /// </summary>
-        public void Refresh(RectInt dirtyRect)
-        {
-            Color32[] pixels = CreatePixelData(chunk.PixelData, settings, dirtyRect);
-
-            texture.SetPixels32(
-                dirtyRect.x,
-                dirtyRect.y,
-                dirtyRect.width,
-                dirtyRect.height,
-                pixels,
-                0);
-
-            texture.Apply(false, false);
         }
 
         /// <summary>
