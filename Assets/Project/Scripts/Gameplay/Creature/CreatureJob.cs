@@ -227,9 +227,11 @@ namespace TRPG.Runtime
 
     public class CreatureEngageJob : CreatureJob
     {
-        public CreatureEngageJob(CreatureController controller) : base(controller)
-        {
+        private CreatureController target;
 
+        public CreatureEngageJob(CreatureController controller, CreatureController target) : base(controller)
+        {
+            this.target = target;
         }
     }
 }

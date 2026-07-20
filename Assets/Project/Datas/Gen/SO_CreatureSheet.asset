@@ -17,12 +17,12 @@ MonoBehaviour:
     Name: dwarf
     Description: 
     Faction: Human
-    Hp: 1
-    Damage: 1
-    DetectRange: 1
+    Hp: 5
+    Damage: 5
+    DetectRange: 5
     AttackRange: 1
-    AttackSpeed: 1
-    MoveSpeed: 1
+    AttackSpeed: 5
+    MoveSpeed: 5
     AIType: Ground
     PrefabPath: Assets/Project/Prefabs/Gameplay/PF_creature_dwarf_001.prefab
     Sprite: {fileID: 21300000, guid: a6f1824e05c4683448a1220b334d087d, type: 3}
@@ -32,12 +32,12 @@ MonoBehaviour:
     Name: lizard
     Description: 
     Faction: Monster
-    Hp: 1
-    Damage: 1
-    DetectRange: 1
+    Hp: 5
+    Damage: 5
+    DetectRange: 5
     AttackRange: 1
-    AttackSpeed: 1
-    MoveSpeed: 1
+    AttackSpeed: 5
+    MoveSpeed: 5
     AIType: Ground
     PrefabPath: Assets/Project/Prefabs/Gameplay/PF_creature_lizard_001.prefab
     Sprite: {fileID: 21300000, guid: 30079013dd9c93e47a948521ea457742, type: 3}

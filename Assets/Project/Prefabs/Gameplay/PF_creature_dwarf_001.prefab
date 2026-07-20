@@ -69,8 +69,16 @@ PrefabInstance:
       value: -0.3125
       objectReference: {fileID: 0}
     - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.Hp
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: context.Id
       value: creature_dwarf_001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.Atk
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: context.Name
@@ -81,8 +89,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: a6f1824e05c4683448a1220b334d087d, type: 3}
     - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.BaseAtk
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: context.Faction
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.MoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.AttackSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.DetectRange
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.BaseAttackSpeed
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5466476860050821414, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: m_Size.x
@@ -105,7 +133,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1809254756998236648, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1450509314536568960}
+      addedObject: {fileID: 2551622415314931644}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
 --- !u!4 &263434539048164682 stripped
@@ -113,7 +141,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1809254756998236648, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
   m_PrefabInstance: {fileID: 1926462899314234530}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &7306709966444339902
+--- !u!1001 &5921872425634829698
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -170,8 +198,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b6957f79e572244a80ef9fff6713d8c, type: 3}
---- !u!4 &1450509314536568960 stripped
+--- !u!4 &2551622415314931644 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8162660564596709950, guid: 6b6957f79e572244a80ef9fff6713d8c, type: 3}
-  m_PrefabInstance: {fileID: 7306709966444339902}
+  m_PrefabInstance: {fileID: 5921872425634829698}
   m_PrefabAsset: {fileID: 0}

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &5283584384590932984
+--- !u!1001 &4534376483662495118
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -57,10 +57,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40b515375dbb62a47a34ae35f5d5b692, type: 3}
---- !u!4 &4041004884407333318 stripped
+--- !u!4 &5740629280786098096 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8162660564596709950, guid: 40b515375dbb62a47a34ae35f5d5b692, type: 3}
-  m_PrefabInstance: {fileID: 5283584384590932984}
+  m_PrefabInstance: {fileID: 4534376483662495118}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8892246808251625838
 PrefabInstance:
@@ -131,8 +131,16 @@ PrefabInstance:
       value: -0.25
       objectReference: {fileID: 0}
     - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.Hp
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: context.Id
       value: creature_lizard_001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.Atk
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: context.Name
@@ -143,8 +151,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 30079013dd9c93e47a948521ea457742, type: 3}
     - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.BaseAtk
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: context.Faction
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.MoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.AttackSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.DetectRange
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5108346331041859384, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
+      propertyPath: context.BaseAttackSpeed
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5466476860050821414, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       propertyPath: m_Size.x
@@ -167,7 +195,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1809254756998236648, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4041004884407333318}
+      addedObject: {fileID: 5740629280786098096}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b1c400a67cf75644e85722de29e5e748, type: 3}
 --- !u!4 &7096644722401261702 stripped

@@ -106,13 +106,9 @@ namespace TRPG.Runtime
 
         /// <summary>
         /// 현재 좌표에서 실행 가능한 모든 플랫폼 행동을 추가합니다.
-        /// 현재 위치에서 실행 가능한 Walk, CalculateJumpPosition, Fall 행동의 도착점이 이웃 노드가 됩니다.
+        /// 현재 위치에서 실행 가능한 Walk, Jump, Fall 행동의 도착점이 이웃 노드가 됩니다.
         /// </summary>
-        private static void AddAvailableActions(
-            WorldMap worldMap,
-            Vector2Int currentCoordinate,
-            WorldPathMovementProfile movementProfile,
-            List<WorldPathAction> actions)
+        private static void AddAvailableActions(WorldMap worldMap, Vector2Int currentCoordinate, WorldPathMovementProfile movementProfile, List<WorldPathAction> actions)
         {
             AddWalkActions(worldMap, currentCoordinate, movementProfile, actions);
             AddJumpActions(worldMap, currentCoordinate, movementProfile, actions);
@@ -122,11 +118,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 현재 좌표에서 좌우로 걸을 수 있는 행동을 추가합니다.
         /// </summary>
-        private static void AddWalkActions(
-            WorldMap worldMap,
-            Vector2Int currentCoordinate,
-            WorldPathMovementProfile movementProfile,
-            List<WorldPathAction> actions)
+        private static void AddWalkActions(WorldMap worldMap, Vector2Int currentCoordinate, WorldPathMovementProfile movementProfile, List<WorldPathAction> actions)
         {
             foreach (Vector2Int direction in walkDirections)
             {
@@ -140,22 +132,14 @@ namespace TRPG.Runtime
                 int cost = 1;
 
                 // TODO : 코스트 선정에서 좀 신경을 써야할듯
-                actions.Add(new WorldPathAction(
-                    WorldPathActionType.Walk,
-                    currentCoordinate,
-                    targetCoordinate,
-                    cost));
+                actions.Add(new WorldPathAction(WorldPathActionType.Walk, currentCoordinate, targetCoordinate, cost));
             }
         }
 
         /// <summary>
         /// 현재 위치에서 같은 높이 또는 높은 발판으로 점프할 수 있는 행동을 추가합니다.
         /// </summary>
-        private static void AddJumpActions(
-            WorldMap worldMap,
-            Vector2Int startCoordinate,
-            WorldPathMovementProfile movementProfile,
-            List<WorldPathAction> actions)
+        private static void AddJumpActions(WorldMap worldMap, Vector2Int startCoordinate, WorldPathMovementProfile movementProfile, List<WorldPathAction> actions)
         {
             int maximumHorizontalDistance = movementProfile.MaximumJumpHorizontalDistance;
             int maximumVerticalDistance = movementProfile.MaximumJumpHeight;
@@ -176,10 +160,10 @@ namespace TRPG.Runtime
                         continue;
                     }
 
-                    if (IsJumpTrajectoryClear(worldMap, startCoordinate, targetCoordinate, movementProfile.BodyHeight) == false)
-                    {
-                        continue;
-                    }
+                    //if (IsJumpTrajectoryClear(worldMap, startCoordinate, targetCoordinate, movementProfile.BodyHeight) == false)
+                    //{
+                    //    continue;
+                    //}
 
                     int cost = Mathf.Abs(horizontalDistance) + verticalDistance + 2;
 
@@ -196,11 +180,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 현재 발판의 좌우 끝에서 아래 발판으로 낙하하는 행동을 추가합니다.
         /// </summary>
-        private static void AddFallActions(
-            WorldMap worldMap,
-            Vector2Int startCoordinate,
-            WorldPathMovementProfile movementProfile,
-            List<WorldPathAction> actions)
+        private static void AddFallActions(WorldMap worldMap, Vector2Int startCoordinate, WorldPathMovementProfile movementProfile, List<WorldPathAction> actions)
         {
             foreach (Vector2Int direction in fallDirections)
             {
@@ -218,43 +198,28 @@ namespace TRPG.Runtime
                     continue;
                 }
 
-                if (TryFindFallLanding(
-                    worldMap,
-                    fallEntryCoordinate,
-                    movementProfile,
-                    out Vector2Int landingCoordinate,
-                    out int fallDistance) == false)
+                if (TryFindFallLanding(worldMap, fallEntryCoordinate, movementProfile, out Vector2Int landingCoordinate, out int fallDistance) == false)
                 {
                     continue;
                 }
 
                 int cost = fallDistance + 2;
 
-                actions.Add(new WorldPathAction(
-                    WorldPathActionType.Fall,
-                    startCoordinate,
-                    landingCoordinate,
-                    cost));
+                actions.Add(new WorldPathAction(WorldPathActionType.Fall, startCoordinate, landingCoordinate, cost));
             }
         }
 
         /// <summary>
         /// 낙하 진입 좌표 아래에서 처음 만나는 유효한 착지점을 찾습니다.
         /// </summary>
-        private static bool TryFindFallLanding(
-            WorldMap worldMap,
-            Vector2Int fallEntryCoordinate,
-            WorldPathMovementProfile movementProfile,
-            out Vector2Int landingCoordinate,
-            out int fallDistance)
+        private static bool TryFindFallLanding(WorldMap worldMap, Vector2Int fallEntryCoordinate, WorldPathMovementProfile movementProfile, out Vector2Int landingCoordinate, out int fallDistance)
         {
             landingCoordinate = default;
             fallDistance = 0;
 
             for (int distance = 1; distance <= movementProfile.MaximumFallDistance; distance++)
             {
-                Vector2Int candidateCoordinate =
-                    fallEntryCoordinate + Vector2Int.down * distance;
+                Vector2Int candidateCoordinate = fallEntryCoordinate + Vector2Int.down * distance;
 
                 if (candidateCoordinate.y <= 0)
                 {
@@ -262,18 +227,12 @@ namespace TRPG.Runtime
                 }
 
                 // 몸체가 지형에 부딪혔다면 그 아래로 통과할 수 없습니다.
-                if (IsBodyAreaEmpty(
-                    worldMap,
-                    candidateCoordinate,
-                    movementProfile.BodyHeight) == false)
+                if (IsBodyAreaEmpty(worldMap, candidateCoordinate, movementProfile.BodyHeight) == false)
                 {
                     return false;
                 }
 
-                if (IsStandable(
-                    worldMap,
-                    candidateCoordinate,
-                    movementProfile.BodyHeight) == false)
+                if (IsStandable(worldMap, candidateCoordinate, movementProfile.BodyHeight) == false)
                 {
                     continue;
                 }
@@ -290,11 +249,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 점프 곡선 전체에서 크리처 몸체가 지형과 충돌하지 않는지 확인합니다.
         /// </summary>
-        private static bool IsJumpTrajectoryClear(
-            WorldMap worldMap,
-            Vector2Int startCoordinate,
-            Vector2Int targetCoordinate,
-            int bodyHeight)
+        private static bool IsJumpTrajectoryClear(WorldMap worldMap, Vector2Int startCoordinate, Vector2Int targetCoordinate, int bodyHeight)
         {
             float middleHeight = (startCoordinate.y + targetCoordinate.y) * 0.5f;
             float apexHeight = Mathf.Max(startCoordinate.y, targetCoordinate.y) + 1f;
@@ -338,11 +293,7 @@ namespace TRPG.Runtime
         /// 요청 좌표와 같은 열에서 가장 가까운 한 칸짜리 캐릭터 이동 좌표를 찾습니다.
         /// 같은 거리에서는 위쪽 좌표를 우선합니다.
         /// </summary>
-        public static bool TryFindNearestStandableCoordinate(
-            WorldMap worldMap,
-            Vector2Int requestedCoordinate,
-            int maximumVerticalSearchDistance,
-            out Vector2Int standableCoordinate)
+        public static bool TryFindNearestStandableCoordinate(WorldMap worldMap, Vector2Int requestedCoordinate, int maximumVerticalSearchDistance, out Vector2Int standableCoordinate)
         {
             standableCoordinate = default;
 
@@ -360,6 +311,7 @@ namespace TRPG.Runtime
             for (int distance = 1; distance <= maximumVerticalSearchDistance; distance++)
             {
                 Vector2Int upperCoordinate = requestedCoordinate + Vector2Int.up * distance;
+
                 if (IsStandable(worldMap, upperCoordinate) == true)
                 {
                     standableCoordinate = upperCoordinate;
@@ -367,6 +319,7 @@ namespace TRPG.Runtime
                 }
 
                 Vector2Int lowerCoordinate = requestedCoordinate + Vector2Int.down * distance;
+
                 if (IsStandable(worldMap, lowerCoordinate) == true)
                 {
                     standableCoordinate = lowerCoordinate;
