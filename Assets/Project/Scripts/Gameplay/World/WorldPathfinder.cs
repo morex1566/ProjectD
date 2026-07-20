@@ -33,8 +33,7 @@ namespace TRPG.Runtime
             }
 
             // 시작과 목표에 크리처 몸체 전체가 들어갈 수 있어야 합니다.
-            if (IsStandable(worldMap, startCoordinate, movementProfile.BodyHeight) == false ||
-                IsStandable(worldMap, goalCoordinate, movementProfile.BodyHeight) == false)
+            if (IsStandable(worldMap, goalCoordinate, movementProfile.BodyHeight) == false)
             {
                 return false;
             }
@@ -75,7 +74,7 @@ namespace TRPG.Runtime
                 AddAvailableActions(worldMap, currentCoordinate, movementProfile, availableActions);
                 foreach (WorldPathAction action in availableActions)
                 {
-                    Vector2Int neighborCoordinate = action.To;
+                    Vector2Int neighborCoordinate = WorldManager.WorldToTileCoordinate(action.To);
 
                     if (closedCoordinates.Contains(neighborCoordinate) == true)
                     {
@@ -132,7 +131,9 @@ namespace TRPG.Runtime
                 int cost = 1;
 
                 // TODO : 코스트 선정에서 좀 신경을 써야할듯
-                actions.Add(new WorldPathAction(WorldPathActionType.Walk, currentCoordinate, targetCoordinate, cost));
+                Vector2 fromWorldPosition = WorldManager.TileToWorldPosition(currentCoordinate);
+                Vector2 targetWorldPosition = WorldManager.TileToWorldPosition(targetCoordinate);
+                actions.Add(new WorldPathAction(WorldPathActionType.Walk, fromWorldPosition, targetWorldPosition, cost));
             }
         }
 
@@ -168,11 +169,9 @@ namespace TRPG.Runtime
                     int cost = Mathf.Abs(horizontalDistance) + verticalDistance + 2;
 
                     // TODO : 코스트 선정에서 좀 신경을 써야할듯
-                    actions.Add(new WorldPathAction(
-                        WorldPathActionType.Jump,
-                        startCoordinate,
-                        targetCoordinate,
-                        cost));
+                    Vector2 fromWorldPosition = WorldManager.TileToWorldPosition(startCoordinate);
+                    Vector2 targetWorldPosition = WorldManager.TileToWorldPosition(targetCoordinate);
+                    actions.Add(new WorldPathAction(WorldPathActionType.Jump, fromWorldPosition, targetWorldPosition, cost));
                 }
             }
         }
@@ -205,7 +204,9 @@ namespace TRPG.Runtime
 
                 int cost = fallDistance + 2;
 
-                actions.Add(new WorldPathAction(WorldPathActionType.Fall, startCoordinate, landingCoordinate, cost));
+                Vector2 fromWorldPosition = WorldManager.TileToWorldPosition(startCoordinate);
+                Vector2 landingWorldPosition = WorldManager.TileToWorldPosition(landingCoordinate);
+                actions.Add(new WorldPathAction(WorldPathActionType.Fall, fromWorldPosition, landingWorldPosition, cost));
             }
         }
 

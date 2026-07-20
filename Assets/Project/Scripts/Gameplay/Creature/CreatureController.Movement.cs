@@ -29,12 +29,11 @@ namespace TRPG.Runtime
         /// <summary>
         /// 지정된 점프 진행률에 해당하는 위치로 이동하고 완료 여부를 반환합니다.
         /// </summary>
-        public bool Jump(Vector2Int startCoordinate, Vector2Int targetCoordinate, float ratio)
+        public bool Jump(Vector2 startWorldPosition, Vector2 targetWorldPosition, float ratio)
         {
-            Vector2 jumpTilePosition = CalculateJumpPosition(startCoordinate, targetCoordinate, ratio);
-            Vector2 jumpWorldPosition = WorldManager.TileToWorldPosition(jumpTilePosition);
+            Vector2 jumpWorldPosition = CalculateJumpPosition(startWorldPosition, targetWorldPosition, ratio);
 
-            transform.position = jumpWorldPosition;
+            transform.position = new Vector3(jumpWorldPosition.x, jumpWorldPosition.y, transform.position.z);
 
             return ratio >= 1f;
         }
@@ -45,16 +44,17 @@ namespace TRPG.Runtime
         public bool Walk(WorldPathAction action)
         {
             Vector3 currentWorldPosition = transform.position;
-            Vector3 targetWorldPosition = WorldManager.TileToWorldPosition(action.To);
+            Vector3 targetWorldPosition = new Vector3(action.To.x, action.To.y, currentWorldPosition.z);
 
             // MoveSpeed는 초당 타일 수로 사용합니다.
-            float movementDistance = context.MoveSpeed * Time.deltaTime;
+            float tileWorldSize = WorldManager.Settings.WorldGenerationSettingsData.TileWorldSize;
+            float movementDistance = context.MoveSpeed * tileWorldSize * Time.deltaTime;
 
             // 이동
-            Vector3 nextWorldPosition = Vector3.MoveTowards(currentWorldPosition, targetWorldPosition, movementDistance);
-            transform.position = nextWorldPosition;
+            float nextWorldPositionX = Mathf.MoveTowards(currentWorldPosition.x, targetWorldPosition.x, movementDistance);
+            transform.position = new Vector3(nextWorldPositionX, currentWorldPosition.y, currentWorldPosition.z);
 
-            if (Vector2.Distance(transform.position, targetWorldPosition) > 0.001f)
+            if (Mathf.Abs(transform.position.x - targetWorldPosition.x) > 0.001f)
             {
                 return false;
             }
@@ -69,27 +69,25 @@ namespace TRPG.Runtime
         /// </summary>
         public bool Fall(WorldPathAction action, float ratio)
         {
-            Vector2 fallTilePosition = CalculateFallPosition(action, ratio);
-            Vector2 fallWorldPosition = WorldManager.TileToWorldPosition(fallTilePosition);
-
+            Vector2 fallWorldPosition = CalculateFallPosition(action, ratio);
             transform.position = new Vector3(fallWorldPosition.x, fallWorldPosition.y, transform.position.z);
 
             return ratio >= 1f;
         }
 
         /// <summary>
-        /// 출발 타일과 도착 타일을 연결하는 점프 곡선의 위치를 계산합니다.
+        /// 출발 월드 위치와 도착 월드 위치를 연결하는 점프 곡선의 위치를 계산합니다.
         /// </summary>
-        public static Vector2 CalculateJumpPosition(Vector2Int startCoordinate, Vector2Int targetCoordinate, float ratio)
+        public static Vector2 CalculateJumpPosition(Vector2 startWorldPosition, Vector2 targetWorldPosition, float ratio)
         {
             ratio = Mathf.Clamp01(ratio);
 
-            float middleHeight = (startCoordinate.y + targetCoordinate.y) * 0.5f;
-            float apexHeight = Mathf.Max(startCoordinate.y, targetCoordinate.y) + 1f;
+            float middleHeight = (startWorldPosition.y + targetWorldPosition.y) * 0.5f;
+            float apexHeight = Mathf.Max(startWorldPosition.y, targetWorldPosition.y) + WorldManager.Settings.WorldGenerationSettingsData.TileWorldSize;
             float arcHeight = apexHeight - middleHeight;
 
-            float horizontalPosition = Mathf.Lerp(startCoordinate.x, targetCoordinate.x, ratio);
-            float linearVerticalPosition = Mathf.Lerp(startCoordinate.y, targetCoordinate.y, ratio);
+            float horizontalPosition = Mathf.Lerp(startWorldPosition.x, targetWorldPosition.x, ratio);
+            float linearVerticalPosition = Mathf.Lerp(startWorldPosition.y, targetWorldPosition.y, ratio);
             float arcOffset = 4f * arcHeight * ratio * (1f - ratio);
             float verticalPosition = linearVerticalPosition + arcOffset;
 
@@ -103,31 +101,31 @@ namespace TRPG.Runtime
         {
             ratio = Mathf.Clamp01(ratio);
 
-            Vector2 startCoordinate = action.From;
-            Vector2 entryCoordinate = GetFallEntryCoordinate(action);
-            Vector2 targetCoordinate = action.To;
+            Vector2 startWorldPosition = action.From;
+            Vector2 entryWorldPosition = GetFallEntryPosition(action);
+            Vector2 targetWorldPosition = action.To;
 
-            float entryDistance = Vector2.Distance(startCoordinate, entryCoordinate);
-            float fallDistance = Vector2.Distance(entryCoordinate, targetCoordinate);
+            float entryDistance = Vector2.Distance(startWorldPosition, entryWorldPosition);
+            float fallDistance = Vector2.Distance(entryWorldPosition, targetWorldPosition);
             float totalDistance = entryDistance + fallDistance;
             float currentDistance = totalDistance * ratio;
 
             if (currentDistance <= entryDistance)
             {
                 float entryRatio = entryDistance > 0f ? currentDistance / entryDistance : 1f;
-                return Vector2.Lerp(startCoordinate, entryCoordinate, entryRatio);
+                return Vector2.Lerp(startWorldPosition, entryWorldPosition, entryRatio);
             }
 
             float fallRatio = fallDistance > 0f ? (currentDistance - entryDistance) / fallDistance : 1f;
-            return Vector2.Lerp(entryCoordinate, targetCoordinate, fallRatio);
+            return Vector2.Lerp(entryWorldPosition, targetWorldPosition, fallRatio);
         }
 
         /// <summary>
-        /// 낙하 행동에서 발판 밖으로 한 칸 이동한 진입 좌표를 반환합니다.
+        /// 낙하 행동에서 발판 밖으로 이동한 진입 월드 위치를 반환합니다.
         /// </summary>
-        public static Vector2Int GetFallEntryCoordinate(WorldPathAction action)
+        public static Vector2 GetFallEntryPosition(WorldPathAction action)
         {
-            return new Vector2Int(action.To.x, action.From.y);
+            return new Vector2(action.To.x, action.From.y);
         }
     }
 }

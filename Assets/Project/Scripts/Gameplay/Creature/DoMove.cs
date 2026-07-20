@@ -90,8 +90,10 @@ namespace TRPG.Runtime
 
         private NodeResult ExecuteJump(CreatureMoveJob moveJob, WorldPathAction action)
         {
-            float actionDistance = Mathf.Max(Vector2.Distance(action.From, action.To), 1f);
-            float progressDelta = controller.Context.MoveSpeed * Time.deltaTime / actionDistance;
+            float tileWorldSize = WorldManager.Settings.WorldGenerationSettingsData.TileWorldSize;
+            float actionDistance = Mathf.Max(Vector2.Distance(action.From, action.To), tileWorldSize);
+            float movementSpeed = controller.Context.MoveSpeed * tileWorldSize;
+            float progressDelta = movementSpeed * Time.deltaTime / actionDistance;
 
             moveJob.AdvanceActionProgress(progressDelta);
 
@@ -107,10 +109,12 @@ namespace TRPG.Runtime
 
         private NodeResult ExecuteFall(CreatureMoveJob moveJob, WorldPathAction action)
         {
-            Vector2Int entryCoordinate = CreatureController.GetFallEntryCoordinate(action);
+            Vector2 entryWorldPosition = CreatureController.GetFallEntryPosition(action);
 
-            float actionDistance = Vector2.Distance(action.From, entryCoordinate) + Vector2.Distance(entryCoordinate, action.To);
-            float progressDelta = controller.Context.MoveSpeed * Time.deltaTime / Mathf.Max(actionDistance, 1f);
+            float tileWorldSize = WorldManager.Settings.WorldGenerationSettingsData.TileWorldSize;
+            float actionDistance = Vector2.Distance(action.From, entryWorldPosition) + Vector2.Distance(entryWorldPosition, action.To);
+            float movementSpeed = controller.Context.MoveSpeed * tileWorldSize;
+            float progressDelta = movementSpeed * Time.deltaTime / Mathf.Max(actionDistance, tileWorldSize);
 
             moveJob.AdvanceActionProgress(progressDelta);
 
@@ -163,8 +167,8 @@ namespace TRPG.Runtime
         /// </summary>
         private static void DrawPathActionGizmo(WorldPathAction action, float worldRadius)
         {
-            Vector3 fromWorldPosition = WorldManager.TileToWorldPosition(action.From);
-            Vector3 targetWorldPosition = WorldManager.TileToWorldPosition(action.To);
+            Vector3 fromWorldPosition = action.From;
+            Vector3 targetWorldPosition = action.To;
 
             Gizmos.DrawWireSphere(fromWorldPosition, worldRadius);
 
@@ -175,8 +179,7 @@ namespace TRPG.Runtime
                     break;
 
                 case WorldPathActionType.Fall:
-                    Vector2Int fallEntryCoordinate = CreatureController.GetFallEntryCoordinate(action);
-                    Vector3 entryWorldPosition = WorldManager.TileToWorldPosition(fallEntryCoordinate);
+                    Vector3 entryWorldPosition = CreatureController.GetFallEntryPosition(action);
                     Gizmos.DrawLine(fromWorldPosition, entryWorldPosition);
                     Gizmos.DrawLine(entryWorldPosition, targetWorldPosition);
                     break;
@@ -196,13 +199,12 @@ namespace TRPG.Runtime
         private static void DrawJumpGizmo(WorldPathAction action)
         {
             const int SegmentCount = 12;
-            Vector3 previousWorldPosition = WorldManager.TileToWorldPosition(action.From);
+            Vector3 previousWorldPosition = action.From;
 
             for (int i = 1; i <= SegmentCount; i++)
             {
                 float ratio = i / (float)SegmentCount;
-                Vector2 jumpTilePosition = CreatureController.CalculateJumpPosition(action.From, action.To, ratio);
-                Vector3 jumpWorldPosition = WorldManager.TileToWorldPosition(jumpTilePosition);
+                Vector3 jumpWorldPosition = CreatureController.CalculateJumpPosition(action.From, action.To, ratio);
                 Gizmos.DrawLine(previousWorldPosition, jumpWorldPosition);
                 previousWorldPosition = jumpWorldPosition;
             }

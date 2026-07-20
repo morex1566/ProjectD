@@ -27,7 +27,7 @@ namespace TRPG.Runtime
         public static IReadOnlyDictionary<int, CreatureController> Creatures => GetInstance().creatures;
 
 
-        public void Start()
+        private void Start()
         {
             worldCameraController = null;
 
@@ -38,6 +38,31 @@ namespace TRPG.Runtime
                 worldMapInstance = RenderWorld(Settings.WorldGenerationSettingsData, worldMap);
                 worldMapInstance.transform.SetParent(worldRoot.transform, false);
             }
+        }
+
+        private void Update()
+        {
+            
+        }
+
+        /// <summary>
+        /// 월드 런타임 오브젝트와 캐시를 정리합니다.
+        /// </summary>
+        protected override void OnDestroy()
+        {
+            if (worldRoot != null)
+            {
+                UnityEngine.Object.Destroy(worldRoot);
+            }
+
+            worldRoot = null;
+            worldCameraController = null;
+            worldMap = null;
+            worldMapInstance = null;
+            creatures.Clear();
+            Settings = null;
+
+            base.OnDestroy();
         }
 
         /// <summary>
@@ -56,7 +81,7 @@ namespace TRPG.Runtime
         public static GameObject RenderWorld(WorldGenerationSettingsData settings, WorldMap map)
         {
             GameObject worldMapInstance = new GameObject("WorldMap");
-            foreach (WorldChunk chunk in map.Chunks.Values)
+            foreach (WorldChunk chunk in map.Chunks)
             {
                 CreateChunkInstance(worldMapInstance, settings, chunk);
             }
@@ -98,26 +123,6 @@ namespace TRPG.Runtime
 
             WorldChunkRenderer chunkRenderer = chunkInstance.AddComponent<WorldChunkRenderer>();
             chunkRenderer.Render(chunk, settings);
-        }
-
-        /// <summary>
-        /// 월드 런타임 오브젝트와 캐시를 정리합니다.
-        /// </summary>
-        protected override void OnDestroy()
-        {
-            if (worldRoot != null)
-            {
-                UnityEngine.Object.Destroy(worldRoot);
-            }
-
-            worldRoot = null;
-            worldCameraController = null;
-            worldMap = null;
-            worldMapInstance = null;
-            creatures.Clear();
-            Settings = null;
-
-            base.OnDestroy();
         }
 
         /// <summary>

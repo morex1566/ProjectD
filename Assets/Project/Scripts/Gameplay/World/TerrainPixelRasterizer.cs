@@ -19,7 +19,7 @@ namespace TRPG.Runtime
         {
             int pixelsPerChunk = worldMap.TilesPerChunk * pixelsPerTile;
 
-            foreach (WorldChunk chunk in worldMap.Chunks.Values)
+            foreach (WorldChunk chunk in worldMap.Chunks)
             {
                 WorldChunkPixelData pixelData = new WorldChunkPixelData(chunk.Coordinate, pixelsPerChunk);
 

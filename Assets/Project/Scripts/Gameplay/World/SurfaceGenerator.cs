@@ -31,7 +31,7 @@ namespace TRPG.Runtime
                 return surfaceHeights;
             }
 
-            foreach (WorldChunk chunk in worldMap.Chunks.Values)
+            foreach (WorldChunk chunk in worldMap.Chunks)
             {
                 CarveChunk(chunk, surfaceHeights, worldMap.TilesPerChunk);
             }

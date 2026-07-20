@@ -53,11 +53,12 @@ namespace TRPG.Runtime
         /// </summary>
         private static WorldMap CreateChunks(Vector2Int chunkSize, int tilesPerChunk)
         {
-            WorldMap worldMap = new WorldMap(tilesPerChunk);
+            WorldMap worldMap = new WorldMap(chunkSize, tilesPerChunk);
 
-            for (int chunkX = 0; chunkX < chunkSize.x; chunkX++)
+            // 청크 배열을 아래에서 위로, 각 행은 왼쪽에서 오른쪽으로 채웁니다.
+            for (int chunkY = 0; chunkY < chunkSize.y; chunkY++)
             {
-                for (int chunkY = 0; chunkY < chunkSize.y; chunkY++)
+                for (int chunkX = 0; chunkX < chunkSize.x; chunkX++)
                 {
                     Vector2Int chunkCoordinate = new Vector2Int(chunkX, chunkY);
                     worldMap.AddChunk(new WorldChunk(chunkCoordinate, tilesPerChunk));

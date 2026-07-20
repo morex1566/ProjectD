@@ -22,7 +22,7 @@ namespace TRPG.Runtime
                 return;
             }
 
-            foreach (WorldChunk chunk in worldMap.Chunks.Values)
+            foreach (WorldChunk chunk in worldMap.Chunks)
             {
                 for (int localY = 0; localY < worldMap.TilesPerChunk; localY++)
                 {

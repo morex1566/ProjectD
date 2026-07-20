@@ -176,6 +176,12 @@ namespace TRPG.Runtime
                 return;
             }
 
+            if (path.Count > 0)
+            {
+                // 첫 행동은 셀 중심이 아니라 명령을 받은 순간의 실제 위치에서 시작합니다.
+                path[0] = path[0].WithFrom(controller.transform.position);
+            }
+
             hasPath = true;
         }
 

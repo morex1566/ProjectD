@@ -74,7 +74,7 @@ namespace TRPG.Runtime
         {
             List<(WorldChunk Chunk, Vector2Int Coordinate)> roughPixels = new();
 
-            foreach (WorldChunk chunk in worldMap.Chunks.Values)
+            foreach (WorldChunk chunk in worldMap.Chunks)
             {
                 int pixelSize = chunk.PixelData.Size;
 

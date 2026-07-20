@@ -24,7 +24,7 @@ namespace TRPG.Runtime
             List<List<Vector2Int>> caveRegions = new List<List<Vector2Int>>();
             HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
 
-            foreach (WorldChunk chunk in worldMap.Chunks.Values)
+            foreach (WorldChunk chunk in worldMap.Chunks)
             {
                 FindChunkCaveRegions(worldMap, chunk, visited, caveRegions);
             }

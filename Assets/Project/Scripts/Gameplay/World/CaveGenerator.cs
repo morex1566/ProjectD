@@ -34,7 +34,7 @@ namespace TRPG.Runtime
 
             FastNoiseLite caveNoise = CreateNoise(seed);
 
-            foreach (WorldChunk chunk in worldMap.Chunks.Values)
+            foreach (WorldChunk chunk in worldMap.Chunks)
             {
                 GenerateChunk(chunk, surfaceHeights, caveNoise, worldMap.TilesPerChunk);
             }
