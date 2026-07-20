@@ -62,7 +62,7 @@ namespace TRPG.Runtime
 
                 foreach (var roughPixel in roughPixels)
                 {
-                    roughPixel.Chunk.PixelData.SetPixel(roughPixel.Coordinate.x, roughPixel.Coordinate.y, WorldTileMaterialType.Empty);
+                    roughPixel.Chunk.SetPixel(roughPixel.Coordinate.x, roughPixel.Coordinate.y, WorldTileMaterialType.Empty);
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace TRPG.Runtime
 
             foreach (WorldChunk chunk in worldMap.Chunks)
             {
-                int pixelSize = chunk.PixelData.Size;
+                int pixelSize = chunk.PixelSize;
 
                 for (int y = 0; y < pixelSize; y++)
                 {
@@ -166,7 +166,7 @@ namespace TRPG.Runtime
         /// </summary>
         private static bool IsBoundaryPixel(WorldMap worldMap, WorldChunk chunk, int localPixelX, int localPixelY)
         {
-            WorldTileMaterialType currentType = chunk.PixelData.GetPixel(localPixelX, localPixelY);
+            WorldTileMaterialType currentType = chunk.GetPixel(localPixelX, localPixelY);
 
             if (currentType == WorldTileMaterialType.Empty)
             {
@@ -197,15 +197,13 @@ namespace TRPG.Runtime
         /// </summary>
         private static bool TryGetPixel(WorldMap worldMap, WorldChunk sourceChunk, int localPixelX, int localPixelY, out WorldTileMaterialType type)
         {
-            WorldChunkPixelData sourcePixelData = sourceChunk.PixelData;
-
-            if (sourcePixelData.IsInside(localPixelX, localPixelY))
+            if (sourceChunk.IsInsidePixel(localPixelX, localPixelY))
             {
-                type = sourcePixelData.GetPixel(localPixelX, localPixelY);
+                type = sourceChunk.GetPixel(localPixelX, localPixelY);
                 return true;
             }
 
-            int pixelsPerChunk = sourcePixelData.Size;
+            int pixelsPerChunk = sourceChunk.PixelSize;
             int worldPixelX = sourceChunk.Coordinate.x * pixelsPerChunk + localPixelX;
             int worldPixelY = sourceChunk.Coordinate.y * pixelsPerChunk + localPixelY;
 
@@ -225,16 +223,10 @@ namespace TRPG.Runtime
                 return false;
             }
 
-            if (targetChunk.PixelData == null)
-            {
-                type = WorldTileMaterialType.Empty;
-                return false;
-            }
-
             int targetLocalPixelX = worldPixelX % pixelsPerChunk;
             int targetLocalPixelY = worldPixelY % pixelsPerChunk;
 
-            type = targetChunk.PixelData.GetPixel(targetLocalPixelX, targetLocalPixelY);
+            type = targetChunk.GetPixel(targetLocalPixelX, targetLocalPixelY);
             return true;
         }
     }

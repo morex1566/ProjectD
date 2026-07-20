@@ -17,32 +17,26 @@ namespace TRPG.Runtime
         /// </summary>
         public void Generate(WorldMap worldMap, int pixelsPerTile)
         {
-            int pixelsPerChunk = worldMap.TilesPerChunk * pixelsPerTile;
-
             foreach (WorldChunk chunk in worldMap.Chunks)
             {
-                WorldChunkPixelData pixelData = new WorldChunkPixelData(chunk.Coordinate, pixelsPerChunk);
-
                 if (isEnabled == true)
                 {
-                    RasterizeTiles(chunk, pixelData, worldMap.TilesPerChunk, pixelsPerTile);
+                    RasterizeTiles(chunk, worldMap.TilesPerChunk, pixelsPerTile);
                 }
-
-                chunk.SetPixelData(pixelData);
             }
         }
 
         /// <summary>
         /// 청크의 각 타일을 픽셀 영역으로 확대합니다.
         /// </summary>
-        private static void RasterizeTiles(WorldChunk chunk, WorldChunkPixelData pixelData, int tilesPerChunk, int pixelsPerTile)
+        private static void RasterizeTiles(WorldChunk chunk, int tilesPerChunk, int pixelsPerTile)
         {
             for (int tileY = 0; tileY < tilesPerChunk; tileY++)
             {
                 for (int tileX = 0; tileX < tilesPerChunk; tileX++)
                 {
                     WorldTile tile = chunk.GetTile(tileX, tileY);
-                    FillTilePixels(pixelData, tileX, tileY, pixelsPerTile, tile.MaterialType);
+                    FillTilePixels(chunk, tileX, tileY, pixelsPerTile, tile.MaterialType);
                 }
             }
         }
@@ -50,7 +44,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 타일 하나에 해당하는 모든 픽셀을 같은 지형 종류로 채웁니다.
         /// </summary>
-        private static void FillTilePixels(WorldChunkPixelData pixelData, int tileX, int tileY, int pixelsPerTile, WorldTileMaterialType type)
+        private static void FillTilePixels(WorldChunk chunk, int tileX, int tileY, int pixelsPerTile, WorldTileMaterialType type)
         {
             int pixelOriginX = tileX * pixelsPerTile;
             int pixelOriginY = tileY * pixelsPerTile;
@@ -62,7 +56,7 @@ namespace TRPG.Runtime
                     int localPixelX = pixelOriginX + pixelX;
                     int localPixelY = pixelOriginY + pixelY;
 
-                    pixelData.SetPixel(localPixelX, localPixelY, type);
+                    chunk.SetPixel(localPixelX, localPixelY, type);
                 }
             }
         }

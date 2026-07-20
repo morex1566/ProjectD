@@ -66,7 +66,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void Refresh()
         {
-            int textureSize = chunk.PixelData.Size;
+            int textureSize = chunk.PixelSize;
             Refresh(new RectInt(0, 0, textureSize, textureSize));
         }
 
@@ -75,7 +75,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void Refresh(RectInt dirtyRect)
         {
-            Color32[] pixels = CreatePixelData(chunk.PixelData, settings, dirtyRect);
+            Color32[] pixels = CreatePixelData(chunk, settings, dirtyRect);
 
             texture.SetPixels32(
                 dirtyRect.x,
@@ -113,7 +113,7 @@ namespace TRPG.Runtime
         /// </summary>
         private void CreateRenderResources()
         {
-            int textureSize = chunk.PixelData.Size;
+            int textureSize = chunk.PixelSize;
 
             texture = new Texture2D(textureSize, textureSize, TextureFormat.RGBA32, false);
             {
@@ -142,7 +142,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 청크의 지정한 픽셀 영역을 렌더링용 색상 데이터로 변환합니다.
         /// </summary>
-        private static Color32[] CreatePixelData(WorldChunkPixelData pixelData, WorldGenerationSettingsData settings, RectInt pixelRect)
+        private static Color32[] CreatePixelData(WorldChunk chunk, WorldGenerationSettingsData settings, RectInt pixelRect)
         {
             Color32[] pixels = new Color32[pixelRect.width * pixelRect.height];
 
@@ -153,7 +153,7 @@ namespace TRPG.Runtime
                     int localPixelX = pixelRect.x + x;
                     int localPixelY = pixelRect.y + y;
                     int pixelIndex = x + y * pixelRect.width;
-                    WorldTileMaterialType pixelType = pixelData.GetPixel(localPixelX, localPixelY);
+                    WorldTileMaterialType pixelType = chunk.GetPixel(localPixelX, localPixelY);
 
                     pixels[pixelIndex] = GetTileColor(pixelType, settings);
                 }

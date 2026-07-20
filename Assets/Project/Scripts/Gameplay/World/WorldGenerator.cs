@@ -34,7 +34,7 @@ namespace TRPG.Runtime
         /// </summary>
         public WorldMap Generate(WorldGenerationSettingsData settings)
         {
-            WorldMap worldMap = CreateChunks(settings.ChunkSize, settings.TilesPerChunk);
+            WorldMap worldMap = CreateChunks(settings.ChunkSize, settings.TilesPerChunk, settings.PixelsPerTile);
             int worldWidth = settings.ChunkSize.x * settings.TilesPerChunk;
 
             // CAUTION : 순서 중요합니다...
@@ -51,9 +51,10 @@ namespace TRPG.Runtime
         /// <summary>
         /// 지정한 크기만큼 빈 월드 청크를 생성합니다.
         /// </summary>
-        private static WorldMap CreateChunks(Vector2Int chunkSize, int tilesPerChunk)
+        private static WorldMap CreateChunks(Vector2Int chunkSize, int tilesPerChunk, int pixelsPerTile)
         {
             WorldMap worldMap = new WorldMap(chunkSize, tilesPerChunk);
+            int pixelsPerChunk = tilesPerChunk * pixelsPerTile;
 
             // 청크 배열을 아래에서 위로, 각 행은 왼쪽에서 오른쪽으로 채웁니다.
             for (int chunkY = 0; chunkY < chunkSize.y; chunkY++)
@@ -61,7 +62,7 @@ namespace TRPG.Runtime
                 for (int chunkX = 0; chunkX < chunkSize.x; chunkX++)
                 {
                     Vector2Int chunkCoordinate = new Vector2Int(chunkX, chunkY);
-                    worldMap.AddChunk(new WorldChunk(chunkCoordinate, tilesPerChunk));
+                    worldMap.AddChunk(new WorldChunk(chunkCoordinate, tilesPerChunk, pixelsPerChunk));
                 }
             }
 

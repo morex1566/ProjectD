@@ -974,10 +974,10 @@ MonoBehaviour:
     terrainPostProcessor:
       isEnabled: 1
       edgeRoughnessDepth: 1
-      convexCornerDepth: 4
+      convexCornerDepth: 2
       edgeNoiseFrequency: 0.12
       edgeNoiseThreshold: 0.024
-      convexCornerNoiseThreshold: -0.05
+      convexCornerNoiseThreshold: -1
   worldMapInstance: {fileID: 0}
   settings: {fileID: 11400000, guid: fa20057a19ec0714381a074dcabd23bc, type: 2}
 --- !u!4 &580407105
