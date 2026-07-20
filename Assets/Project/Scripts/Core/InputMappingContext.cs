@@ -176,7 +176,7 @@ namespace TRPG.Runtime
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Jump"",
+                    ""name"": ""CalculateJumpPosition"",
                     ""type"": ""Button"",
                     ""id"": ""f1ba0d36-48eb-4cd5-b651-1c94a6531f70"",
                     ""expectedControlType"": """",
@@ -605,7 +605,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Jump"",
+                    ""action"": ""CalculateJumpPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -616,7 +616,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Jump"",
+                    ""action"": ""CalculateJumpPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -627,7 +627,7 @@ namespace TRPG.Runtime
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""Jump"",
+                    ""action"": ""CalculateJumpPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1371,7 +1371,7 @@ namespace TRPG.Runtime
             m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
             m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
             m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
-            m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+            m_Player_Jump = m_Player.FindAction("CalculateJumpPosition", throwIfNotFound: true);
             m_Player_Previous = m_Player.FindAction("Previous", throwIfNotFound: true);
             m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
             m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
@@ -1534,7 +1534,7 @@ namespace TRPG.Runtime
             /// </summary>
             public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
             /// <summary>
-            /// Provides access to the underlying input action "Player/Jump".
+            /// Provides access to the underlying input action "Player/CalculateJumpPosition".
             /// </summary>
             public InputAction @Jump => m_Wrapper.m_Player_Jump;
             /// <summary>
@@ -2135,7 +2135,7 @@ namespace TRPG.Runtime
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnCrouch(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "CalculateJumpPosition" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />

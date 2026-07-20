@@ -128,10 +128,7 @@ namespace TRPG.Runtime
 
             GameObject selectionUI = new GameObject("selection_tile");
             selectionUI.transform.SetParent(transform, false);
-            selectionUI.transform.position = new Vector3(
-                (coordinate.x + 0.5f) * settings.TileWorldSize,
-                (coordinate.y + 0.5f) * settings.TileWorldSize,
-                0f);
+            selectionUI.transform.position = WorldManager.TileToWorldPosition(coordinate);
 
             SpriteRenderer selectionRenderer = selectionUI.AddComponent<SpriteRenderer>();
             selectionRenderer.sprite = selectedTileSprite;
@@ -180,8 +177,8 @@ namespace TRPG.Runtime
             }
 
             Rect selectionRect = ScreenEx.CreateScreenRect(startScreenPosition, endScreenPosition);
-            Vector2Int startCoordinate = WorldToTileCoordinate(startWorldPosition, settings.TileWorldSize);
-            Vector2Int endCoordinate = WorldToTileCoordinate(endWorldPosition, settings.TileWorldSize);
+            Vector2Int startCoordinate = WorldManager.WorldToTileCoordinate(startWorldPosition);
+            Vector2Int endCoordinate = WorldManager.WorldToTileCoordinate(endWorldPosition);
             Vector2Int minimum = Vector2Int.Min(startCoordinate, endCoordinate);
             Vector2Int maximum = Vector2Int.Max(startCoordinate, endCoordinate);
             Vector2Int worldMaximum = settings.ChunkSize * settings.TilesPerChunk - Vector2Int.one;
@@ -205,10 +202,7 @@ namespace TRPG.Runtime
                         continue;
                     }
 
-                    Vector3 tileCenterWorldPosition = new Vector3(
-                        (coordinate.x + 0.5f) * settings.TileWorldSize,
-                        (coordinate.y + 0.5f) * settings.TileWorldSize,
-                        0f);
+                    Vector3 tileCenterWorldPosition = WorldManager.TileToWorldPosition(coordinate);
                     Vector2 tileCenterScreenPosition = cam.WorldToScreenPoint(tileCenterWorldPosition);
 
                     if (selectionRect.Contains(tileCenterScreenPosition) == true)
@@ -239,7 +233,7 @@ namespace TRPG.Runtime
                 return false;
             }
 
-            tileCoordinate = WorldToTileCoordinate(pointerWorldPosition, settings.TileWorldSize);
+            tileCoordinate = WorldManager.WorldToTileCoordinate(pointerWorldPosition);
             return TryGetSelectableTile(worldMap, tileCoordinate, out _);
         }
 
@@ -258,14 +252,5 @@ namespace TRPG.Runtime
             return worldMap.TryGetTile(coordinate, out tile) == true && tile.IsEmpty == false;
         }
 
-        /// <summary>
-        /// 월드 위치를 현재 월드의 전역 타일 좌표로 변환합니다.
-        /// </summary>
-        private static Vector2Int WorldToTileCoordinate(Vector2 worldPosition, float tileWorldSize)
-        {
-            return new Vector2Int(
-                Mathf.FloorToInt(worldPosition.x / tileWorldSize),
-                Mathf.FloorToInt(worldPosition.y / tileWorldSize));
-        }
     }
 }

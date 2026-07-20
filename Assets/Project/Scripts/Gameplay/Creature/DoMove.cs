@@ -10,6 +10,11 @@ namespace TRPG.Runtime
     {
         [SerializeField, ReadOnly] private CreatureController controller = null;
 
+        [Header("Debug")]
+        [SerializeField] private bool drawPathGizmos = true;
+
+        [SerializeField, Min(0.01f)] private float pathGizmoRadius = 0.12f;
+
         private void OnValidate()
         {
             CacheComponents();
@@ -34,6 +39,7 @@ namespace TRPG.Runtime
 
             if (job.hasPath == false)
             {
+                job.Complete();
                 return NodeResult.failure;
             }
 
@@ -60,30 +66,57 @@ namespace TRPG.Runtime
                     return ExecuteWalk(moveJob, action);
 
                 case WorldPathActionType.Jump:
+                    return ExecuteJump(moveJob, action);
+
                 case WorldPathActionType.Fall:
+                    return ExecuteFall(moveJob, action);
+
+                // 아직 구현되지 않은 행동이 경로에 포함되면 Job을 실패 종료합니다.
                 default:
-                    // 아직 구현되지 않은 행동이 경로에 포함되면 Job을 실패 종료합니다.
                     moveJob.Complete();
                     return NodeResult.failure;
             }
         }
 
-        /// <summary>
-        /// 현재 위치에서 Walk 행동의 도착 셀까지 Creature를 이동시킵니다.
-        /// </summary>
         private NodeResult ExecuteWalk(CreatureMoveJob moveJob, WorldPathAction action)
         {
-            Vector3 currentWorldPosition = controller.transform.position;
-            Vector3 targetWorldPosition = WorldManager.TileToWorldPosition(action.To);
+            if (controller.Walk(action) == true)
+            {
+                moveJob.Advance();
+            }
 
-            // MoveSpeed는 초당 타일 수로 사용합니다.
-            float movementDistance = controller.Context.MoveSpeed * WorldManager.Settings.WorldGenerationSettingsData.TileWorldSize * Time.deltaTime;
+            return NodeResult.running;
+        }
 
-            // 이동
-            Vector3 nextWorldPosition = Vector3.MoveTowards(currentWorldPosition, targetWorldPosition, movementDistance);
-            controller.transform.position = nextWorldPosition;
+        private NodeResult ExecuteJump(CreatureMoveJob moveJob, WorldPathAction action)
+        {
+            float actionDistance = Mathf.Max(Vector2.Distance(action.From, action.To), 1f);
+            float progressDelta = controller.Context.MoveSpeed * Time.deltaTime / actionDistance;
 
-            if (Vector2.Distance(controller.transform.position, targetWorldPosition) < 0.001f)
+            moveJob.AdvanceActionProgress(progressDelta);
+
+            float actionProgress = moveJob.GetActionProgress();
+
+            if (controller.Jump(action.From, action.To, actionProgress) == true)
+            {
+                moveJob.Advance();
+            }
+
+            return NodeResult.running;
+        }
+
+        private NodeResult ExecuteFall(CreatureMoveJob moveJob, WorldPathAction action)
+        {
+            Vector2Int entryCoordinate = CreatureController.GetFallEntryCoordinate(action);
+
+            float actionDistance = Vector2.Distance(action.From, entryCoordinate) + Vector2.Distance(entryCoordinate, action.To);
+            float progressDelta = controller.Context.MoveSpeed * Time.deltaTime / Mathf.Max(actionDistance, 1f);
+
+            moveJob.AdvanceActionProgress(progressDelta);
+
+            float actionProgress = moveJob.GetActionProgress();
+
+            if (controller.Fall(action, actionProgress) == true)
             {
                 moveJob.Advance();
             }
@@ -94,6 +127,108 @@ namespace TRPG.Runtime
         private void CacheComponents()
         {
             controller = GetComponentInParent<CreatureController>();
+        }
+
+        /// <summary>
+        /// 현재 MoveJob의 완료, 실행 중, 예정 경로를 Scene 뷰에 표시합니다.
+        /// </summary>
+        private void OnDrawGizmos()
+        {
+            if (drawPathGizmos == false || WorldManager.Settings?.WorldGenerationSettingsData == null)
+            {
+                return;
+            }
+
+            CreatureController targetController = controller != null ? controller : GetComponentInParent<CreatureController>();
+            if (targetController == null || targetController.JobQueue.TryPeek(out CreatureMoveJob moveJob) == false || moveJob.hasPath == false)
+            {
+                return;
+            }
+
+            Color previousColor = Gizmos.color;
+            float worldRadius = pathGizmoRadius * WorldManager.Settings.WorldGenerationSettingsData.TileWorldSize;
+
+            for (int i = 0; i < moveJob.Path.Count; i++)
+            {
+                WorldPathAction action = moveJob.Path[i];
+                Gizmos.color = GetPathGizmoColor(action.Type, i, moveJob.PathIndex);
+                DrawPathActionGizmo(action, worldRadius);
+            }
+
+            Gizmos.color = previousColor;
+        }
+
+        /// <summary>
+        /// 행동 종류에 맞는 경로 모양을 표시합니다.
+        /// </summary>
+        private static void DrawPathActionGizmo(WorldPathAction action, float worldRadius)
+        {
+            Vector3 fromWorldPosition = WorldManager.TileToWorldPosition(action.From);
+            Vector3 targetWorldPosition = WorldManager.TileToWorldPosition(action.To);
+
+            Gizmos.DrawWireSphere(fromWorldPosition, worldRadius);
+
+            switch (action.Type)
+            {
+                case WorldPathActionType.Jump:
+                    DrawJumpGizmo(action);
+                    break;
+
+                case WorldPathActionType.Fall:
+                    Vector2Int fallEntryCoordinate = CreatureController.GetFallEntryCoordinate(action);
+                    Vector3 entryWorldPosition = WorldManager.TileToWorldPosition(fallEntryCoordinate);
+                    Gizmos.DrawLine(fromWorldPosition, entryWorldPosition);
+                    Gizmos.DrawLine(entryWorldPosition, targetWorldPosition);
+                    break;
+
+                case WorldPathActionType.Walk:
+                default:
+                    Gizmos.DrawLine(fromWorldPosition, targetWorldPosition);
+                    break;
+            }
+
+            Gizmos.DrawWireSphere(targetWorldPosition, worldRadius);
+        }
+
+        /// <summary>
+        /// 점프 행동을 여러 선분으로 나눠 포물선 형태로 표시합니다.
+        /// </summary>
+        private static void DrawJumpGizmo(WorldPathAction action)
+        {
+            const int SegmentCount = 12;
+            Vector3 previousWorldPosition = WorldManager.TileToWorldPosition(action.From);
+
+            for (int i = 1; i <= SegmentCount; i++)
+            {
+                float ratio = i / (float)SegmentCount;
+                Vector2 jumpTilePosition = CreatureController.CalculateJumpPosition(action.From, action.To, ratio);
+                Vector3 jumpWorldPosition = WorldManager.TileToWorldPosition(jumpTilePosition);
+                Gizmos.DrawLine(previousWorldPosition, jumpWorldPosition);
+                previousWorldPosition = jumpWorldPosition;
+            }
+        }
+
+        /// <summary>
+        /// 완료 경로는 회색, 현재 경로는 빨강, 예정 경로는 행동별 색으로 구분합니다.
+        /// </summary>
+        private static Color GetPathGizmoColor(WorldPathActionType actionType, int actionIndex, int currentPathIndex)
+        {
+            if (actionIndex < currentPathIndex)
+            {
+                return Color.gray;
+            }
+
+            if (actionIndex == currentPathIndex)
+            {
+                return Color.red;
+            }
+
+            return actionType switch
+            {
+                WorldPathActionType.Jump => Color.cyan,
+                WorldPathActionType.Fall => Color.yellow,
+                _ => Color.green,
+            };
         }
     }
 }

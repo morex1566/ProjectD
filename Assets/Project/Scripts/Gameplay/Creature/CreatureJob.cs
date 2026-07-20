@@ -142,6 +142,8 @@ namespace TRPG.Runtime
 
         private int pathIndex = 0;
 
+        private float actionProgress = 0f;
+
         public Vector2Int TargetCoordinate => targetCoordinate;
 
         public IReadOnlyList<WorldPathAction> Path => path;
@@ -187,6 +189,11 @@ namespace TRPG.Runtime
             return hasPath == true && pathIndex >= path.Count;
         }
 
+        public float GetActionProgress()
+        {
+            return actionProgress;
+        }
+
         public WorldPathAction GetCurrentPathAction()
         {
             return path[pathIndex];
@@ -195,6 +202,12 @@ namespace TRPG.Runtime
         public void Advance()
         {
             pathIndex++;
+            actionProgress = 0f;
+        }
+
+        public void AdvanceActionProgress(float amount)
+        {
+            actionProgress = Mathf.Clamp01(actionProgress + amount);
         }
     }
 

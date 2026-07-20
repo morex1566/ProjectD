@@ -88,11 +88,12 @@ namespace TRPG.Runtime
             GameObject chunkInstance = new GameObject($"Chunk_{chunk.Coordinate.x}_{chunk.Coordinate.y}");
             chunkInstance.transform.SetParent(worldMapInstance.transform, false);
 
-            // 청크의 좌측 하단이 청크 월드 좌표와 일치하도록 배치합니다.
+            // 정수 월드 좌표가 같은 타일 좌표의 중심과 일치하도록 반 타일만큼 보정합니다.
             float chunkWorldSize = settings.ChunkWorldSize;
+            float tileCenterOffset = settings.TileWorldSize * 0.5f;
             chunkInstance.transform.localPosition = new Vector3(
-                chunk.Coordinate.x * chunkWorldSize,
-                chunk.Coordinate.y * chunkWorldSize,
+                chunk.Coordinate.x * chunkWorldSize - tileCenterOffset,
+                chunk.Coordinate.y * chunkWorldSize - tileCenterOffset,
                 0f);
 
             WorldChunkRenderer chunkRenderer = chunkInstance.AddComponent<WorldChunkRenderer>();
@@ -293,18 +294,34 @@ namespace TRPG.Runtime
             return manager.worldCameraController;
         }
 
+        /// <summary>
+        /// 월드 위치를 가장 가까운 타일 중심 좌표로 변환합니다.
+        /// </summary>
         public static Vector2Int WorldToTileCoordinate(Vector2 worldPosition)
         {
+            float tileWorldSize = Settings.WorldGenerationSettingsData.TileWorldSize;
+
             return new Vector2Int(
-                Mathf.FloorToInt(worldPosition.x / Settings.WorldGenerationSettingsData.TileWorldSize),
-                Mathf.FloorToInt(worldPosition.y / Settings.WorldGenerationSettingsData.TileWorldSize));
+                Mathf.FloorToInt(worldPosition.x / tileWorldSize + 0.5f),
+                Mathf.FloorToInt(worldPosition.y / tileWorldSize + 0.5f));
         }
 
+        /// <summary>
+        /// 타일 좌표를 해당 타일 중심의 월드 위치로 변환합니다.
+        /// </summary>
         public static Vector2 TileToWorldPosition(Vector2Int coordinate)
         {
             return new Vector2(
                 coordinate.x * Settings.WorldGenerationSettingsData.TileWorldSize,
                 coordinate.y * Settings.WorldGenerationSettingsData.TileWorldSize);
+        }
+
+        /// <summary>
+        /// 타일 단위의 연속 좌표를 월드 위치로 변환합니다.
+        /// </summary>
+        public static Vector2 TileToWorldPosition(Vector2 coordinate)
+        {
+            return coordinate * Settings.WorldGenerationSettingsData.TileWorldSize;
         }
     }
 }

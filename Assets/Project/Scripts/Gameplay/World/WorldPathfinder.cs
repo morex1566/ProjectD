@@ -106,7 +106,7 @@ namespace TRPG.Runtime
 
         /// <summary>
         /// 현재 좌표에서 실행 가능한 모든 플랫폼 행동을 추가합니다.
-        /// 현재 위치에서 실행 가능한 Walk, Jump, Fall 행동의 도착점이 이웃 노드가 됩니다.
+        /// 현재 위치에서 실행 가능한 Walk, CalculateJumpPosition, Fall 행동의 도착점이 이웃 노드가 됩니다.
         /// </summary>
         private static void AddAvailableActions(
             WorldMap worldMap,
