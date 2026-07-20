@@ -15,7 +15,7 @@ using NPOI.SS.UserModel;
 public class ExcelAssetScriptMenu
 {
 	const string ScriptTemplateName = "ExcelAssetScriptTemplete.cs.txt";
-	const string FieldTemplete = "\t//public List<EntityType> #FIELDNAME#; // Replace 'EntityType' to an actual Type that is serializable.";
+	const string FieldTemplete = "\t//public List<EntityType> #FIELDNAME#; // Replace 'EntityType' to an actual MaterialType that is serializable.";
 
 	/// <summary>
 	/// 선택한 엑셀 파일에 대응하는 ExcelAsset Script 파일을 생성합니다.

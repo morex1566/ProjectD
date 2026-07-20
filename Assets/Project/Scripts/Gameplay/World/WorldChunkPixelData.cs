@@ -7,7 +7,7 @@ namespace TRPG.Runtime
     /// </summary>
     public sealed class WorldChunkPixelData
     {
-        private readonly WorldTileType[] pixelTypes;
+        private readonly WorldTileMaterialType[] pixelTypes;
 
 
         public Vector2Int ChunkCoordinate { get; }
@@ -19,13 +19,13 @@ namespace TRPG.Runtime
         {
             ChunkCoordinate = chunkCoordinate;
             Size = size;
-            pixelTypes = new WorldTileType[size * size];
+            pixelTypes = new WorldTileMaterialType[size * size];
         }
 
         /// <summary>
         /// 로컬 픽셀 좌표의 지형 종류를 반환합니다.
         /// </summary>
-        public WorldTileType GetPixel(int localPixelX, int localPixelY)
+        public WorldTileMaterialType GetPixel(int localPixelX, int localPixelY)
         {
             return pixelTypes[ToIndex(localPixelX, localPixelY)];
         }
@@ -33,7 +33,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 로컬 픽셀 좌표에 지형 종류를 저장합니다.
         /// </summary>
-        public void SetPixel(int localPixelX, int localPixelY, WorldTileType type)
+        public void SetPixel(int localPixelX, int localPixelY, WorldTileMaterialType type)
         {
             pixelTypes[ToIndex(localPixelX, localPixelY)] = type;
         }

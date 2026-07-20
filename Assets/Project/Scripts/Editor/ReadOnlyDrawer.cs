@@ -149,7 +149,7 @@ namespace TRPG.Editor
                 float elementHeight = EditorGUI.GetPropertyHeight(element, true);
                 lineRect.height = elementHeight;
 
-                // Unity 기본 리스트 UI를 우회해 Size/Add/Remove/Reorder 편집을 막고 값만 표시합니다.
+                // Unity 기본 리스트 UI를 우회해 Size/AddTarget/Remove/Reorder 편집을 막고 값만 표시합니다.
                 EditorGUI.BeginDisabledGroup(true);
                 EditorGUI.PropertyField(lineRect, element, new GUIContent($"Element {i}"), true);
                 EditorGUI.EndDisabledGroup();

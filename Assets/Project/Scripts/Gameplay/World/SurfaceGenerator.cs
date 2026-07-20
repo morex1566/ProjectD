@@ -9,6 +9,8 @@ namespace TRPG.Runtime
     [Serializable]
     public sealed class SurfaceGenerator
     {
+        [SerializeField] private bool isEnabled = true;
+
         [SerializeField, Min(0.0001f)] private float frequency = 0.03f;
 
         [SerializeField] private float baseHeight = 16f;
@@ -23,6 +25,11 @@ namespace TRPG.Runtime
         {
             FastNoiseLite surfaceNoise = CreateNoise(seed);
             float[] surfaceHeights = CreateSurfaceHeights(worldWidth, surfaceNoise);
+
+            if (isEnabled == false)
+            {
+                return surfaceHeights;
+            }
 
             foreach (WorldChunk chunk in worldMap.Chunks.Values)
             {
@@ -65,7 +72,7 @@ namespace TRPG.Runtime
 
                     if (worldY > surfaceHeights[worldX])
                     {
-                        chunk.SetTile(localX, localY, new WorldTile(WorldTileType.Empty));
+                        chunk.SetTile(localX, localY, new WorldTile(WorldTileMaterialType.Empty));
                     }
                 }
             }

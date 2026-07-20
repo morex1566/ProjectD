@@ -121,10 +121,10 @@ namespace MBTEditor
                 newVariableKey = EditorGUILayout.TextField(newVariableKey);
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
-                GUILayout.Label("Type", GUILayout.MaxWidth(80));
+                GUILayout.Label("MaterialType", GUILayout.MaxWidth(80));
                 selectedVariableType = EditorGUILayout.Popup(selectedVariableType, variableTypesNames);
                 GUI.SetNextControlName("AddButton");
-                if (GUILayout.Button("Add", EditorStyles.miniButton)) {
+                if (GUILayout.Button("AddTarget", EditorStyles.miniButton)) {
                     CreateVariableAndResetInput();
                 }
             EditorGUILayout.EndHorizontal();
@@ -196,7 +196,7 @@ namespace MBTEditor
                     return;
                 }
             }
-            // Add variable
+            // AddTarget variable
             Undo.RecordObject(blackboard, "Create Blackboard Variable");
             BlackboardVariable var = Undo.AddComponent(blackboard.gameObject, variableTypes[selectedVariableType]) as BlackboardVariable;
             var.hideFlags = HideFlags.HideInInspector;
@@ -204,7 +204,7 @@ namespace MBTEditor
             blackboard.variables.Add(var);
             // Reset field
             newVariableKey = "";
-            GUI.FocusControl("Clear");
+            GUI.FocusControl("ClearTarget");
         }
     }
 }

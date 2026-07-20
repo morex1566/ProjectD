@@ -26,7 +26,7 @@ namespace MBT
             if (monoBehaviourTree != null && monoBehaviourTree.parent != null)
             {
                 monoBehaviourTree = null;
-                Debug.LogWarning("Subtree should not be target of update. Select parent tree instead.", this.gameObject);
+                Debug.LogWarning("Subtree should not be target of update. SelectTarget parent tree instead.", this.gameObject);
             }
         }
     }

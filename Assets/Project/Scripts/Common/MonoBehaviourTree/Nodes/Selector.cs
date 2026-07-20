@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MBT
 {
     [AddComponentMenu("")]
-    [MBTNode(name = "Selector", order = 100)]
+    [MBTNode(name = "SelectorPrefab", order = 100)]
     public class Selector : Composite
     {
         private int index;

@@ -75,7 +75,7 @@ namespace TRPG.Runtime
                     float caveDensity = caveNoise.GetNoise(worldX, worldY);
                     if (caveDensity <= threshold)
                     {
-                        chunk.SetTile(localX, localY, new WorldTile(WorldTileType.Empty));
+                        chunk.SetTile(localX, localY, new WorldTile(WorldTileMaterialType.Empty));
                     }
                 }
             }
@@ -106,7 +106,7 @@ namespace TRPG.Runtime
         {
             foreach (Vector2Int coordinate in caveRegion)
             {
-                worldMap.TrySetTile(coordinate, new WorldTile(WorldTileType.Stone));
+                worldMap.TrySetTile(coordinate, new WorldTile(WorldTileMaterialType.Stone));
             }
         }
 

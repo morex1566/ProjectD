@@ -98,7 +98,7 @@ namespace MBT
             int nodeIndex = abortingNode.runtimePriority - 1;
             // Sanity check
             if (abortingNode != executionLog[nodeIndex]) {
-                Debug.LogWarning("Priority of node does not match with exectuion log");
+                Debug.LogWarning("PriorityInJobQueue of node does not match with exectuion log");
             }
             // Abort nodes in log
             ResetNodesTo(abortingNode, true);
@@ -150,10 +150,10 @@ namespace MBT
                         _TickMarker.End();
                         return;
                     } else {
-                        // Add child to execution stack and execute it in next loop
+                        // AddTarget child to execution stack and execute it in next loop
                         executionStack.Add(child);
                         executionLog.Add(child);
-                        // IMPORTANT: Priority must be > 0 and assigned in this order
+                        // IMPORTANT: PriorityInJobQueue must be > 0 and assigned in this order
                         child.runtimePriority = executionLog.Count;
                         child.OnAllowInterrupt();
                         child.OnEnter();

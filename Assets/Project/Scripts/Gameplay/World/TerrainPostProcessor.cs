@@ -8,7 +8,7 @@ namespace TRPG.Runtime
     /// 월드 타일을 렌더링과 충돌 생성에 사용할 픽셀 지형으로 변환합니다.
     /// </summary>
     [Serializable]
-    public sealed class TerrainPixelGenerator
+    public sealed class TerrainPostProcessor
     {
         private static readonly Vector2Int[] neighborDirections =
         {
@@ -18,33 +18,28 @@ namespace TRPG.Runtime
             Vector2Int.up,
         };
 
-        [SerializeField, Min(0)] private int cornerCutDepth = 2;
+        [SerializeField] private bool isEnabled = true;
 
         [SerializeField, Min(0)] private int edgeRoughnessDepth = 2;
 
+        [SerializeField, Min(0)] private int convexCornerDepth = 2;
+
         [SerializeField, Min(0.0001f)] private float edgeNoiseFrequency = 0.12f;
 
-        [SerializeField, Range(-1f, 1f)] private float edgeNoiseThreshold = 0.1f;
+        [SerializeField, Range(-1f, 1f)] private float edgeNoiseThreshold = 0.15f;
+
+        [SerializeField, Range(-1f, 1f)] private float convexCornerNoiseThreshold = -0.05f;
 
         /// <summary>
-        /// 월드의 모든 청크에 픽셀 지형 데이터를 생성합니다.
+        /// 생성된 청크 픽셀 지형의 외곽을 후처리합니다.
         /// </summary>
-        public void Generate(WorldMap worldMap, int pixelsPerTile, int seed)
+        public void Process(WorldMap worldMap, int seed)
         {
-            int pixelsPerChunk = worldMap.TilesPerChunk * pixelsPerTile;
-
-            foreach (WorldChunk chunk in worldMap.Chunks.Values)
+            if (isEnabled == false)
             {
-                WorldChunkPixelData pixelData = new WorldChunkPixelData(chunk.Coordinate, pixelsPerChunk);
-
-                RasterizeTiles(chunk, pixelData, worldMap.TilesPerChunk, pixelsPerTile);
-                chunk.SetPixelData(pixelData);
+                return;
             }
 
-            // 타일각을 둥글게
-            CarveConvexCorners(worldMap);
-
-            // 모서리를 거칠게
             FastNoiseLite edgeNoise = CreateEdgeNoise(seed);
             CarveRoughEdges(worldMap, edgeNoise);
         }
@@ -54,9 +49,11 @@ namespace TRPG.Runtime
         /// </summary>
         private void CarveRoughEdges(WorldMap worldMap, FastNoiseLite edgeNoise)
         {
-            for (int pass = 0; pass < edgeRoughnessDepth; pass++)
+            int passCount = Mathf.Max(edgeRoughnessDepth, convexCornerDepth);
+
+            for (int pass = 0; pass < passCount; pass++)
             {
-                List<(WorldChunk Chunk, Vector2Int Coordinate)> roughPixels = FindRoughBoundaryPixels(worldMap, edgeNoise);
+                List<(WorldChunk Chunk, Vector2Int Coordinate)> roughPixels = FindRoughBoundaryPixels(worldMap, edgeNoise, pass);
 
                 if (roughPixels.Count == 0)
                 {
@@ -65,7 +62,7 @@ namespace TRPG.Runtime
 
                 foreach (var roughPixel in roughPixels)
                 {
-                    roughPixel.Chunk.PixelData.SetPixel(roughPixel.Coordinate.x, roughPixel.Coordinate.y, WorldTileType.Empty);
+                    roughPixel.Chunk.PixelData.SetPixel(roughPixel.Coordinate.x, roughPixel.Coordinate.y, WorldTileMaterialType.Empty);
                 }
             }
         }
@@ -73,7 +70,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 노이즈 조건을 만족하는 현재 외곽 픽셀을 찾습니다.
         /// </summary>
-        private List<(WorldChunk Chunk, Vector2Int Coordinate)> FindRoughBoundaryPixels(WorldMap worldMap, FastNoiseLite edgeNoise)
+        private List<(WorldChunk Chunk, Vector2Int Coordinate)> FindRoughBoundaryPixels(WorldMap worldMap, FastNoiseLite edgeNoise, int pass)
         {
             List<(WorldChunk Chunk, Vector2Int Coordinate)> roughPixels = new();
 
@@ -93,7 +90,17 @@ namespace TRPG.Runtime
                         int worldPixelX = chunk.Coordinate.x * pixelSize + x;
                         int worldPixelY = chunk.Coordinate.y * pixelSize + y;
                         float noiseValue = edgeNoise.GetNoise(worldPixelX, worldPixelY);
-                        if (noiseValue <= edgeNoiseThreshold)
+                        bool isConvexCorner = IsConvexCornerPixel(worldMap, chunk, x, y);
+                        int maximumDepth = isConvexCorner ? convexCornerDepth : edgeRoughnessDepth;
+
+                        if (pass >= maximumDepth)
+                        {
+                            continue;
+                        }
+
+                        float noiseThreshold = isConvexCorner ? convexCornerNoiseThreshold : edgeNoiseThreshold;
+
+                        if (noiseValue <= noiseThreshold)
                         {
                             continue;
                         }
@@ -118,54 +125,6 @@ namespace TRPG.Runtime
             }
 
             return noise;
-        }
-
-        /// <summary>
-        /// 볼록한 외곽 모서리를 지정한 깊이만큼 단계적으로 깎습니다.
-        /// </summary>
-        private void CarveConvexCorners(WorldMap worldMap)
-        {
-            for (int pass = 0; pass < cornerCutDepth; pass++)
-            {
-                List<(WorldChunk Chunk, Vector2Int Coordinate)> cornerPixels = FindConvexCornerPixels(worldMap);
-
-                if (cornerPixels.Count == 0)
-                {
-                    return;
-                }
-
-                foreach (var cornerPixel in cornerPixels)
-                {
-                    cornerPixel.Chunk.PixelData.SetPixel(cornerPixel.Coordinate.x, cornerPixel.Coordinate.y, WorldTileType.Empty);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 현재 픽셀 상태를 변경하지 않고 모든 볼록 모서리 픽셀을 찾습니다.
-        /// </summary>
-        private static List<(WorldChunk Chunk, Vector2Int Coordinate)> FindConvexCornerPixels(WorldMap worldMap)
-        {
-            List<(WorldChunk Chunk, Vector2Int Coordinate)> cornerPixels = new();
-
-            foreach (WorldChunk chunk in worldMap.Chunks.Values)
-            {
-                int pixelSize = chunk.PixelData.Size;
-                for (int y = 0; y < pixelSize; y++)
-                {
-                    for (int x = 0; x < pixelSize; x++)
-                    {
-                        if (IsConvexCornerPixel(worldMap, chunk, x, y) == false)
-                        {
-                            continue;
-                        }
-
-                        cornerPixels.Add((chunk, new Vector2Int(x, y)));
-                    }
-                }
-            }
-
-            return cornerPixels;
         }
 
         /// <summary>
@@ -194,12 +153,12 @@ namespace TRPG.Runtime
         /// </summary>
         private static bool IsEmptyPixel(WorldMap worldMap, WorldChunk chunk, int localPixelX, int localPixelY)
         {
-            if (TryGetPixel(worldMap, chunk, localPixelX, localPixelY, out WorldTileType type) == false)
+            if (TryGetPixel(worldMap, chunk, localPixelX, localPixelY, out WorldTileMaterialType type) == false)
             {
                 return true;
             }
 
-            return type == WorldTileType.Empty;
+            return type == WorldTileMaterialType.Empty;
         }
 
         /// <summary>
@@ -207,9 +166,9 @@ namespace TRPG.Runtime
         /// </summary>
         private static bool IsBoundaryPixel(WorldMap worldMap, WorldChunk chunk, int localPixelX, int localPixelY)
         {
-            WorldTileType currentType = chunk.PixelData.GetPixel(localPixelX, localPixelY);
+            WorldTileMaterialType currentType = chunk.PixelData.GetPixel(localPixelX, localPixelY);
 
-            if (currentType == WorldTileType.Empty)
+            if (currentType == WorldTileMaterialType.Empty)
             {
                 return false;
             }
@@ -219,12 +178,12 @@ namespace TRPG.Runtime
                 int neighborPixelX = localPixelX + direction.x;
                 int neighborPixelY = localPixelY + direction.y;
 
-                if (TryGetPixel(worldMap, chunk, neighborPixelX, neighborPixelY, out WorldTileType neighborType) == false)
+                if (TryGetPixel(worldMap, chunk, neighborPixelX, neighborPixelY, out WorldTileMaterialType neighborType) == false)
                 {
                     return true;
                 }
 
-                if (neighborType == WorldTileType.Empty)
+                if (neighborType == WorldTileMaterialType.Empty)
                 {
                     return true;
                 }
@@ -236,7 +195,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 현재 청크를 기준으로 인접 청크를 포함한 픽셀을 조회합니다.
         /// </summary>
-        private static bool TryGetPixel(WorldMap worldMap, WorldChunk sourceChunk, int localPixelX, int localPixelY, out WorldTileType type)
+        private static bool TryGetPixel(WorldMap worldMap, WorldChunk sourceChunk, int localPixelX, int localPixelY, out WorldTileMaterialType type)
         {
             WorldChunkPixelData sourcePixelData = sourceChunk.PixelData;
 
@@ -252,7 +211,7 @@ namespace TRPG.Runtime
 
             if (worldPixelX < 0 || worldPixelY < 0)
             {
-                type = WorldTileType.Empty;
+                type = WorldTileMaterialType.Empty;
                 return false;
             }
 
@@ -262,13 +221,13 @@ namespace TRPG.Runtime
 
             if (worldMap.TryGetChunk(targetChunkCoordinate, out WorldChunk targetChunk) == false)
             {
-                type = WorldTileType.Empty;
+                type = WorldTileMaterialType.Empty;
                 return false;
             }
 
             if (targetChunk.PixelData == null)
             {
-                type = WorldTileType.Empty;
+                type = WorldTileMaterialType.Empty;
                 return false;
             }
 
@@ -277,41 +236,6 @@ namespace TRPG.Runtime
 
             type = targetChunk.PixelData.GetPixel(targetLocalPixelX, targetLocalPixelY);
             return true;
-        }
-
-        /// <summary>
-        /// 청크의 각 타일을 픽셀 영역으로 확대합니다.
-        /// </summary>
-        private static void RasterizeTiles(WorldChunk chunk, WorldChunkPixelData pixelData, int tilesPerChunk, int pixelsPerTile)
-        {
-            for (int tileY = 0; tileY < tilesPerChunk; tileY++)
-            {
-                for (int tileX = 0; tileX < tilesPerChunk; tileX++)
-                {
-                    WorldTile tile = chunk.GetTile(tileX, tileY);
-                    FillTilePixels(pixelData, tileX, tileY, pixelsPerTile, tile.Type);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 타일 하나에 해당하는 모든 픽셀을 같은 지형 종류로 채웁니다.
-        /// </summary>
-        private static void FillTilePixels(WorldChunkPixelData pixelData, int tileX, int tileY, int pixelsPerTile, WorldTileType type)
-        {
-            int pixelOriginX = tileX * pixelsPerTile;
-            int pixelOriginY = tileY * pixelsPerTile;
-
-            for (int pixelY = 0; pixelY < pixelsPerTile; pixelY++)
-            {
-                for (int pixelX = 0; pixelX < pixelsPerTile; pixelX++)
-                {
-                    int localPixelX = pixelOriginX + pixelX;
-                    int localPixelY = pixelOriginY + pixelY;
-
-                    pixelData.SetPixel(localPixelX, localPixelY, type);
-                }
-            }
         }
     }
 }

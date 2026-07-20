@@ -1,9 +1,9 @@
 namespace TRPG.Runtime
 {
     /// <summary>
-    /// 월드 타일의 논리적인 종류입니다.
+    /// 월드 타일의 재질입니다.
     /// </summary>
-    public enum WorldTileType : byte
+    public enum WorldTileMaterialType : byte
     {
         Empty = 0,
         Soil,
@@ -17,14 +17,22 @@ namespace TRPG.Runtime
     /// </summary>
     public struct WorldTile
     {
-        public WorldTileType Type;
+        /// <summary>
+        /// 타일을 표현하는 지형 재질입니다.
+        /// </summary>
+        public WorldTileMaterialType MaterialType;
 
-        public bool IsEmpty => Type == WorldTileType.Empty;
+        /// <summary>
+        /// 완전히 비어 있는 타일인지 반환합니다.
+        /// </summary>
+        public bool IsEmpty => MaterialType == WorldTileMaterialType.Empty;
 
-
-        public WorldTile(WorldTileType type)
+        /// <summary>
+        /// 재질을 지정하여 타일을 생성합니다.
+        /// </summary>
+        public WorldTile(WorldTileMaterialType materialType)
         {
-            Type = type;
+            MaterialType = materialType;
         }
     }
 }

@@ -87,7 +87,7 @@ namespace MBTEditor
                 return result != 0 ? result : x.name.CompareTo(y.name);
             });
             
-            // Add all nodes to menu
+            // AddTarget all nodes to menu
             for (int i = 0; i < items.Count; i++)
             {
                 nodePathsDictionary[items[i].path].AddChild(items[i]);
@@ -100,7 +100,7 @@ namespace MBTEditor
                 return x.name.CompareTo(y.name);
             });
 
-            // Add folders
+            // AddTarget folders
             for (int i = 0; i < parentNodes.Count(); i++)
             {
                 root.AddChild(parentNodes[i]);

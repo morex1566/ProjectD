@@ -34,7 +34,6 @@ namespace TRPG.Runtime
             // 월드 런타임 루트와 생성 결과를 구성합니다.
             worldRoot = new GameObject("World");
             {
-                worldRoot.transform.SetParent(transform, false);
                 worldMap = Settings.WorldGenerationSettingsData.WorldGenerator.Generate(Settings.WorldGenerationSettingsData);
                 worldMapInstance = RenderWorld(Settings.WorldGenerationSettingsData, worldMap);
                 worldMapInstance.transform.SetParent(worldRoot.transform, false);
@@ -63,6 +62,22 @@ namespace TRPG.Runtime
             }
 
             return worldMapInstance;
+        }
+
+        /// <summary>
+        /// 현재 생성되어 있는 월드 맵을 반환합니다.
+        /// </summary>
+        public static bool TryGetWorldMap(out WorldMap map)
+        {
+            map = null;
+
+            if (TryGetInstance(out WorldManager manager) == false || manager.worldMap == null)
+            {
+                return false;
+            }
+
+            map = manager.worldMap;
+            return true;
         }
 
         /// <summary>
@@ -120,45 +135,12 @@ namespace TRPG.Runtime
                 return null;
             }
 
-            return SpawnCreature(data.Prefab, worldPosition);
-        }
-
-        /// <summary>
-        /// Creature 프리팹을 월드에 생성합니다.
-        /// </summary>
-        public static CreatureController SpawnCreature(GameObject creaturePrefab, string id, Vector3 worldPosition)
-        {
-            if (TryGetCreatureData(id, out CreatureData data) == false)
-            {
-                return null;
-            }
-
-            GameObject prefab = creaturePrefab != null ? creaturePrefab : data.Prefab;
-            return SpawnCreature(prefab, worldPosition);
-        }
-
-        /// <summary>
-        /// Creature 프리팹을 월드에 생성하고 GameObject InstanceID 기준으로 등록합니다.
-        /// </summary>
-        public static CreatureController SpawnCreature(GameObject creaturePrefab, Vector3 worldPosition)
-        {
-            if (creaturePrefab == null)
-            {
-                Debug.LogWarning("SpawnCreature failed. Creature prefab is null.");
-                return null;
-            }
-
-            if (creaturePrefab.GetComponent<CreatureController>() == null)
-            {
-                Debug.LogWarning("SpawnCreature failed. Prefab is not creature.");
-                return null;
-            }
-
             WorldManager manager = GetInstance();
             Transform parent = manager.worldRoot != null ? manager.worldRoot.transform : manager.transform;
-            CreatureController creature = Instantiate(creaturePrefab, worldPosition, Quaternion.identity, parent).GetComponent<CreatureController>();
+            CreatureController creature = Instantiate(data.Prefab, worldPosition, Quaternion.identity, parent).GetComponent<CreatureController>();
 
-            manager.creatures[creature.gameObject.GetInstanceID()] = creature;
+            RegisterCreature(creature);
+
             return creature;
         }
 
@@ -174,27 +156,43 @@ namespace TRPG.Runtime
                 return false;
             }
 
-            manager.creatures.Remove(gameObjectInstanceId);
+            UnregisterCreature(creature);
 
             if (creature != null)
             {
-                UnityEngine.Object.Destroy(creature.gameObject);
+                Destroy(creature.gameObject);
             }
 
             return true;
         }
 
+
         /// <summary>
-        /// 등록된 Creature를 제거합니다.
+        /// 씬 또는 런타임에 생성된 Creature를 선택 가능한 월드 목록에 등록합니다.
         /// </summary>
-        public static bool DespawnCreature(CreatureController creature)
+        public static bool RegisterCreature(CreatureController creature)
         {
             if (creature == null)
             {
                 return false;
             }
 
-            return DespawnCreature(creature.gameObject.GetInstanceID());
+            WorldManager manager = GetInstance();
+            manager.creatures[creature.InstanceId] = creature;
+            return true;
+        }
+
+        /// <summary>
+        /// Creature를 파괴하지 않고 선택 가능한 월드 목록에서 제거합니다.
+        /// </summary>
+        public static bool UnregisterCreature(CreatureController creature)
+        {
+            if (creature == null || TryGetInstance(out WorldManager manager) == false)
+            {
+                return false;
+            }
+
+            return manager.creatures.Remove(creature.InstanceId);
         }
 
         /// <summary>
@@ -293,6 +291,20 @@ namespace TRPG.Runtime
             }
 
             return manager.worldCameraController;
+        }
+
+        public static Vector2Int WorldToTileCoordinate(Vector2 worldPosition)
+        {
+            return new Vector2Int(
+                Mathf.FloorToInt(worldPosition.x / Settings.WorldGenerationSettingsData.TileWorldSize),
+                Mathf.FloorToInt(worldPosition.y / Settings.WorldGenerationSettingsData.TileWorldSize));
+        }
+
+        public static Vector2 TileToWorldPosition(Vector2Int coordinate)
+        {
+            return new Vector2(
+                coordinate.x * Settings.WorldGenerationSettingsData.TileWorldSize,
+                coordinate.y * Settings.WorldGenerationSettingsData.TileWorldSize);
         }
     }
 }

@@ -153,7 +153,7 @@ namespace TRPG.Runtime
                     int localPixelX = pixelRect.x + x;
                     int localPixelY = pixelRect.y + y;
                     int pixelIndex = x + y * pixelRect.width;
-                    WorldTileType pixelType = pixelData.GetPixel(localPixelX, localPixelY);
+                    WorldTileMaterialType pixelType = pixelData.GetPixel(localPixelX, localPixelY);
 
                     pixels[pixelIndex] = GetTileColor(pixelType, settings);
                 }
@@ -165,14 +165,14 @@ namespace TRPG.Runtime
         /// <summary>
         /// WorldTile 종류에 대응하는 픽셀 색상을 반환합니다.
         /// </summary>
-        private static Color32 GetTileColor(WorldTileType tileType, WorldGenerationSettingsData settings)
+        private static Color32 GetTileColor(WorldTileMaterialType tileType, WorldGenerationSettingsData settings)
         {
             switch (tileType)
             {
-                case WorldTileType.Soil:
+                case WorldTileMaterialType.Soil:
                     return settings.SoilColor;
 
-                case WorldTileType.Stone:
+                case WorldTileMaterialType.Stone:
                     return settings.StoneColor;
 
                 default:

@@ -166,14 +166,14 @@ namespace MBTEditor
                 if (GUILayout.Button("Focus Root", EditorStyles.toolbarButton)){
                     FocusRoot();
                 }
-                if (GUILayout.Button("Select In Hierarchy", EditorStyles.toolbarButton)){
+                if (GUILayout.Button("SelectTarget In Hierarchy", EditorStyles.toolbarButton)){
                     if (currentMBT != null)
                     {
                         Selection.activeGameObject = currentMBT.gameObject;
                         EditorGUIUtility.PingObject(currentMBT.gameObject);
                     }
                 }
-                if (GUILayout.Button("Add Node", EditorStyles.toolbarDropDown)){
+                if (GUILayout.Button("AddTarget Node", EditorStyles.toolbarDropDown)){
                     OpenNodeFinder(nodeFinderActivatorRect, false);
                 }
                 if (Event.current.type == EventType.Repaint) nodeFinderActivatorRect = GUILayoutUtility.GetLastRect();
@@ -308,7 +308,7 @@ namespace MBTEditor
                             break;
                         }
                         Node node = FindNode(e.mousePosition);
-                        // Select node if contains point
+                        // SelectTarget node if contains point
                         if (node != null) {
                             DeselectNode();
                             SelectNode(node);
@@ -634,7 +634,7 @@ namespace MBTEditor
             node.rect.position = nodeDropdownTargetPosition - new Vector2(node.rect.width/2, 0);
             UpdateSelection();
             if (dropdownHandleCache != null) {
-                // Add additonal offset (3,3) to be sure that point is inside rect
+                // AddTarget additonal offset (3,3) to be sure that point is inside rect
                 TryConnectNodes(dropdownHandleCache, nodeDropdownTargetPosition + workspaceOffset + new Vector2(3,3));
             }
         }

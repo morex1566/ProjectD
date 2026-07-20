@@ -328,6 +328,7 @@ namespace TRPG.Runtime
             SetFloat(serializedController, "context.DetectRange", entity.DetectRange);
             SetFloat(serializedController, "context.AttackRange", entity.AttackRange);
             SetFloat(serializedController, "context.AttackSpeed", entity.AttackSpeed);
+            SetFloat(serializedController, "context.MoveSpeed", entity.MoveSpeed);
             SetString(serializedController, "context.Id", entity.Id);
             SetString(serializedController, "context.Name", entity.Name);
             SetString(serializedController, "context.Description", entity.Description);

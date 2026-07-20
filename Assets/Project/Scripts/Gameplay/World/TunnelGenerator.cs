@@ -344,7 +344,7 @@ namespace TRPG.Runtime
                         continue;
                     }
 
-                    worldMap.TrySetTile(targetCoordinate, new WorldTile(WorldTileType.Empty));
+                    worldMap.TrySetTile(targetCoordinate, new WorldTile(WorldTileMaterialType.Empty));
                 }
             }
         }

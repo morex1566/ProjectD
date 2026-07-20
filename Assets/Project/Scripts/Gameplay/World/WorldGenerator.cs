@@ -19,7 +19,9 @@ namespace TRPG.Runtime
 
         [SerializeField] private TunnelGenerator tunnelGenerator = new TunnelGenerator();
 
-        [SerializeField] private TerrainPixelGenerator terrainPixelGenerator = new TerrainPixelGenerator();
+        [SerializeField] private TerrainPixelRasterizer terrainPixelRasterizer = new TerrainPixelRasterizer();
+
+        [SerializeField] private TerrainPostProcessor terrainPostProcessor = new TerrainPostProcessor();
 
         private float[] surfaceHeights = null;
 
@@ -40,7 +42,8 @@ namespace TRPG.Runtime
             surfaceHeights = surfaceGenerator.Generate(worldMap, worldWidth, seed);
             caveGenerator.Generate(worldMap, surfaceHeights, seed + 1);
             tunnelGenerator.Generate(worldMap, seed + 2);
-            terrainPixelGenerator.Generate(worldMap, settings.PixelsPerTile, seed + 3);
+            terrainPixelRasterizer.Generate(worldMap, settings.PixelsPerTile);
+            terrainPostProcessor.Process(worldMap, seed + 3);
 
             return worldMap;
         }

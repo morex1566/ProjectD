@@ -91,7 +91,7 @@ namespace TRPG.Runtime
         ///</summary>
         public void OnBeforeSerialize()
         {
-            // entries는 Add/Set/Remove 때마다 갱신되므로 여기서 전체 동기화를 하지 않습니다.
+            // entries는 AddTarget/Set/Remove 때마다 갱신되므로 여기서 전체 동기화를 하지 않습니다.
         }
 
         ///<summary>

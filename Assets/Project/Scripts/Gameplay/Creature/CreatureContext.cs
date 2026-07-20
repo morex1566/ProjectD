@@ -25,6 +25,8 @@ namespace TRPG.Runtime
 
         public float AttackSpeed = 1;
 
+        public float MoveSpeed = 1;
+
         public string Id;
 
         public string Name;
