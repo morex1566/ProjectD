@@ -335,6 +335,49 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
+        /// 요청 좌표와 같은 열에서 가장 가까운 한 칸짜리 캐릭터 이동 좌표를 찾습니다.
+        /// 같은 거리에서는 위쪽 좌표를 우선합니다.
+        /// </summary>
+        public static bool TryFindNearestStandableCoordinate(
+            WorldMap worldMap,
+            Vector2Int requestedCoordinate,
+            int maximumVerticalSearchDistance,
+            out Vector2Int standableCoordinate)
+        {
+            standableCoordinate = default;
+
+            if (worldMap == null || maximumVerticalSearchDistance < 0)
+            {
+                return false;
+            }
+
+            if (IsStandable(worldMap, requestedCoordinate) == true)
+            {
+                standableCoordinate = requestedCoordinate;
+                return true;
+            }
+
+            for (int distance = 1; distance <= maximumVerticalSearchDistance; distance++)
+            {
+                Vector2Int upperCoordinate = requestedCoordinate + Vector2Int.up * distance;
+                if (IsStandable(worldMap, upperCoordinate) == true)
+                {
+                    standableCoordinate = upperCoordinate;
+                    return true;
+                }
+
+                Vector2Int lowerCoordinate = requestedCoordinate + Vector2Int.down * distance;
+                if (IsStandable(worldMap, lowerCoordinate) == true)
+                {
+                    standableCoordinate = lowerCoordinate;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// 연속 좌표에 가로 1타일, 지정한 높이의 몸체를 배치할 수 있는지 확인합니다.
         /// </summary>
         private static bool IsBodyAreaEmpty(WorldMap worldMap, Vector2 bottomLeftPosition, int bodyHeight)
@@ -376,6 +419,12 @@ namespace TRPG.Runtime
             }
 
             return tile.IsEmpty;
+        }
+
+        public static bool IsStandable(WorldMap worldMap, Vector2Int coordinate)
+        {
+            const int navigationBodyHeight = 1;
+            return IsStandable(worldMap, coordinate, navigationBodyHeight);
         }
 
         /// <summary>

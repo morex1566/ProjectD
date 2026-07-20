@@ -22,9 +22,11 @@ namespace TRPG.Runtime
 
         private const string CreaturePrefabFolder = "Assets/Project/Prefabs/Gameplay";
 
+        private const string CreatureBehaviourTreePrefabNamePrefix = "PF_MBT_";
+
         ///<summary>
         /// 엑셀에서 생성된 원본 CreatureData 목록입니다.
-        ///</summary>
+        ///</summary>   
         public List<CreatureData> Entities;
 
         ///<summary>
@@ -156,13 +158,19 @@ namespace TRPG.Runtime
                     continue;
                 }
 
-                // Id와 같은 이름 규칙의 스프라이트를 찾아 엔티티에 매핑합니다.
+                // Id와 같은 이름 규칙의 스프라이트와 MBT 프리팹을 찾아 엔티티에 매핑합니다.
                 entity.Sprite = FindCreatureSprite(entity.Id);
+                entity.BehaviourTree = FindCreatureBehaviourTreePrefab(entity.Id);
                 entity.Prefab = CreateOrUpdateCreaturePrefab(entity);
 
                 if (entity.Sprite == null)
                 {
                     Debug.LogWarning($"Creature sprite not found. Id: {entity.Id}", this);
+                }
+
+                if (entity.BehaviourTree == null)
+                {
+                    Debug.LogWarning($"Creature behaviour tree prefab not found. Id: {entity.Id}", this);
                 }
 
                 if (entity.Prefab == null)
@@ -245,6 +253,22 @@ namespace TRPG.Runtime
         }
 
         ///<summary>
+        /// Id와 같은 이름 규칙의 Creature MBT 프리팹을 찾습니다.
+        ///</summary>
+        private static GameObject FindCreatureBehaviourTreePrefab(string id)
+        {
+            string prefabName = $"{CreatureBehaviourTreePrefabNamePrefix}{id}";
+            string prefabPath = FindExactPrefabPath(prefabName, CreaturePrefabFolder);
+
+            if (string.IsNullOrEmpty(prefabPath) == true)
+            {
+                return null;
+            }
+
+            return AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        }
+
+        ///<summary>
         /// CreatureData를 반영한 완성 Creature 프리팹을 생성하거나 갱신합니다.
         ///</summary>
         private static GameObject CreateOrUpdateCreaturePrefab(CreatureData entity)
@@ -298,6 +322,7 @@ namespace TRPG.Runtime
         {
             SpriteRenderer spriteRenderer = prefabRoot.GetComponentInChildren<SpriteRenderer>(true);
             BoxCollider2DSizeFitter collider2DSizeFitter = prefabRoot.GetComponentInChildren<BoxCollider2DSizeFitter>(true);
+            CreateGeneratedBehaviourTree(prefabRoot, entity.BehaviourTree);
             SerializedObject serializedController = new(controller);
             SetObjectReference(serializedController, "spriter", spriteRenderer);
             WriteGeneratedCreatureContext(serializedController, entity);
@@ -316,6 +341,40 @@ namespace TRPG.Runtime
             }
 
             EditorUtility.SetDirty(controller);
+        }
+
+        ///<summary>
+        /// 기존에 생성된 MBT 자식을 교체하고 현재 Creature의 MBT 프리팹을 자식으로 추가합니다.
+        ///</summary>
+        private static void CreateGeneratedBehaviourTree(GameObject prefabRoot, GameObject behaviourTreePrefab)
+        {
+            MBT.MonoBehaviourTree[] behaviourTrees = prefabRoot.GetComponentsInChildren<MBT.MonoBehaviourTree>(true);
+            foreach (MBT.MonoBehaviourTree behaviourTree in behaviourTrees)
+            {
+                if (behaviourTree == null || behaviourTree.transform == prefabRoot.transform)
+                {
+                    continue;
+                }
+
+                DestroyImmediate(behaviourTree.gameObject);
+            }
+
+            if (behaviourTreePrefab == null)
+            {
+                return;
+            }
+
+            GameObject behaviourTreeObject = PrefabUtility.InstantiatePrefab(behaviourTreePrefab, prefabRoot.transform) as GameObject;
+            if (behaviourTreeObject == null)
+            {
+                behaviourTreeObject = Instantiate(behaviourTreePrefab, prefabRoot.transform);
+            }
+
+            behaviourTreeObject.name = behaviourTreePrefab.name;
+            behaviourTreeObject.transform.localPosition = Vector3.zero;
+            behaviourTreeObject.transform.localRotation = Quaternion.identity;
+            behaviourTreeObject.transform.localScale = Vector3.one;
+            EditorUtility.SetDirty(behaviourTreeObject);
         }
 
         private static void WriteGeneratedCreatureContext(SerializedObject serializedController, CreatureData entity)

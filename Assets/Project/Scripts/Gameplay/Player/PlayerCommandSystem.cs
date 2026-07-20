@@ -31,6 +31,8 @@ namespace TRPG.Runtime
     {
         private readonly CreatureSelector creatureSelector = null;
 
+        private const int MaximumDestinationSearchDistance = 8;
+
 
         public IdleCommandSystem(CreatureSelector creatureSelector)
         {
@@ -73,17 +75,37 @@ namespace TRPG.Runtime
         /// <summary>
         /// 현재 선택된 모든 Creature의 기존 명령을 새 이동 명령으로 교체합니다.
         /// </summary>
-        public void CommandMove(Vector2Int targetCoordinate)
+        public void CommandMove(Vector2Int requestedCoordinate)
         {
             if (creatureSelector == null)
             {
                 return;
             }
 
-            foreach (CreatureController creature in creatureSelector.Targets)
+            if (WorldManager.TryGetWorldMap(out WorldMap worldMap) == false)
             {
-                // TODO : 여기에서 명령 ㄱㄱ
-                creature.EnqueueJob(new CreatureMoveJob(creature, targetCoordinate), PlayerCommandQueueMode.Replace);
+                return;
+            }
+
+            if (WorldPathfinder.TryFindNearestStandableCoordinate(
+                worldMap,
+                requestedCoordinate,
+                MaximumDestinationSearchDistance,
+                out Vector2Int targetCoordinate) == false)
+            {
+                return;
+            }
+
+            foreach (CreatureController creature in creatureSelector.Selecteds)
+            {
+                if (creature == null || creature.isActiveAndEnabled == false)
+                {
+                    continue;
+                }
+
+                creature.EnqueueJob(
+                    new CreatureMoveJob(creature, targetCoordinate),
+                    PlayerCommandQueueMode.Replace);
             }
         }
 
@@ -111,8 +133,8 @@ namespace TRPG.Runtime
                 return;
             }
 
-            Vector2Int targetCoordinate = WorldManager.WorldToTileCoordinate(worldPosition);
-            CommandMove(targetCoordinate);
+            Vector2Int requestedCoordinate = WorldManager.WorldToTileCoordinate(worldPosition);
+            CommandMove(requestedCoordinate);
         }
     }
 }

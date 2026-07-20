@@ -18,7 +18,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 드래그 화면 영역에 들어온 지형 타일의 선택 표시를 갱신합니다.
         /// </summary>
-        protected override void SelectTargets(Camera cam, Vector2 startScreenPosition, Vector2 endScreenPosition)
+        protected override void Selects(Camera cam, Vector2 startScreenPosition, Vector2 endScreenPosition)
         {
             SetSelection(FindSelectableTiles(cam, startScreenPosition, endScreenPosition));
         }
@@ -26,7 +26,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 포인터 아래의 지형 타일 하나의 선택 표시를 갱신합니다.
         /// </summary>
-        protected override void SelectTarget(Camera cam, Vector2 pointerWorldPosition)
+        protected override void Select(Camera cam, Vector2 pointerWorldPosition)
         {
             HashSet<Vector2Int> currentSelectedCoordinates = new();
 
@@ -43,18 +43,18 @@ namespace TRPG.Runtime
         /// </summary>
         protected override void CompleteSelection()
         {
-            targets.Clear();
+            selected.Clear();
 
             foreach (Vector2Int coordinate in selectedCoordinates)
             {
-                AddTarget(coordinate);
+                Add(coordinate);
             }
         }
 
         /// <summary>
         /// 현재 확정 선택 목록과 타일 선택 표시를 제거합니다.
         /// </summary>
-        protected override void ClearTarget()
+        protected override void Clear()
         {
             foreach (GameObject selectionUI in selectionUIMap.Values)
             {
@@ -66,17 +66,17 @@ namespace TRPG.Runtime
 
             selectionUIMap.Clear();
             selectedCoordinates.Clear();
-            targets.Clear();
+            selected.Clear();
         }
 
         /// <summary>
         /// 확정 Target 목록에 타일 좌표를 중복 없이 추가합니다.
         /// </summary>
-        protected override void AddTarget(Vector2Int selectedTarget)
+        protected override void Add(Vector2Int selectedTarget)
         {
-            if (targets.Contains(selectedTarget) == false)
+            if (selected.Contains(selectedTarget) == false)
             {
-                targets.Add(selectedTarget);
+                selected.Add(selectedTarget);
             }
         }
 

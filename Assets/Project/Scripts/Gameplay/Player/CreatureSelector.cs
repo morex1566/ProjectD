@@ -18,7 +18,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 드래그 사각형 안에 들어온 크리처의 선택 표시를 갱신합니다.
         /// </summary>
-        protected override void SelectTargets(Camera cam, Vector2 startScreenPosition, Vector2 endScreenPosition)
+        protected override void Selects(Camera cam, Vector2 startScreenPosition, Vector2 endScreenPosition)
         {
             SetSelection(FindCreatures(cam, startScreenPosition, endScreenPosition));
         }
@@ -26,7 +26,7 @@ namespace TRPG.Runtime
         /// <summary>
         /// 클릭 위치를 포함하는 크리처 하나의 선택 표시를 갱신합니다.
         /// </summary>
-        protected override void SelectTarget(Camera cam, Vector2 pointerWorldPosition)
+        protected override void Select(Camera cam, Vector2 pointerWorldPosition)
         {
             HashSet<CreatureController> currentSelectedCreatures = new();
 
@@ -44,18 +44,18 @@ namespace TRPG.Runtime
         /// </summary>
         protected override void CompleteSelection()
         {
-            targets.Clear();
+            selected.Clear();
 
             foreach (CreatureController creature in selectedCreatures)
             {
-                AddTarget(creature);
+                Add(creature);
             }
         }
 
         /// <summary>
         /// 현재 확정 선택 목록과 표시를 제거합니다.
         /// </summary>
-        protected override void ClearTarget()
+        protected override void Clear()
         {
             foreach (GameObject selectionUI in selectionUIMap.Values)
             {
@@ -67,20 +67,20 @@ namespace TRPG.Runtime
 
             selectionUIMap.Clear();
             selectedCreatures.Clear();
-            targets.Clear();
+            selected.Clear();
         }
 
         /// <summary>
         /// 확정 Target 목록에 크리처를 중복 없이 추가합니다.
         /// </summary>
-        protected override void AddTarget(CreatureController creature)
+        protected override void Add(CreatureController creature)
         {
-            if (creature == null || targets.Contains(creature) == true)
+            if (creature == null || selected.Contains(creature) == true)
             {
                 return;
             }
 
-            targets.Add(creature);
+            selected.Add(creature);
         }
 
         /// <summary>

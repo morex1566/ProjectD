@@ -34,7 +34,7 @@ public class ExcelImporter : AssetPostprocessor
 		}
 	}
 
-	static List<ExcelAssetInfo> cachedInfos = null; // ClearTarget on compile.
+	static List<ExcelAssetInfo> cachedInfos = null; // Clear on compile.
 
 	/// <summary>
 	/// 엑셀 파일이 임포트되면 대응되는 ScriptableObject 에셋을 갱신합니다.
@@ -313,7 +313,7 @@ public class ExcelImporter : AssetPostprocessor
 		List<string> excelColumnNames = GetFieldNamesFromSheetHeader(sheet);
 
 		Type listType = typeof(List<>).MakeGenericType(entityType);
-		MethodInfo listAddMethod = listType.GetMethod("AddTarget", new Type[]{entityType});
+		MethodInfo listAddMethod = listType.GetMethod("Add", new Type[]{entityType});
 		object list = Activator.CreateInstance(listType);
 
 		// row of index 0 is header

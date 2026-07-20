@@ -136,8 +136,6 @@ namespace TRPG.Runtime
     /// </summary>
     public class CreatureMoveJob : CreatureJob
     {
-        public override int PriorityInJobQueue => 1000;
-
         private readonly Vector2Int targetCoordinate;
 
         private readonly List<WorldPathAction> path = new();
@@ -150,10 +148,53 @@ namespace TRPG.Runtime
 
         public int PathIndex => pathIndex;
 
+        public bool hasPath = false;
+
+        public bool IsPathComplete => hasPath == true && pathIndex >= path.Count;
+
+        public override int PriorityInJobQueue => 1000;
+
 
         public CreatureMoveJob(CreatureController controller, Vector2Int targetCoordinate) : base(controller)
         {
             this.targetCoordinate = targetCoordinate;
+
+            if (WorldManager.TryGetWorldMap(out WorldMap map) == false)
+            {
+                hasPath = false;
+                return;
+            }
+
+            Vector2Int startCoordinate = WorldManager.WorldToTileCoordinate(controller.transform.position);
+            WorldPathMovementProfile movementProfile = controller.CreatePathMovementProfile();
+
+            if (WorldPathfinder.TryFindPath(map, startCoordinate, targetCoordinate, movementProfile, out path) == false)
+            {
+                hasPath = false;
+                return;
+            }
+
+            hasPath = true;
+        }
+
+        public void SetPathIndex(int index)
+        {
+            pathIndex = index;
+        }
+
+        public bool IsPathCompleted()
+        {
+            return hasPath == true && pathIndex >= path.Count;
+        }
+
+        public WorldPathAction GetCurrentPathAction()
+        {
+            return path[pathIndex];
+        }
+
+        public void Advance()
+        {
+            pathIndex++;
         }
     }
 

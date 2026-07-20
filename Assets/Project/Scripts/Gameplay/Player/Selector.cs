@@ -25,10 +25,10 @@ namespace TRPG.Runtime
 
         private bool isPointerDown = false;
 
-        protected readonly List<T> targets = new();
+        protected readonly List<T> selected = new();
 
 
-        public virtual IReadOnlyList<T> Targets => targets;
+        public virtual IReadOnlyList<T> Selecteds => selected;
 
         public event Action SelectionCompleted;
 
@@ -69,7 +69,7 @@ namespace TRPG.Runtime
             }
 
             isPointerDown = false;
-            ClearTarget();
+            Clear();
             HideSelectionBox();
         }
 
@@ -87,7 +87,7 @@ namespace TRPG.Runtime
             if (Pointer.current == null || cam == null)
             {
                 isPointerDown = false;
-                ClearTarget();
+                Clear();
                 HideSelectionBox();
                 return;
             }
@@ -96,29 +96,29 @@ namespace TRPG.Runtime
             float dragSqrDistance = (pointerScreenPosition - startPointerDownScreenPosition).sqrMagnitude;
             if (dragSqrDistance < dragThreshold * dragThreshold)
             {
-                ClearTarget();
+                Clear();
                 HideSelectionBox();
                 return;
             }
 
             ShowSelectionBox(startPointerDownScreenPosition, pointerScreenPosition);
-            SelectTargets(cam, startPointerDownScreenPosition, pointerScreenPosition);
+            Selects(cam, startPointerDownScreenPosition, pointerScreenPosition);
         }
 
-        protected abstract void SelectTargets(Camera cam, Vector2 startScreenPosition, Vector2 endScreenPosition);
+        protected abstract void Selects(Camera cam, Vector2 startScreenPosition, Vector2 endScreenPosition);
 
-        protected abstract void SelectTarget(Camera cam, Vector2 pointerWorldPosition);
+        protected abstract void Select(Camera cam, Vector2 pointerWorldPosition);
 
         protected abstract void CompleteSelection();
 
-        protected virtual void ClearTarget()
+        protected virtual void Clear()
         {
-            targets.Clear();
+            selected.Clear();
         }
 
-        protected virtual void AddTarget(T selected)
+        protected virtual void Add(T selected)
         {
-            targets.Add(selected);
+            this.selected.Add(selected);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace TRPG.Runtime
             if (Pointer.current == null)
             {
                 isPointerDown = false;
-                ClearTarget();
+                Clear();
                 HideSelectionBox();
                 return;
             }
@@ -165,7 +165,7 @@ namespace TRPG.Runtime
                 CacheCamera();
             }
 
-            ClearTarget();
+            Clear();
             startPointerDownScreenPosition = pointerScreenPosition;
             isPointerDown = true;
         }
@@ -185,13 +185,13 @@ namespace TRPG.Runtime
 
             if (ScreenEx.IsPointerOverUI(pointerScreenPosition) == true)
             {
-                ClearTarget();
+                Clear();
                 return;
             }
 
             if (cam == null)
             {
-                ClearTarget();
+                Clear();
                 return;
             }
 
@@ -199,13 +199,13 @@ namespace TRPG.Runtime
             float dragSqrDistance = (pointerScreenPosition - startPointerDownScreenPosition).sqrMagnitude;
             if (dragSqrDistance >= dragThreshold * dragThreshold)
             {
-                SelectTargets(cam, startPointerDownScreenPosition, pointerScreenPosition);
+                Selects(cam, startPointerDownScreenPosition, pointerScreenPosition);
             }
             // 클릭 수준
             else 
             if (MouseEx.TryGetWorldPosition(cam, pointerScreenPosition, out Vector3 pointerWorldPosition) == true)
             {
-                SelectTarget(cam, pointerWorldPosition);
+                Select(cam, pointerWorldPosition);
             }
 
             CompleteSelection();

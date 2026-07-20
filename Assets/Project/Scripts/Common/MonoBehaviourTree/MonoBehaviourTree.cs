@@ -150,7 +150,7 @@ namespace MBT
                         _TickMarker.End();
                         return;
                     } else {
-                        // AddTarget child to execution stack and execute it in next loop
+                        // Add child to execution stack and execute it in next loop
                         executionStack.Add(child);
                         executionLog.Add(child);
                         // IMPORTANT: PriorityInJobQueue must be > 0 and assigned in this order
