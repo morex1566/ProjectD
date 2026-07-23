@@ -1,38 +1,23 @@
+using System;
+using UnityEngine;
+
 namespace TRPG.Runtime
 {
-    /// <summary>
-    /// 월드 타일의 재질입니다.
-    /// </summary>
-    public enum WorldTileMaterialType : byte
+    [Flags]
+    public enum WorldTileFlag
     {
-        Empty = 0,
-        Soil,
-        Stone,
-        Sand,
-        Water,
+        None = 0,
+        Gate = 1 << 0,
+        Road = 1 << 1,
+        Spawnable = 1 << 2,
+        Building = 1 << 3,
+        Enviroment = 1 << 4,
     }
 
-    /// <summary>
-    /// 월드의 논리적인 타일 한 칸입니다.
-    /// </summary>
+    [Serializable]
     public struct WorldTile
     {
-        /// <summary>
-        /// 타일을 표현하는 지형 재질입니다.
-        /// </summary>
-        public WorldTileMaterialType MaterialType;
-
-        /// <summary>
-        /// 완전히 비어 있는 타일인지 반환합니다.
-        /// </summary>
-        public bool IsEmpty => MaterialType == WorldTileMaterialType.Empty;
-
-        /// <summary>
-        /// 재질을 지정하여 타일을 생성합니다.
-        /// </summary>
-        public WorldTile(WorldTileMaterialType materialType)
-        {
-            MaterialType = materialType;
-        }
+        public Vector3Int CellPosition;
+        public WorldTileFlag Flag;
     }
 }

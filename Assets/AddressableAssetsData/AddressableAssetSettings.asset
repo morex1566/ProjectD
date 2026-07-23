@@ -101,10 +101,7 @@ MonoBehaviour:
     m_ProfileVersion: 1
   m_LabelTable:
     m_LabelNames:
-    - Map
-    - Creature
     - Core
-    - CreatureData
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 67df9be4093f78946bd5edce5bc67270, type: 2}

@@ -12,34 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1573807f418ce341884e4ede7912622, type: 3}
   m_Name: SO_CreatureSheet
   m_EditorClassIdentifier: TRPG.Runtime::TRPG.Runtime.CreatureSheet
-  Entities:
-  - Id: creature_dwarf_001
-    Name: dwarf
-    Description: 
-    Faction: Human
-    Hp: 5
-    Damage: 5
-    DetectRange: 5
-    AttackRange: 1
-    AttackSpeed: 5
-    MoveSpeed: 5
-    AIType: Ground
-    PrefabPath: Assets/Project/Prefabs/Gameplay/PF_creature_dwarf_001.prefab
-    Sprite: {fileID: 21300000, guid: a6f1824e05c4683448a1220b334d087d, type: 3}
-    Prefab: {fileID: 1542031678423563330, guid: 892398fa3c9e757459883f3199f0fa5e, type: 3}
-    BehaviourTree: {fileID: 2770895693265254133, guid: 6b6957f79e572244a80ef9fff6713d8c, type: 3}
-  - Id: creature_lizard_001
-    Name: lizard
-    Description: 
-    Faction: Monster
-    Hp: 5
-    Damage: 5
-    DetectRange: 5
-    AttackRange: 1
-    AttackSpeed: 5
-    MoveSpeed: 5
-    AIType: Ground
-    PrefabPath: Assets/Project/Prefabs/Gameplay/PF_creature_lizard_001.prefab
-    Sprite: {fileID: 21300000, guid: 30079013dd9c93e47a948521ea457742, type: 3}
-    Prefab: {fileID: 8412114094265309582, guid: bc1aea319fc54ba42b06446bb48f0114, type: 3}
-    BehaviourTree: {fileID: 2770895693265254133, guid: 40b515375dbb62a47a34ae35f5d5b692, type: 3}
+  Entities: []

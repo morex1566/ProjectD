@@ -20,14 +20,12 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 씬 오브젝트가 로드된 뒤 씬 의존 매니저들을 초기화합니다.
+        /// 씬 오브젝트가 로드된 뒤 씬 의존 UI 매니저를 초기화합니다.
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void OnAfterSceneLoaded()
         {
             UIManager.Init();
-            WorldManager.Init();
-            PlayerManager.Init();
         }
 
         /// <summary>
@@ -43,8 +41,6 @@ namespace TRPG.Runtime
         /// </summary>
         protected override void OnDestroy()
         {
-            PlayerManager.Destroy();
-            WorldManager.Destroy();
             UIManager.Destroy();
             InputManager.Destroy();
             DOTweenManager.Destroy();

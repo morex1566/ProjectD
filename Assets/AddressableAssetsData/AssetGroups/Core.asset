@@ -15,18 +15,6 @@ MonoBehaviour:
   m_GroupName: Core
   m_GUID: 4bcec18cbf956b3498a87dcbcb54eeeb
   m_SerializeEntries:
-  - m_GUID: 099cfefca6d047d89863ba4bee854710
-    m_Address: SO_WorldManagerSettings
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 23dac19e3f940bd489566dcb08380d8a
-    m_Address: SO_PlayerManagerSettings
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Core
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 28c26837290c4d8489cab122b7461198
     m_Address: SO_ResourceManagerSettings
     m_ReadOnly: 0
