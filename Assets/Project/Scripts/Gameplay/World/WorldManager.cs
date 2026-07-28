@@ -54,6 +54,13 @@ namespace TRPG.Runtime
             return true;
         }
 
+        public static bool TryGetMouseWorldPosition(out Vector3 worldPosition)
+        {
+            worldPosition = default;
+
+            return MouseEx.TryGetMouseWorldPosition(cameraController.Cam, out worldPosition);
+        }
+
         private void CacheComponents()
         {
             gridController = GameObject.FindWithTag(UnityConstant.Tags.WorldGridController).GetComponentInHierarchy<WorldGridController>();

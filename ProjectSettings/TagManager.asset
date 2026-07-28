@@ -8,6 +8,9 @@ TagManager:
   - WorldCamera
   - WorldGenerator
   - WorldGridController
+  - PlayerManager
+  - WorldManager
+  - OverlayCanvas
   layers:
   - Default
   - TransparentFX
@@ -19,8 +22,8 @@ TagManager:
   - WorldUI
   - CameraUI
   - 
-  - 
-  - 
+  - Creature
+  - AllyCreature
   - 
   - 
   - 

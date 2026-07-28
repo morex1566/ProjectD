@@ -12,8 +12,9 @@ namespace TRPG.Runtime
         [Header("Tile Assets")]
         [SerializeField] private TileBase gateTile;
         [SerializeField] private TileBase roadTile;
-        [SerializeField] private TileBase spawnableTile;
-        [SerializeField] private TileBase buildingTile;
+        [SerializeField] private TileBase castleTile;
+        [SerializeField] private TileBase forestTile;
+        [SerializeField] private TileBase farmTile;
 
 
         private void OnValidate()
@@ -35,7 +36,7 @@ namespace TRPG.Runtime
             {
                 WorldTile worldTile = worldTiles[i];
 
-                if (TryGetTileAsset(worldTile.Flag, out TileBase tileAsset) == false)
+                if (TryGetTileAsset(worldTile.Type, out TileBase tileAsset) == false)
                 {
                     continue;
                 }
@@ -49,7 +50,7 @@ namespace TRPG.Runtime
         /// </summary>
         public void SetTile(WorldTile worldTile)
         {
-            if (TryGetTileAsset(worldTile.Flag, out TileBase tileAsset) == false)
+            if (TryGetTileAsset(worldTile.Type, out TileBase tileAsset) == false)
             {
                 return;
             }
@@ -66,36 +67,38 @@ namespace TRPG.Runtime
         }
 
         /// <summary>
-        /// 타일 플래그에 맞는 시각적 타일 에셋을 반환합니다.
+        /// 월드 타일 타입에 대응하는 시각적 타일 에셋을 반환합니다.
         /// </summary>
-        private bool TryGetTileAsset(WorldTileFlag flag, out TileBase tileAsset)
+        private bool TryGetTileAsset(WorldTileType type, out TileBase tileAsset)
         {
-            if ((flag & WorldTileFlag.Gate) != 0)
+            switch (type)
             {
-                tileAsset = gateTile;
-                return tileAsset != null;
+                case WorldTileType.Gate:
+                    tileAsset = gateTile;
+                    break;
+
+                case WorldTileType.Road:
+                    tileAsset = roadTile;
+                    break;
+
+                case WorldTileType.Castle:
+                    tileAsset = castleTile;
+                    break;
+
+                case WorldTileType.Forest:
+                    tileAsset = forestTile;
+                    break;
+
+                case WorldTileType.Farm:
+                    tileAsset = farmTile;
+                    break;
+
+                default:
+                    tileAsset = null;
+                    break;
             }
 
-            if ((flag & WorldTileFlag.Building) != 0)
-            {
-                tileAsset = buildingTile;
-                return tileAsset != null;
-            }
-
-            if ((flag & WorldTileFlag.Road) != 0)
-            {
-                tileAsset = roadTile;
-                return tileAsset != null;
-            }
-
-            if ((flag & WorldTileFlag.Spawnable) != 0)
-            {
-                tileAsset = spawnableTile;
-                return tileAsset != null;
-            }
-
-            tileAsset = null;
-            return false;
+            return tileAsset != null;
         }
 
         private void CacheComponents()

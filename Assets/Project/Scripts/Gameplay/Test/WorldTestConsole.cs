@@ -1,17 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Tilemaps;
 
 namespace TRPG.Runtime
 {
     public class WorldTestConsole : MonoBehaviour
     {
-        [SerializeField] private bool isCastle = false;
-
-        [SerializeField] private bool isForest = false;
-
-        [SerializeField] private bool isFarm = false;
-
+        [SerializeField] private WorldTileType selectedTileType = WorldTileType.None;
 
         private void OnEnable()
         {
@@ -31,104 +25,51 @@ namespace TRPG.Runtime
 
         private void OnLeftClickPerformed(InputAction.CallbackContext context)
         {
+            if (selectedTileType == WorldTileType.None)
+            {
+                return;
+            }
+
             if (WorldManager.TryGetMouseCellPosition(out Vector3Int cellPosition) == false)
             {
                 return;
             }
 
-            if (isCastle == true)
+            WorldTile worldTile = new WorldTile()
             {
-                SetCastleTIle(cellPosition);
-                return;
-            }
+                CellPosition = cellPosition,
+                Type = selectedTileType,
+                Flag = GetTileFlag(selectedTileType)
+            };
 
-            if (isForest == true)
-            {
-                SetForestTile(cellPosition);
-                return;
-            }
-
-            if (isFarm == true)
-            {
-                SetFarmTile(cellPosition);
-                return;
-            }
+            WorldManager.SetTile(worldTile);
         }
 
         /// <summary>
-        /// WorldManager에 저장된 월드 타일을 배치합니다.
+        /// 타일 타입에 필요한 게임 로직 플래그를 반환합니다.
         /// </summary>
-        public void SetCastleTIle(Vector3Int cellPosition)
+        private WorldTileFlag GetTileFlag(WorldTileType type)
         {
-            WorldTile tile = new WorldTile()
+            switch (type)
             {
-                CellPosition = cellPosition,
-                Flag = WorldTileFlag.Building
-            };
+                case WorldTileType.Gate:
+                    return WorldTileFlag.Gate | WorldTileFlag.Road;
 
-            WorldManager.SetTile(tile);
-        }
+                case WorldTileType.Road:
+                    return WorldTileFlag.Road;
 
-        public void SetForestTile(Vector3Int cellPosition)
-        {
-            WorldTile tile = new WorldTile()
-            {
-                CellPosition = cellPosition,
-                Flag = WorldTileFlag.Enviroment
-            };
+                case WorldTileType.Castle:
+                    return WorldTileFlag.Building;
 
-            WorldManager.SetTile(tile);
-        }
+                case WorldTileType.Forest:
+                    return WorldTileFlag.Environment;
 
-        public void SetFarmTile(Vector3Int cellPosition)
-        {
-            WorldTile tile = new WorldTile()
-            {
-                CellPosition = cellPosition,
-                Flag = WorldTileFlag.Building
-            };
+                case WorldTileType.Farm:
+                    return WorldTileFlag.Building | WorldTileFlag.Spawnable;
 
-            WorldManager.SetTile(tile);
+                default:
+                    return WorldTileFlag.None;
+            }
         }
     }
 }
-
-//#if UNITY_EDITOR
-
-//namespace TRPG.Editor
-//{
-//    using NUnit.Framework.Internal;
-//    using TRPG.Runtime;
-//    using UnityEditor;
-//    using UnityEngine;
-
-//    [CustomEditor(typeof(WorldTestConsole))]
-//    public class WorldTestConsoleEditor : UnityEditor.Editor
-//    {
-//        public override void OnInspectorGUI()
-//        {
-//            DrawDefaultInspector();
-//            EditorGUILayout.Space();
-
-//            if (GUILayout.Button("castle"))
-//            {
-//                WorldTestConsole test = (WorldTestConsole)target;
-//                test.SetCastleTIle();
-//            }
-
-//            if (GUILayout.Button("forest"))
-//            {
-//                WorldTestConsole test = (WorldTestConsole)target;
-//                test.SetCastleTIle();
-//            }
-
-//            if (GUILayout.Button("farm"))
-//            {
-//                WorldTestConsole test = (WorldTestConsole)target;
-//                test.SetCastleTIle();
-//            }
-//        }
-//    }
-//}
-
-//#endif

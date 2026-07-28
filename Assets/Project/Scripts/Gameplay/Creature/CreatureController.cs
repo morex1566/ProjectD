@@ -4,16 +4,35 @@ namespace TRPG.Runtime
 {
     public class CreatureController : MonoBehaviour
     {
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
+        [SerializeField, ReadOnly] private SpriteRenderer spriter;
+
+        [SerializeField, ReadOnly] private Animator animator;
+
+        [SerializeField] private BoxCollider2D hitBox;
+
+
+        private void OnValidate()
         {
-        
+            CacheComponents();
+            SetLayers();
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Awake()
         {
-        
+            CacheComponents();
+            SetLayers();
+        }
+
+        private void CacheComponents()
+        {
+            spriter = gameObject.GetComponentInHierarchy<SpriteRenderer>();
+            animator = gameObject.GetComponentInHierarchy<Animator>();
+        }
+
+        private void SetLayers()
+        {
+            int layer = LayerMask.NameToLayer(UnityConstant.Layers.Creature);
+            gameObject.layer = layer;
         }
     }
 }

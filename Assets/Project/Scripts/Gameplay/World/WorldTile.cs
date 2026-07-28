@@ -3,6 +3,16 @@ using UnityEngine;
 
 namespace TRPG.Runtime
 {
+    public enum WorldTileType
+    {
+        None,
+        Gate,
+        Road,
+        Castle,
+        Forest,
+        Farm
+    }
+
     [Flags]
     public enum WorldTileFlag
     {
@@ -11,13 +21,14 @@ namespace TRPG.Runtime
         Road = 1 << 1,
         Spawnable = 1 << 2,
         Building = 1 << 3,
-        Enviroment = 1 << 4,
+        Environment = 1 << 4,
     }
 
     [Serializable]
-    public struct WorldTile
+    public class WorldTile
     {
         public Vector3Int CellPosition;
+        public WorldTileType Type;
         public WorldTileFlag Flag;
     }
 }

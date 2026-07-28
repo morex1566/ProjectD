@@ -109,12 +109,12 @@ namespace TRPG.Runtime
 
             if (spriteRenderer == null)
             {
-                spriteRenderer = GetComponent<SpriteRenderer>();
+                spriteRenderer = gameObject.GetComponentInHierarchy<SpriteRenderer>();
             }
 
             if (spriteRenderer == null)
             {
-                spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
+                spriteRenderer = gameObject.GetComponentInHierarchy<SpriteRenderer>(true);
             }
         }
 
